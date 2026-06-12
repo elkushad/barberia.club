@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id @default(cuid())
+  name          String?
+  email         String?      @unique
+  password      String?
+  role          String       @default("OWNER") // ADMIN, OWNER
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  barbershops   Barbershop[]
+}
+
+model Barbershop {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  name        String
+  logo        String?
+  banner      String?
+  description String?
+  services    String?    // JSON string for simplicity in MVP
+  hours       String?    // JSON string for simplicity in MVP
+  address     String?
+  whatsapp    String?
+  brandColor  String?    @default("#000000")
+  ownerId     String
+  owner       User       @relation(fields: [ownerId], references: [id])
+  customers   Customer[]
+  rewards     Reward[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Customer {
+  id           String       @id @default(cuid())
+  name         String
+  phone        String
+  status       String       @default("PENDING") // PENDING, ACTIVE
+  uniqueCode   String?      @unique
+  barbershopId String
+  barbershop   Barbershop   @relation(fields: [barbershopId], references: [id])
+  visits       Visit[]
+  redemptions  Redemption[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@unique([phone, barbershopId]) // Phone must be unique per barbershop
+}
+
+model Visit {
+  id           String     @id @default(cuid())
+  status       String     @default("PENDING") // PENDING, CONFIRMED, REJECTED
+  customerId   String
+  customer     Customer   @relation(fields: [customerId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Reward {
+  id             String       @id @default(cuid())
+  name           String
+  image          String?
+  visitsRequired Int
+  barbershopId   String
+  barbershop     Barbershop   @relation(fields: [barbershopId], references: [id])
+  redemptions    Redemption[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Redemption {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+  rewardId   String
+  reward     Reward   @relation(fields: [rewardId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

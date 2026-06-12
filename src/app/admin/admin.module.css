@@ -1,0 +1,244 @@
+.adminLayout {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+}
+
+.navbar {
+  background: rgba(18, 18, 18, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #facc15, #eab308);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.navMenuLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-right: 1.5rem;
+  padding-right: 1.5rem;
+  border-right: 1px solid var(--border-color);
+}
+
+.navLinkItem {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.navLinkItem:hover {
+  color: var(--text-primary);
+}
+
+.userName {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.logoutBtn {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+}
+
+.logoutBtn:hover {
+  background-color: var(--border-color);
+}
+
+.mainContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Customer Card Layout */
+.customerCard {
+  background: rgba(30, 30, 30, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  grid-template-rows: auto auto;
+  gap: 0.5rem 2rem;
+  align-items: center;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.customerCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.customerInfo {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.customerActions {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.customerRewards {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: auto;
+}
+
+/* Hamburger Menu Button (Hidden on Desktop) */
+.hamburgerBtn {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 20;
+}
+
+.hamburgerLine {
+  width: 2rem;
+  height: 0.25rem;
+  background-color: var(--accent-primary);
+  border-radius: 10px;
+  transition: all 0.3s linear;
+  position: relative;
+  transform-origin: 1px;
+}
+
+.line1Open { transform: rotate(45deg); }
+.line2Open { opacity: 0; transform: translateX(20px); }
+.line3Open { transform: rotate(-45deg); }
+
+/* Responsive Mobile Optimizations */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.5rem 1rem;
+  }
+  
+  .navContainer {
+    flex-wrap: nowrap; /* Force 1 line for header */
+  }
+
+  .hamburgerBtn {
+    display: flex;
+  }
+  
+  .navActions {
+    display: none; /* Hidden by default on mobile */
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    
+    /* Overlay Effect */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(18, 18, 18, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    z-index: 99;
+  }
+
+  .navMenuLinks {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-right: 0;
+    padding-right: 0;
+    border-right: none;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .navLinkItem {
+    width: 100%;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .navActionsOpen {
+    display: flex; /* Show when open */
+  }
+  
+  .mainContent {
+    padding: 1rem;
+  }
+
+  .customerCard {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  .customerInfo {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .customerRewards {
+    grid-column: 1;
+    grid-row: 2; /* Now in the middle on mobile */
+    padding-top: 0.5rem;
+    padding-bottom: 0.25rem;
+  }
+  .customerActions {
+    grid-column: 1;
+    grid-row: 3;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+  }
+}
