@@ -45,7 +45,7 @@ export default async function ClientesPage({
   if (search) {
     activeCustomers = activeCustomers.filter(c => 
       c.name.toLowerCase().includes(search) || 
-      c.uniqueCode.toLowerCase().includes(search) || 
+      (c.uniqueCode && c.uniqueCode.toLowerCase().includes(search)) || 
       (c.phone && c.phone.includes(search))
     );
   }
