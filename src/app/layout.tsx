@@ -6,9 +6,35 @@ import AuthProvider from "@/components/AuthProvider";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://barberia.club";
+
 export const metadata: Metadata = {
-  title: "barberia.club - El club de tu barbería",
-  description: "Sistema centralizado para barberías",
+  metadataBase: new URL(appUrl),
+  title: {
+    default: "barberia.club — Fideliza a los clientes de tu barbería",
+    template: "%s · barberia.club",
+  },
+  description:
+    "Crea tu cuenta gratis, obtén tu flyer con código QR y premia la fidelidad de tus clientes con un sistema de recompensas pensado para barberías.",
+  applicationName: "barberia.club",
+  keywords: ["barbería", "fidelización", "recompensas", "código QR", "clientes", "barber"],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "es_ES",
+    url: appUrl,
+    siteName: "barberia.club",
+    title: "barberia.club — Fideliza a los clientes de tu barbería",
+    description:
+      "Crea tu cuenta gratis, obtén tu flyer con código QR y premia la fidelidad de tus clientes.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "barberia.club",
+    description:
+      "Fideliza a los clientes de tu barbería con recompensas y un flyer con código QR.",
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
