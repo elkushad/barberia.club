@@ -26,7 +26,7 @@ export default function CarouselBackground({ mediaUrls }: { mediaUrls: string[] 
 
         return (
           <div 
-            key={url}
+            key={index}
             style={{
               position: 'absolute',
               top: 0,
@@ -48,12 +48,10 @@ export default function CarouselBackground({ mediaUrls }: { mediaUrls: string[] 
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
               />
             ) : (
-              <Image 
+              <img 
                 src={url} 
                 alt={`Fondo ${index}`} 
-                fill 
-                priority={index === 0}
-                style={{ objectFit: 'cover' }} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
               />
             )}
           </div>
@@ -67,7 +65,7 @@ export default function CarouselBackground({ mediaUrls }: { mediaUrls: string[] 
         left: 0,
         width: '100%',
         height: '100%',
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.9))',
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.85))',
         zIndex: 1
       }} />
     </>

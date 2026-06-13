@@ -33,7 +33,7 @@ export default async function PublicLandingPage({ params }: { params: Promise<{ 
       
       {/* Background Layer */}
       {bannerUrls.length > 0 && (
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, opacity: 0.3 }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
           <CarouselBackground mediaUrls={bannerUrls} />
         </div>
       )}
