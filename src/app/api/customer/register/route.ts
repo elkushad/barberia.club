@@ -1,9 +1,25 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
+
+const RegisterCustomerSchema = z.object({
+  phone: z.string().trim().min(3).max(30),
+  name: z.string().trim().min(1).max(80),
+  barbershopId: z.string().min(1),
+});
 
 export async function POST(req: Request) {
   try {
-    const { phone, name, barbershopId } = await req.json();
+    if (!rateLimit(`customer-register:${clientIp(req)}`, 5, 60_000)) {
+      return NextResponse.json({ error: "Demasiados intentos. Intenta más tarde." }, { status: 429 });
+    }
+
+    const parsed = RegisterCustomerSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+    }
+    const { phone, name, barbershopId } = parsed.data;
     
     if (!phone || !name || !barbershopId) {
       return NextResponse.json({ error: "Faltan datos" }, { status: 400 });
@@ -32,7 +48,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "La barbería no acepta más clientes en este momento." }, { status: 403 });
     }
 
-    const customer = await prisma.customer.create({
+    await prisma.customer.create({
       data: {
         name,
         phone,
@@ -41,7 +57,7 @@ export async function POST(req: Request) {
       }
     });
 
-    return NextResponse.json({ success: true, customer });
+    return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Error en el servidor" }, { status: 500 });
   }

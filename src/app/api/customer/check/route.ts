@@ -1,9 +1,24 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
+
+const CheckSchema = z.object({
+  phone: z.string().trim().min(3).max(30),
+  barbershopId: z.string().min(1),
+});
 
 export async function POST(req: Request) {
   try {
-    const { phone, barbershopId } = await req.json();
+    if (!rateLimit(`check:${clientIp(req)}`, 20, 60_000)) {
+      return NextResponse.json({ error: "Demasiados intentos. Intenta más tarde." }, { status: 429 });
+    }
+
+    const parsed = CheckSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+    }
+    const { phone, barbershopId } = parsed.data;
     
     if (!phone || !barbershopId) {
       return NextResponse.json({ error: "Faltan datos" }, { status: 400 });
@@ -14,7 +29,15 @@ export async function POST(req: Request) {
     });
 
     if (customer) {
-      return NextResponse.json({ exists: true, customer });
+      return NextResponse.json({
+        exists: true,
+        customer: {
+          id: customer.id,
+          name: customer.name,
+          status: customer.status,
+          uniqueCode: customer.uniqueCode,
+        },
+      });
     } else {
       return NextResponse.json({ exists: false });
     }

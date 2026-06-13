@@ -1,9 +1,23 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
+
+const VisitSchema = z.object({
+  customerId: z.string().min(1),
+});
 
 export async function POST(req: Request) {
   try {
-    const { customerId } = await req.json();
+    if (!rateLimit(`visit:${clientIp(req)}`, 10, 60_000)) {
+      return NextResponse.json({ error: "Demasiados intentos. Intenta más tarde." }, { status: 429 });
+    }
+
+    const parsed = VisitSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+    }
+    const { customerId } = parsed.data;
     
     if (!customerId) {
       return NextResponse.json({ error: "Faltan datos" }, { status: 400 });
@@ -29,14 +43,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Ya tienes una visita pendiente de confirmar hoy" }, { status: 400 });
     }
 
-    const visit = await prisma.visit.create({
+    await prisma.visit.create({
       data: {
         customerId,
         status: "PENDING",
       }
     });
 
-    return NextResponse.json({ success: true, visit });
+    return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Error en el servidor" }, { status: 500 });
   }

@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import { rateLimit, clientIp } from '@/lib/rate-limit';
+
+const RegisterSchema = z.object({
+  barberName: z.string().trim().min(2).max(80),
+  email: z.string().trim().email().max(120),
+  password: z.string().min(6).max(200),
+});
 
 function generateSlug(name: string): string {
   return name
@@ -13,7 +21,15 @@ function generateSlug(name: string): string {
 
 export async function POST(req: Request) {
   try {
-    const { barberName, email, password } = await req.json();
+    if (!rateLimit(`register:${clientIp(req)}`, 5, 60_000)) {
+      return NextResponse.json({ error: 'Demasiados intentos. Intenta más tarde.' }, { status: 429 });
+    }
+
+    const parsed = RegisterSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 });
+    }
+    const { barberName, email, password } = parsed.data;
 
     if (!barberName || !email || !password) {
       return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
