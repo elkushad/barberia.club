@@ -36,8 +36,11 @@ model Barbershop {
   customers   Customer[]
   rewards     Reward[]
   plan        String     @default("FREE") // FREE or PRO
+  status      String     @default("ACTIVE") // ACTIVE, SUSPENDED
+  expiresAt   DateTime?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+  payments    Payment[]
 }
 
 model Customer {
@@ -85,4 +88,16 @@ model Redemption {
   reward     Reward   @relation(fields: [rewardId], references: [id])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model Payment {
+  id           String     @id @default(cuid())
+  amount       Float
+  currency     String     @default("PEN")
+  status       String     @default("PAID") // PAID, PENDING, FAILED
+  method       String     @default("CREDIT_CARD")
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }

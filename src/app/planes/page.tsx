@@ -21,6 +21,34 @@ export default function PlanesPage() {
             </div>
           </ScrollAnimation>
 
+          <ScrollAnimation delay="delay-100">
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: '1.5rem',
+              border: '1px solid var(--saas-border)',
+              borderRadius: '12px',
+              padding: '1.25rem 2rem',
+              maxWidth: 'fit-content',
+              margin: '0 auto 4rem auto',
+              backgroundColor: 'transparent'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span style={{ fontSize: '0.95rem', color: '#e2e8f0' }}>Sin contratos</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span style={{ fontSize: '0.95rem', color: '#e2e8f0' }}>Cancela cuando quieras</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span style={{ fontSize: '0.95rem', color: '#e2e8f0' }}>Soporte humano</span>
+              </div>
+            </div>
+          </ScrollAnimation>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', alignItems: 'flex-start' }}>
             
             {/* PLAN GRATIS */}
@@ -35,9 +63,12 @@ export default function PlanesPage() {
                 height: '100%'
               }}>
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Gratis</h3>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '0.5rem' }}>
                   <span style={{ fontSize: '3rem', fontWeight: 700, fontFamily: 'var(--font-serif)' }}>S/.0</span>
                 </div>
+                <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: '1.4' }}>
+                  Ideal para empezar<br/>sin riesgos.
+                </p>
                 
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2.5rem 0', display: 'flex', flexDirection: 'column', gap: '1rem', color: 'var(--saas-text-muted)' }}>
                   <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
@@ -59,6 +90,14 @@ export default function PlanesPage() {
                   <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><polyline points="20 6 9 17 4 12"/></svg>
                     <span>Últimas 5 visitas en historial</span>
+                  </li>
+                  <li style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>NUEVO</span>
+                    <span>Recordatorios de citas</span>
+                  </li>
+                  <li style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>NUEVO</span>
+                    <span>Panel de estadísticas básico</span>
                   </li>
                 </ul>
 
@@ -86,10 +125,13 @@ export default function PlanesPage() {
                 </div>
                 
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem', color: 'white' }}>Pro</h3>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '0.5rem' }}>
                   <span style={{ fontSize: '3rem', fontWeight: 700, fontFamily: 'var(--font-serif)', color: 'white' }}>S/.50</span>
                   <span style={{ color: 'var(--saas-text-muted)' }}>/mes</span>
                 </div>
+                <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: '1.4' }}>
+                  Todo lo que necesitas<br/>para hacer crecer tu negocio.
+                </p>
                 
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2.5rem 0', display: 'flex', flexDirection: 'column', gap: '1rem', color: '#e2e8f0' }}>
                   <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
@@ -112,6 +154,14 @@ export default function PlanesPage() {
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><polyline points="20 6 9 17 4 12"/></svg>
                     <span><strong>Historial completo</strong> desde el inicio</span>
                   </li>
+                  <li style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>NUEVO</span>
+                    <span>Automatizaciones de fidelización</span>
+                  </li>
+                  <li style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>NUEVO</span>
+                    <span>Reportes avanzados</span>
+                  </li>
                 </ul>
 
                 <Link href="#" className="saas-btn-primary" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center', animation: 'none' }}>
@@ -121,6 +171,47 @@ export default function PlanesPage() {
             </ScrollAnimation>
 
           </div>
+
+          <ScrollAnimation delay="delay-300">
+            <div style={{ 
+              marginTop: '4rem',
+              backgroundColor: '#0d1117', 
+              borderRadius: '16px', 
+              border: '1px solid var(--saas-border)',
+              padding: '2rem',
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '2rem',
+              flexWrap: 'wrap'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                <div style={{ 
+                  width: '48px', 
+                  height: '48px', 
+                  borderRadius: '50%', 
+                  backgroundColor: 'transparent', 
+                  border: '1px solid var(--saas-red)',
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'white', marginBottom: '0.25rem' }}>¿Necesitas algo más?</h4>
+                  <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.95rem', margin: 0 }}>Planes personalizados para cadenas de barberías.</p>
+                </div>
+              </div>
+              <Link href="#" className="saas-btn-outlined" style={{ whiteSpace: 'nowrap' }}>
+                Hablar con ventas
+              </Link>
+            </div>
+          </ScrollAnimation>
         </div>
       </main>
 
