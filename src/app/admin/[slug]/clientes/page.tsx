@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import Link from "next/link";
 import styles from "../../admin.module.css";
 import FilterDropdown from "./FilterDropdown";
 import SearchInput from "./SearchInput";

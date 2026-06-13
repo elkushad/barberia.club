@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true, customer });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Error en el servidor" }, { status: 500 });
   }
 }

@@ -1,4 +1,4 @@
-import { Settings, Plug, Server, Database } from "lucide-react";
+import { Plug, Server, Database } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 
 export default async function GodmodeSistemaPage() {

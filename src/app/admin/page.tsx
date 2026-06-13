@@ -11,8 +11,8 @@ export default async function AdminDashboard() {
     redirect("/login");
   }
 
-  const role = (session.user as any)?.role;
-  const userId = (session.user as any)?.id;
+  const role = (session.user as { role?: string })?.role;
+  const userId = (session.user as { id?: string })?.id;
 
   if (role === "OWNER") {
     // Redirect owner to their barbershop panel

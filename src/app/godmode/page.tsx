@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import {
   Store, Users, CalendarCheck, Award, 
-  TrendingUp, Activity, AlertTriangle, CircleDollarSign 
+  AlertTriangle, CircleDollarSign 
 } from "lucide-react";
 import DashboardCharts from "./DashboardCharts"; // We will extract client components
 
@@ -36,15 +36,9 @@ export default async function GodmodeDashboard() {
   }, 0);
 
   // Fidelización metrics
-  const totalRewardsCreated = rewards.length;
   const totalRewardsRedeemed = rewards.reduce((acc, r) => acc + r.redemptions.length, 0);
-  const redemptionRate = totalRewardsCreated > 0 
-    ? ((totalRewardsRedeemed / (totalCustomers || 1)) * 100).toFixed(1) 
-    : "0.0";
-
   // Financial (Mock data for MVP, but PRO is 50 PEN/month usually)
-  const mrr = proBarbershops * 50; 
-  const monthlyRevenue = mrr; // Assuming all paid this month
+  const mrr = proBarbershops * 50;
 
   // We can pass data to Client Component for Charts
   const chartData = [

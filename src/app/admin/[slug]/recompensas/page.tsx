@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import fs from "fs/promises";
-import path from "path";
+import Link from "next/link";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
 import styles from "../../admin.module.css";
@@ -74,9 +73,9 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
           {limitReached ? (
             <div style={{ padding: '1.5rem', backgroundColor: 'rgba(230,57,70,0.1)', border: '1px solid var(--saas-red)', borderRadius: '8px', textAlign: 'center' }}>
               <p style={{ color: 'white', marginBottom: '1rem' }}>Has alcanzado el límite de 1 recompensa en el plan Gratis.</p>
-              <a href="/planes" className="saas-btn-primary" style={{ padding: '0.75rem 1.5rem', display: 'inline-block', animation: 'none' }}>
+              <Link href="/planes" className="saas-btn-primary" style={{ padding: '0.75rem 1.5rem', display: 'inline-block', animation: 'none' }}>
                 Actualizar al plan PRO
-              </a>
+              </Link>
             </div>
           ) : (
             <form action={createReward} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

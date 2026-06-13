@@ -26,8 +26,6 @@ export default async function GodmodeFinanzasPage() {
     .filter(p => p.status === 'PAID' && p.createdAt >= thirtyDaysAgo)
     .reduce((acc, p) => acc + p.amount, 0);
 
-  const averagePerBarbershop = barbershops.length > 0 ? (totalRevenue / barbershops.length).toFixed(2) : "0.00";
-
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>

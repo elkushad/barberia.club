@@ -13,8 +13,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/login");
   }
 
-  const role = (session.user as any)?.role;
-  const userId = (session.user as any)?.id;
+  const role = (session.user as { role?: string })?.role;
+  const userId = (session.user as { id?: string })?.id;
   
   let barbershopLogo = "";
   let barbershopName = "";

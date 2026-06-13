@@ -64,7 +64,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, message: 'Barbería registrada exitosamente' }, { status: 201 });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Registration Error:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }

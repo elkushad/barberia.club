@@ -25,7 +25,7 @@ export default async function PublicLandingPage({ params }: { params: Promise<{ 
     } else if (barbershop.banner) {
       bannerUrls = [barbershop.banner];
     }
-  } catch(e) {
+  } catch {
     if (barbershop.banner) bannerUrls = [barbershop.banner];
   }
 

@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     } else {
       return NextResponse.json({ exists: false });
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Error en el servidor" }, { status: 500 });
   }
 }

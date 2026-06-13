@@ -38,8 +38,6 @@ export default async function CustomerDashboardPage({ params }: { params: Promis
 
   const visitsCount = effectiveVisits; // Use effective visits for the UI
 
-  const brandColor = barbershop.brandColor || "#eab308";
-
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflowY: 'auto', backgroundColor: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
       

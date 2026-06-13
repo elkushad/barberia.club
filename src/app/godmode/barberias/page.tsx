@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
-import { Eye, Edit, Power, Trash2 } from "lucide-react";
+import { Eye, Power, Trash2 } from "lucide-react";
 
 export default async function GodmodeBarberiasPage() {
   await requireAdmin();

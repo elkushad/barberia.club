@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
-import { ArrowLeft, Edit, Power, Store, Users, CalendarCheck, CircleDollarSign } from "lucide-react";
+import { ArrowLeft, Store, Users, CalendarCheck, CircleDollarSign } from "lucide-react";
 
 export default async function GodmodeBarbershopDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

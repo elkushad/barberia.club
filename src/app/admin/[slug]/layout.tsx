@@ -17,8 +17,8 @@ export default async function OwnerLayout({
     redirect("/login");
   }
 
-  const userId = (session.user as any)?.id;
-  const role = (session.user as any)?.role;
+  const userId = (session.user as { id?: string })?.id;
+  const role = (session.user as { role?: string })?.role;
 
   const barbershop = await prisma.barbershop.findUnique({
     where: { slug }

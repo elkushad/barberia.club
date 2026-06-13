@@ -54,11 +54,11 @@ export default async function QRPage({ params }: { params: Promise<{ slug: strin
               </li>
               <li>
                 <strong style={{ color: 'var(--text-primary)' }}>Invita a los clientes:</strong>
-                <p style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>Diles: "Escanea este código para unirte a nuestro club y ganar cortes gratis".</p>
+                <p style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>Diles: &quot;Escanea este código para unirte a nuestro club y ganar cortes gratis&quot;.</p>
               </li>
               <li>
                 <strong style={{ color: 'var(--text-primary)' }}>Aprueba en tu panel:</strong>
-                <p style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>Cuando se registren, ve a la pestaña "Clientes" y apruébalos.</p>
+                <p style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>Cuando se registren, ve a la pestaña &quot;Clientes&quot; y apruébalos.</p>
               </li>
               <li>
                 <strong style={{ color: 'var(--text-primary)' }}>Suma visitas:</strong>

@@ -1,7 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import fs from "fs/promises";
-import path from "path";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
 
@@ -22,7 +20,7 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     } else if (barbershop.banner) {
       existingBanners = [barbershop.banner]; // legacy string
     }
-  } catch(e) {
+  } catch {
     if (barbershop.banner) existingBanners = [barbershop.banner];
   }
 
@@ -50,7 +48,7 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     }
 
     let logoUrl = currentBarbershop.logo;
-    let newBanners = [...currentBanners];
+    const newBanners = [...currentBanners];
 
     if (logoFile && logoFile.size > 0) {
       const buffer = Buffer.from(await logoFile.arrayBuffer());

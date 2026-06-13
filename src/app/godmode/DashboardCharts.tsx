@@ -2,10 +2,10 @@
 
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Legend
+  BarChart, Bar
 } from 'recharts';
 
-export default function DashboardCharts({ data }: { data: any[] }) {
+export default function DashboardCharts({ data }: { data: { name: string; barberias: number; ingresos: number }[] }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
       
