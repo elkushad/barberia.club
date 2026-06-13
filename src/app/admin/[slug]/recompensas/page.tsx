@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { assertBarbershopAccessBySlug, assertRewardAccess } from "@/lib/guards";
 import Link from "next/link";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
@@ -20,6 +21,7 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
 
   async function createReward(formData: FormData) {
     "use server";
+    await assertBarbershopAccessBySlug(slug);
     const name = formData.get("name") as string;
     const visitsRequired = parseInt(formData.get("visitsRequired") as string);
     const imageFile = formData.get("image") as File | null;
@@ -53,6 +55,7 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
   async function deleteReward(formData: FormData) {
     "use server";
     const id = formData.get("id") as string;
+    await assertRewardAccess(id);
     await prisma.reward.delete({ where: { id } });
     revalidatePath(`/admin/${slug}/recompensas`);
   }

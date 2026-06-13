@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { assertCustomerAccess, generateUniqueCode } from "@/lib/guards";
 import styles from "../../admin.module.css";
 import FilterDropdown from "./FilterDropdown";
 import SearchInput from "./SearchInput";
@@ -69,7 +70,12 @@ export default async function ClientesPage({
   async function approveCustomer(formData: FormData) {
     "use server";
     const id = formData.get("id") as string;
-    const uniqueCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    await assertCustomerAccess(id);
+
+    let uniqueCode = generateUniqueCode();
+    while (await prisma.customer.findUnique({ where: { uniqueCode } })) {
+      uniqueCode = generateUniqueCode();
+    }
     
     await prisma.customer.update({
       where: { id },
@@ -81,6 +87,7 @@ export default async function ClientesPage({
   async function rejectCustomer(formData: FormData) {
     "use server";
     const id = formData.get("id") as string;
+    await assertCustomerAccess(id);
     await prisma.customer.delete({ where: { id } });
     revalidatePath(`/admin/${slug}/clientes`);
   }

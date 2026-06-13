@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { assertBarbershopAccessBySlug } from "@/lib/guards";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
 
@@ -26,6 +27,7 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
 
   async function updateConfig(formData: FormData) {
     "use server";
+    await assertBarbershopAccessBySlug(slug);
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const brandColor = formData.get("brandColor") as string;
@@ -78,6 +80,7 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
 
   async function deleteBanner(formData: FormData) {
     "use server";
+    await assertBarbershopAccessBySlug(slug);
     const urlToDelete = formData.get("url") as string;
     
     const currentBarbershop = await prisma.barbershop.findUnique({ where: { slug } });
