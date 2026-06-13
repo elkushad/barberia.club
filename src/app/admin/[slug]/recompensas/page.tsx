@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
 import Image from "next/image";
+import styles from "../admin.module.css";
 
 export default async function RecompensasPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -60,7 +61,7 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
     <div>
       <h2 style={{ marginBottom: '1.5rem' }}>Sistema de Recompensas</h2>
       
-      <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: '1fr 1fr' }}>
+      <div className={styles.recompensasGrid}>
         
         {/* Nueva Recompensa */}
         <div className="premium-card">

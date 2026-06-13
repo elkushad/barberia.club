@@ -158,6 +158,18 @@
   transform-origin: 1px;
 }
 
+.recompensasGrid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 768px) {
+  .recompensasGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .line1Open { transform: rotate(45deg); }
 .line2Open { opacity: 0; transform: translateX(20px); }
 .line3Open { transform: rotate(-45deg); }
