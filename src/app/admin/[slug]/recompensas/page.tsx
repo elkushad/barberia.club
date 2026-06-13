@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { assertBarbershopAccessBySlug, assertRewardAccess } from "@/lib/guards";
+import { uploadToBlob } from "@/lib/storage";
 import Link from "next/link";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
@@ -35,10 +36,7 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
     let imageUrl = null;
 
     if (imageFile && imageFile.size > 0) {
-      const buffer = Buffer.from(await imageFile.arrayBuffer());
-      const base64 = buffer.toString('base64');
-      const mimeType = imageFile.type || "image/png";
-      imageUrl = `data:${mimeType};base64,${base64}`;
+      imageUrl = await uploadToBlob(imageFile, `${slug}/reward`);
     }
 
     await prisma.reward.create({

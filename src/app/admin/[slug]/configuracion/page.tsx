@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { assertBarbershopAccessBySlug } from "@/lib/guards";
+import { uploadToBlob } from "@/lib/storage";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
 
@@ -53,19 +54,12 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     const newBanners = [...currentBanners];
 
     if (logoFile && logoFile.size > 0) {
-      const buffer = Buffer.from(await logoFile.arrayBuffer());
-      const base64 = buffer.toString('base64');
-      const mimeType = logoFile.type || "image/png";
-      logoUrl = `data:${mimeType};base64,${base64}`;
+      logoUrl = await uploadToBlob(logoFile, `${slug}/logo`);
     }
 
-    for (let i = 0; i < bannerFiles.length; i++) {
-      const file = bannerFiles[i];
+    for (const file of bannerFiles) {
       if (file.size > 0) {
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const base64 = buffer.toString('base64');
-        const mimeType = file.type || "image/jpeg";
-        newBanners.push(`data:${mimeType};base64,${base64}`);
+        newBanners.push(await uploadToBlob(file, `${slug}/banner`));
       }
     }
 

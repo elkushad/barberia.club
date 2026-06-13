@@ -10,6 +10,7 @@ super‑administración (`/godmode`).
 - **Next.js 16** (App Router, Server Components) + **React 19**
 - **NextAuth** (credenciales, sesión JWT)
 - **Prisma** ORM — **PostgreSQL**
+- **Vercel Blob** (almacenamiento de imágenes)
 - **TypeScript**, **lucide-react**, **recharts**, **qrcode**
 
 ## Requisitos
@@ -53,8 +54,8 @@ Abre [http://localhost:3000](http://localhost:3000).
 ## Variables de entorno
 
 Todas se documentan en [`.env.example`](.env.example): `DATABASE_URL`,
-`NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `NEXT_PUBLIC_APP_URL` y las credenciales del
-seed (`SEED_*`).
+`NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `NEXT_PUBLIC_APP_URL`, `BLOB_READ_WRITE_TOKEN`
+(imágenes) y las credenciales del seed (`SEED_*`).
 
 ## Estructura
 
