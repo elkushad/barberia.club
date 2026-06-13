@@ -18,6 +18,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Ya existe" }, { status: 400 });
     }
 
+    // Check limits
+    const barbershop = await prisma.barbershop.findUnique({
+      where: { id: barbershopId },
+      include: { _count: { select: { customers: true } } }
+    });
+
+    if (!barbershop) {
+      return NextResponse.json({ error: "Barbería no encontrada" }, { status: 404 });
+    }
+
+    if (barbershop.plan === "FREE" && barbershop._count.customers >= 3) {
+      return NextResponse.json({ error: "La barbería no acepta más clientes en este momento." }, { status: 403 });
+    }
+
     const customer = await prisma.customer.create({
       data: {
         name,

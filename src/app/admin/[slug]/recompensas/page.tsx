@@ -58,6 +58,9 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
     revalidatePath(`/admin/${slug}/recompensas`);
   }
 
+  const isFreePlan = barbershop.plan === "FREE";
+  const limitReached = isFreePlan && rewards.length >= 1;
+
   return (
     <div>
       <h2 style={{ marginBottom: '1.5rem' }}>Sistema de Recompensas</h2>
@@ -67,21 +70,31 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
         {/* Nueva Recompensa */}
         <div className="premium-card">
           <h3 style={{ marginBottom: '1rem', color: 'var(--accent-primary)' }}>Crear Nueva Recompensa</h3>
-          <form action={createReward} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Nombre de Recompensa (ej: Corte Gratis)</label>
-              <input type="text" name="name" className="premium-input" required />
+          
+          {limitReached ? (
+            <div style={{ padding: '1.5rem', backgroundColor: 'rgba(230,57,70,0.1)', border: '1px solid var(--saas-red)', borderRadius: '8px', textAlign: 'center' }}>
+              <p style={{ color: 'white', marginBottom: '1rem' }}>Has alcanzado el límite de 1 recompensa en el plan Gratis.</p>
+              <a href="/planes" className="saas-btn-primary" style={{ padding: '0.75rem 1.5rem', display: 'inline-block', animation: 'none' }}>
+                Actualizar al plan PRO
+              </a>
             </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Imagen del Producto</label>
-              <ImageUploadPreview name="image" accept="image/*" className="premium-input" style={{ padding: '8px' }} />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Visitas Requeridas</label>
-              <input type="number" name="visitsRequired" min="1" className="premium-input" required />
-            </div>
-            <button type="submit" className="premium-btn" style={{ marginTop: '0.5rem' }}>Guardar Recompensa</button>
-          </form>
+          ) : (
+            <form action={createReward} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Nombre de Recompensa (ej: Corte Gratis)</label>
+                <input type="text" name="name" className="premium-input" required />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Imagen del Producto</label>
+                <ImageUploadPreview name="image" accept="image/*" className="premium-input" style={{ padding: '8px' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Visitas Requeridas</label>
+                <input type="number" name="visitsRequired" min="1" className="premium-input" required />
+              </div>
+              <button type="submit" className="premium-btn" style={{ marginTop: '0.5rem' }}>Guardar Recompensa</button>
+            </form>
+          )}
         </div>
 
         {/* Lista de Recompensas */}
