@@ -28,13 +28,10 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
     let imageUrl = null;
 
     if (imageFile && imageFile.size > 0) {
-      const uploadsDir = path.join(process.cwd(), "public", "uploads");
-      await fs.mkdir(uploadsDir, { recursive: true }).catch(() => {});
-      const ext = imageFile.name.split('.').pop() || "png";
-      const filename = `reward-${Date.now()}.${ext}`;
       const buffer = Buffer.from(await imageFile.arrayBuffer());
-      await fs.writeFile(path.join(uploadsDir, filename), buffer);
-      imageUrl = `/uploads/${filename}`;
+      const base64 = buffer.toString('base64');
+      const mimeType = imageFile.type || "image/png";
+      imageUrl = `data:${mimeType};base64,${base64}`;
     }
 
     await prisma.reward.create({

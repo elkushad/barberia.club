@@ -38,25 +38,20 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     let logoUrl = barbershop!.logo;
     let newBanners = [...existingBanners];
 
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    await fs.mkdir(uploadsDir, { recursive: true }).catch(() => {});
-
     if (logoFile && logoFile.size > 0) {
-      const ext = logoFile.name.split('.').pop() || "png";
-      const filename = `${barbershop!.id}-logo-${Date.now()}.${ext}`;
       const buffer = Buffer.from(await logoFile.arrayBuffer());
-      await fs.writeFile(path.join(uploadsDir, filename), buffer);
-      logoUrl = `/uploads/${filename}`;
+      const base64 = buffer.toString('base64');
+      const mimeType = logoFile.type || "image/png";
+      logoUrl = `data:${mimeType};base64,${base64}`;
     }
 
     for (let i = 0; i < bannerFiles.length; i++) {
       const file = bannerFiles[i];
       if (file.size > 0) {
-        const ext = file.name.split('.').pop() || "jpg";
-        const filename = `${barbershop!.id}-banner-${Date.now()}-${i}.${ext}`;
         const buffer = Buffer.from(await file.arrayBuffer());
-        await fs.writeFile(path.join(uploadsDir, filename), buffer);
-        newBanners.push(`/uploads/${filename}`);
+        const base64 = buffer.toString('base64');
+        const mimeType = file.type || "image/jpeg";
+        newBanners.push(`data:${mimeType};base64,${base64}`);
       }
     }
 
