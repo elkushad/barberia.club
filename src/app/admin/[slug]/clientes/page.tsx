@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import styles from "../../admin.module.css";
 import FilterDropdown from "./FilterDropdown";
+import SearchInput from "./SearchInput";
 
 export default async function ClientesPage({ 
   params, 
@@ -14,6 +15,7 @@ export default async function ClientesPage({
   const { slug } = await params;
   const resolvedSearchParams = await searchParams;
   const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : 'recientes';
+  const search = typeof resolvedSearchParams.search === 'string' ? resolvedSearchParams.search.toLowerCase() : '';
 
   const barbershop = await prisma.barbershop.findUnique({
     where: { slug },
@@ -39,6 +41,14 @@ export default async function ClientesPage({
       }
     }
   });
+
+  if (search) {
+    activeCustomers = activeCustomers.filter(c => 
+      c.name.toLowerCase().includes(search) || 
+      c.uniqueCode.toLowerCase().includes(search) || 
+      (c.phone && c.phone.includes(search))
+    );
+  }
 
   // Sort in memory
   activeCustomers.sort((a, b) => {
@@ -111,9 +121,12 @@ export default async function ClientesPage({
       )}
 
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-          <h3 style={{ margin: 0 }}>Clientes Activos ({activeCustomers.length})</h3>
-          <FilterDropdown currentSort={sort} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            <h3 style={{ margin: 0 }}>Clientes Activos ({activeCustomers.length})</h3>
+            <FilterDropdown currentSort={sort} />
+          </div>
+          <SearchInput />
         </div>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
