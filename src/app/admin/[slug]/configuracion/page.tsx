@@ -151,7 +151,7 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1rem' }}>
             {existingBanners.map((url, idx) => {
-              const isVideo = url.endsWith('.mp4') || url.endsWith('.webm');
+              const isVideo = url.endsWith('.mp4') || url.endsWith('.webm') || url.startsWith('data:video/');
               return (
                 <div key={idx} style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)', height: '100px' }}>
                   {isVideo ? (

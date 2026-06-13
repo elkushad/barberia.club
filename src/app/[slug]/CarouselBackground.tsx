@@ -21,7 +21,7 @@ export default function CarouselBackground({ mediaUrls }: { mediaUrls: string[] 
   return (
     <>
       {mediaUrls.map((url, index) => {
-        const isVideo = url.endsWith('.mp4') || url.endsWith('.webm');
+        const isVideo = url.endsWith('.mp4') || url.endsWith('.webm') || url.startsWith('data:video/');
         const isActive = index === currentIndex;
 
         return (
