@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
@@ -6,7 +7,9 @@ import { ArrowLeft, Edit, Power, Store, Users, CalendarCheck, CircleDollarSign }
 
 export default async function GodmodeBarbershopDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  
+
+  await requireAdmin();
+
   const barbershop = await prisma.barbershop.findUnique({
     where: { slug },
     include: {
@@ -30,6 +33,7 @@ export default async function GodmodeBarbershopDetail({ params }: { params: Prom
 
   async function updatePlan(formData: FormData) {
     "use server";
+    await requireAdmin();
     const newPlan = formData.get("plan") as string;
     await prisma.barbershop.update({
       where: { id: barbershop?.id },

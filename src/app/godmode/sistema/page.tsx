@@ -1,6 +1,9 @@
 import { Settings, Plug, Server, Database } from "lucide-react";
+import { requireAdmin } from "@/lib/auth";
 
-export default function GodmodeSistemaPage() {
+export default async function GodmodeSistemaPage() {
+  await requireAdmin();
+
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>

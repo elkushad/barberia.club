@@ -1,5 +1,7 @@
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { redirect } from "next/navigation";
+import { cache } from "react";
 import { prisma } from "./prisma";
 
 export const authOptions: NextAuthOptions = {
@@ -62,3 +64,25 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET || "super-secret-barberia-club-key",
 };
+
+/**
+ * Devuelve la sesión actual del servidor, memoizada durante el render
+ * para evitar consultas duplicadas en una misma petición.
+ */
+export const getSession = cache(() => getServerSession(authOptions));
+
+/**
+ * Exige una sesión autenticada con rol ADMIN.
+ * Redirige a /login si no hay sesión y a /admin si el rol no es ADMIN.
+ * Úsala para proteger el panel God Mode (/godmode).
+ */
+export async function requireAdmin() {
+  const session = await getSession();
+  if (!session) {
+    redirect("/login");
+  }
+  if ((session.user as { role?: string } | undefined)?.role !== "ADMIN") {
+    redirect("/admin");
+  }
+  return session;
+}

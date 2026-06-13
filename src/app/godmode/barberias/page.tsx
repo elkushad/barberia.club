@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { Eye, Edit, Power, Trash2 } from "lucide-react";
 
 export default async function GodmodeBarberiasPage() {
+  await requireAdmin();
+
   const barbershops = await prisma.barbershop.findMany({
     include: {
       _count: {
@@ -18,6 +21,7 @@ export default async function GodmodeBarberiasPage() {
 
   async function toggleStatus(formData: FormData) {
     "use server";
+    await requireAdmin();
     const id = formData.get("id") as string;
     const currentStatus = formData.get("currentStatus") as string;
     
@@ -30,6 +34,7 @@ export default async function GodmodeBarberiasPage() {
 
   async function deleteBarbershop(formData: FormData) {
     "use server";
+    await requireAdmin();
     const id = formData.get("id") as string;
     await prisma.barbershop.delete({ where: { id } });
     revalidatePath("/godmode/barberias");

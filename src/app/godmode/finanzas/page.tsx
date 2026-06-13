@@ -1,7 +1,10 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { CircleDollarSign, TrendingUp, RefreshCw, CreditCard } from "lucide-react";
 
 export default async function GodmodeFinanzasPage() {
+  await requireAdmin();
+
   const payments = await prisma.payment.findMany({
     include: { barbershop: { select: { name: true, slug: true } } },
     orderBy: { createdAt: 'desc' }

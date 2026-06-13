@@ -1,11 +1,14 @@
 import { prisma } from "@/lib/prisma";
-import { 
+import { requireAdmin } from "@/lib/auth";
+import {
   Store, Users, CalendarCheck, Award, 
   TrendingUp, Activity, AlertTriangle, CircleDollarSign 
 } from "lucide-react";
 import DashboardCharts from "./DashboardCharts"; // We will extract client components
 
 export default async function GodmodeDashboard() {
+  await requireAdmin();
+
   // Fetch real data
   const barbershops = await prisma.barbershop.findMany();
   const customers = await prisma.customer.findMany({ include: { visits: true } });

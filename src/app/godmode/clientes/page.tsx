@@ -1,7 +1,10 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { Users, Store } from "lucide-react";
 
 export default async function GodmodeClientesPage() {
+  await requireAdmin();
+
   const customers = await prisma.customer.findMany({
     include: {
       barbershop: { select: { name: true, slug: true } },

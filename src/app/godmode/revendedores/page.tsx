@@ -1,6 +1,9 @@
 import { Network, Construction } from "lucide-react";
+import { requireAdmin } from "@/lib/auth";
 
-export default function GodmodeRevendedoresPage() {
+export default async function GodmodeRevendedoresPage() {
+  await requireAdmin();
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center' }}>
       <Network size={64} color="var(--accent-primary)" style={{ marginBottom: '1.5rem', opacity: 0.5 }} />
