@@ -22,12 +22,12 @@ export default function PublicNavbar() {
           <Link href="#beneficios" className="text-secondary" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
             Beneficios
           </Link>
-          <Link href="#precios" className="text-secondary" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
+          <Link href="/planes" className="text-secondary" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
             Precios
           </Link>
-          <Link href="#soporte" className="text-secondary" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
+          <a href="mailto:contacto@barberia.club" className="text-secondary" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
             Soporte
-          </Link>
+          </a>
         </div>
 
         {/* Action Buttons */}

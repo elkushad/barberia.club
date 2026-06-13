@@ -19,7 +19,7 @@ export default function PublicFooter() {
             <h4 style={{ color: 'white', marginBottom: '1rem', fontWeight: 500 }}>Producto</h4>
             <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <li><Link href="#como-funciona" style={{ fontSize: '0.9rem' }}>Características</Link></li>
-              <li><Link href="#precios" style={{ fontSize: '0.9rem' }}>Precios</Link></li>
+              <li><Link href="/planes" style={{ fontSize: '0.9rem' }}>Precios</Link></li>
               <li><Link href="/login" style={{ fontSize: '0.9rem' }}>Iniciar sesión</Link></li>
             </ul>
           </div>
@@ -27,7 +27,7 @@ export default function PublicFooter() {
           <div>
             <h4 style={{ color: 'white', marginBottom: '1rem', fontWeight: 500 }}>Soporte</h4>
             <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <li><Link href="#soporte" style={{ fontSize: '0.9rem' }}>Centro de ayuda</Link></li>
+              <li><a href="mailto:contacto@barberia.club" style={{ fontSize: '0.9rem' }}>Centro de ayuda</a></li>
               <li><a href="mailto:contacto@barberia.club" style={{ fontSize: '0.9rem' }}>Contacto</a></li>
             </ul>
           </div>
