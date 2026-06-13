@@ -275,12 +275,18 @@ button {
   border: none;
   cursor: pointer;
   text-decoration: none;
+  animation: pulseNeonRed 2s infinite;
 }
 .saas-btn-primary:hover {
   background-color: var(--saas-red-hover);
   transform: translateY(-1px);
 }
 
+@keyframes pulseNeonRed {
+  0% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.5); }
+  70% { box-shadow: 0 0 15px 15px rgba(230, 57, 70, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0); }
+}
 .saas-btn-outlined {
   display: inline-flex;
   align-items: center;

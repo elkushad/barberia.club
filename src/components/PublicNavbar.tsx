@@ -35,7 +35,7 @@ export default function PublicNavbar() {
           <Link href="/login" className="saas-btn-outlined nav-btn-outline" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>
             Iniciar sesión
           </Link>
-          <Link href="/login" className="saas-btn-primary nav-btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>
+          <Link href="/register" className="saas-btn-primary nav-btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>
             Empezar ahora
           </Link>
         </div>

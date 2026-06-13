@@ -29,7 +29,7 @@ export default function SaaSLanding() {
             
             <ScrollAnimation delay="delay-200">
               <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
-                <Link href="/login" className="saas-btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.05rem', width: '100%', maxWidth: '350px' }}>
+                <Link href="/register" className="saas-btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.05rem', width: '100%', maxWidth: '350px' }}>
                   Registrar mi barbería gratis &rarr;
                 </Link>
                 <Link href="#" className="saas-btn-outlined" style={{ padding: '1rem 2rem', fontSize: '1.05rem' }}>
@@ -215,7 +215,7 @@ export default function SaaSLanding() {
             </ScrollAnimation>
             <ScrollAnimation delay="delay-200">
               <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link href="/login" className="saas-btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}>
+                <Link href="/register" className="saas-btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}>
                   Registrar mi barbería gratis &rarr;
                 </Link>
                 <Link href="#" className="saas-btn-outlined" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}>
