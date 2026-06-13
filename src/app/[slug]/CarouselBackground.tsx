@@ -11,7 +11,7 @@ export default function CarouselBackground({ mediaUrls }: { mediaUrls: string[] 
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % mediaUrls.length);
-    }, 5000); // Cambia cada 5 segundos
+    }, 4000); // Cambia cada 4 segundos
 
     return () => clearInterval(interval);
   }, [mediaUrls]);
@@ -20,9 +20,20 @@ export default function CarouselBackground({ mediaUrls }: { mediaUrls: string[] 
 
   return (
     <>
+      <style>{`
+        @keyframes panLeft {
+          0% { transform: scale(1.1) translateX(2%); }
+          100% { transform: scale(1.1) translateX(-2%); }
+        }
+        @keyframes panRight {
+          0% { transform: scale(1.1) translateX(-2%); }
+          100% { transform: scale(1.1) translateX(2%); }
+        }
+      `}</style>
       {mediaUrls.map((url, index) => {
         const isVideo = url.endsWith('.mp4') || url.endsWith('.webm') || url.startsWith('data:video/');
         const isActive = index === currentIndex;
+        const isEven = index % 2 === 0;
 
         return (
           <div 
@@ -35,6 +46,7 @@ export default function CarouselBackground({ mediaUrls }: { mediaUrls: string[] 
               height: '100%',
               opacity: isActive ? 1 : 0,
               transition: 'opacity 1s ease-in-out',
+              animation: isEven ? 'panLeft 15s alternate infinite linear' : 'panRight 15s alternate infinite linear',
               zIndex: 0
             }}
           >
