@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
 import Image from "next/image";
+import ImageUploadPreview from "@/components/ImageUploadPreview";
 
 export default async function ConfiguracionPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -124,15 +125,16 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
           <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Logo de la Barbería</label>
           {barbershop.logo && (
             <div style={{ marginBottom: '1rem' }}>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Logo actual:</p>
               <Image src={barbershop.logo} alt="Logo actual" width={100} height={100} style={{ borderRadius: '0', objectFit: 'contain' }} />
             </div>
           )}
-          <input type="file" name="logo" accept="image/*" className="premium-input" style={{ padding: '8px' }} />
+          <ImageUploadPreview name="logo" accept="image/*" className="premium-input" style={{ padding: '8px' }} />
         </div>
 
         <div>
           <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Añadir Fondos (Imágenes/Videos)</label>
-          <input type="file" name="banners" accept="image/*,video/*" multiple className="premium-input" style={{ padding: '8px' }} />
+          <ImageUploadPreview name="banners" accept="image/*,video/*" multiple className="premium-input" style={{ padding: '8px' }} />
           <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
             Puedes subir varios archivos. Estos se mostrarán en un carrusel dinámico en tu página pública.
           </p>

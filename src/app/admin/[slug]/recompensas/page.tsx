@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
 import Image from "next/image";
+import ImageUploadPreview from "@/components/ImageUploadPreview";
 import styles from "../../admin.module.css";
 
 export default async function RecompensasPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -73,7 +74,7 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
             </div>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Imagen del Producto</label>
-              <input type="file" name="image" accept="image/*" className="premium-input" style={{ padding: '8px' }} />
+              <ImageUploadPreview name="image" accept="image/*" className="premium-input" style={{ padding: '8px' }} />
             </div>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Visitas Requeridas</label>

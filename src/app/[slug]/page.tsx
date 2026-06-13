@@ -29,7 +29,7 @@ export default async function PublicLandingPage({ params }: { params: Promise<{ 
   }
 
   return (
-    <div style={{ height: '100dvh', overflow: 'hidden', backgroundColor: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ position: 'relative', width: '100vw', height: '100dvh', overflow: 'hidden', backgroundColor: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
       
       {/* Background Layer */}
       {bannerUrls.length > 0 && (
