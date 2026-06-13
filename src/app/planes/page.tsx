@@ -114,7 +114,7 @@ export default function PlanesPage() {
                   </li>
                 </ul>
 
-                <Link href="#" className="saas-btn-primary" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center', animation: 'none' }} onClick={() => alert('¡Próximamente! Contáctanos para habilitar el plan PRO.')}>
+                <Link href="#" className="saas-btn-primary" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center', animation: 'none' }}>
                   Contactar para subir a PRO
                 </Link>
               </div>
