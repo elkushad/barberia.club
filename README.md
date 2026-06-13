@@ -9,7 +9,7 @@ super‑administración (`/godmode`).
 
 - **Next.js 16** (App Router, Server Components) + **React 19**
 - **NextAuth** (credenciales, sesión JWT)
-- **Prisma** ORM — **SQLite** en desarrollo
+- **Prisma** ORM — **PostgreSQL**
 - **TypeScript**, **lucide-react**, **recharts**, **qrcode**
 
 ## Requisitos
@@ -25,7 +25,7 @@ pnpm install
 # 2. Variables de entorno
 cp .env.example .env   # y completa los valores (ver .env.example)
 
-# 3. Crear la base de datos local (SQLite) a partir del esquema
+# 3. Aplicar el esquema a tu base de datos PostgreSQL
 pnpm prisma db push
 
 # 4. (Opcional) Datos de prueba: cuenta ADMIN, dueño demo y barbería "demo"
@@ -77,9 +77,9 @@ scripts/seed.mjs        Seed
 
 ## Despliegue
 
-El proyecto está pensado para Vercel. **Importante:** SQLite no funciona en
-entornos serverless (sistema de archivos efímero); para producción migra
-`DATABASE_URL` a Postgres (Neon, Supabase) o Turso/libSQL.
+El proyecto usa **PostgreSQL** (compatible con Vercel/serverless). Provisiona una
+base en Neon o Supabase, define `DATABASE_URL` y aplica el esquema. Guía paso a
+paso en [docs/MIGRACION-POSTGRES.md](docs/MIGRACION-POSTGRES.md).
 
 ## Auditoría
 
