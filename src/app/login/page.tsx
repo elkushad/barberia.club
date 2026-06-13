@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./login.module.css";
@@ -27,7 +27,9 @@ export default function LoginPage() {
       setError("Credenciales incorrectas");
       setLoading(false);
     } else {
-      router.push("/admin");
+      const session = await getSession();
+      const role = (session?.user as { role?: string } | undefined)?.role;
+      router.push(role === "ADMIN" ? "/godmode" : "/admin");
       router.refresh();
     }
   };

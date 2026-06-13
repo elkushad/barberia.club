@@ -45,7 +45,7 @@ export default function RegisterPage() {
         setError("Registrado exitosamente, pero falló el inicio de sesión automático.");
         setLoading(false);
       } else {
-        router.push("/planes");
+        router.push("/admin");
         router.refresh();
       }
     } catch (err) {
