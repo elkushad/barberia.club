@@ -19,7 +19,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   let barbershopLogo = "";
   let barbershopName = "";
   let barbershopSlug = "";
-  let navLinks: { label: string; href: string }[] = [];
+  let navLinks: { label: string; href: string; badge?: number }[] = [];
 
   if (role === "OWNER") {
     const barbershop = await prisma.barbershop.findFirst({
@@ -32,7 +32,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       barbershopSlug = barbershop.slug;
       
       const pendingVisitsCount = await prisma.visit.count({
-        where: { barbershopId: barbershop.id, status: "PENDING" }
+        where: { 
+          customer: { barbershopId: barbershop.id },
+          status: "PENDING" 
+        }
       });
 
       navLinks = [
