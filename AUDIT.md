@@ -14,14 +14,18 @@ SEC-3 (NEXTAUTH_SECRET sin fallback), SEC-4 (seed por env), SEC-9 (log Prisma),
 LINK-1/3/4 (enlaces de navbar, landing y planes), UX-1/2 (redirects),
 SEO-1 (metadata), CLAIM-1/2 (copy y badges), ARCH-4 (código muerto),
 A11Y-3 (rel noopener) y A11Y-1 parcial (aria-labels en God Mode),
-ARCH-6/7 (README + `.env.example`).
+ARCH-6/7 (README + `.env.example`), SEC-5/6/7/8 (DTO en `check`, IDOR en
+server actions, `uniqueCode` con crypto, validación zod + rate-limit) y
+limpieza de lint (de 61 a 20 problemas).
 
 **Parcial:** LINK-2 — se arreglaron "Precios" y "Centro de ayuda" del footer;
 los enlaces legales y de redes sociales quedan pendientes (ver LEGAL-1 y URLs reales).
 
-**Pendiente (requiere tu OK / decisión):** CFG-1 (migrar a Postgres — decidido),
-PERF-1 (imágenes base64 → almacenamiento de objetos), SEC-5/6/7/8, LEGAL-1/2,
+**Pendiente (requiere tu OK / decisión):** CFG-1 (migrar a Postgres — en curso),
+PERF-1 (imágenes base64 → almacenamiento de objetos — en curso), LEGAL-1/2,
 LINK-5 (`/success`), SEO-2/3, PERF-2/3, ARCH-1/2/3, A11Y-2, UX-3/4, CLAIM-3/4, CFG-4.
+Lint residual (5 errores): hooks de `LandingForm` y `Date.now` en `clientes`
+(Server Component, falso positivo) — pendientes del refactor de comportamiento.
 
 > ⚠️ Tras el cambio a bcrypt, las cuentas sembradas en texto plano dejan de
 > poder iniciar sesión hasta volver a ejecutar `node scripts/seed.mjs`.
