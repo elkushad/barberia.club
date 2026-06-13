@@ -23,7 +23,7 @@ export default function SaaSLanding() {
             
             <ScrollAnimation delay="delay-100">
               <p style={{ fontSize: '1.1rem', color: 'var(--saas-text-muted)', marginBottom: '2.5rem', maxWidth: '500px', lineHeight: 1.6 }}>
-                Crea tu cuenta gratis, obtiene tu flyer con código QR listo para imprimir y comienza a premiar la fidelidad de tus clientes.
+                Crea tu cuenta gratis, obtén tu flyer con código QR listo para imprimir y comienza a premiar la fidelidad de tus clientes.
               </p>
             </ScrollAnimation>
             
@@ -32,7 +32,7 @@ export default function SaaSLanding() {
                 <Link href="/register" className="saas-btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.05rem', width: '100%', maxWidth: '350px' }}>
                   Registrar mi barbería gratis &rarr;
                 </Link>
-                <Link href="#" className="saas-btn-outlined" style={{ padding: '1rem 2rem', fontSize: '1.05rem' }}>
+                <Link href="/demo" className="saas-btn-outlined" style={{ padding: '1rem 2rem', fontSize: '1.05rem' }}>
                   Ver demo <span style={{ marginLeft: '8px' }}>&#9658;</span>
                 </Link>
               </div>
@@ -210,7 +210,7 @@ export default function SaaSLanding() {
             </ScrollAnimation>
             <ScrollAnimation delay="delay-100">
               <p style={{ fontSize: '1.1rem', color: 'var(--saas-text-muted)', marginBottom: '3rem', lineHeight: 1.6 }}>
-                Únete a cientos de barberías que ya están fidelizando a sus clientes con barberia.club. Sin costos ocultos, sin compromisos.
+                Únete a las barberías que ya están fidelizando a sus clientes con barberia.club. Sin costos ocultos, sin compromisos.
               </p>
             </ScrollAnimation>
             <ScrollAnimation delay="delay-200">
@@ -218,7 +218,7 @@ export default function SaaSLanding() {
                 <Link href="/register" className="saas-btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}>
                   Registrar mi barbería gratis &rarr;
                 </Link>
-                <Link href="#" className="saas-btn-outlined" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}>
+                <Link href="#como-funciona" className="saas-btn-outlined" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}>
                   Conocer más
                 </Link>
               </div>

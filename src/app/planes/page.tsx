@@ -92,16 +92,16 @@ export default function PlanesPage() {
                     <span>Últimas 5 visitas en historial</span>
                   </li>
                   <li style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>NUEVO</span>
+                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>PRONTO</span>
                     <span>Recordatorios de citas</span>
                   </li>
                   <li style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>NUEVO</span>
+                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>PRONTO</span>
                     <span>Panel de estadísticas básico</span>
                   </li>
                 </ul>
 
-                <Link href="/admin" className="saas-btn-outlined" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center' }}>
+                <Link href="/register" className="saas-btn-outlined" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center' }}>
                   Elegir plan Gratis
                 </Link>
               </div>
@@ -155,18 +155,18 @@ export default function PlanesPage() {
                     <span><strong>Historial completo</strong> desde el inicio</span>
                   </li>
                   <li style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>NUEVO</span>
+                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>PRONTO</span>
                     <span>Automatizaciones de fidelización</span>
                   </li>
                   <li style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>NUEVO</span>
+                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>PRONTO</span>
                     <span>Reportes avanzados</span>
                   </li>
                 </ul>
 
-                <Link href="#" className="saas-btn-primary" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center', animation: 'none' }}>
+                <a href="mailto:contacto@barberia.club?subject=Quiero%20el%20plan%20Pro" className="saas-btn-primary" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center', animation: 'none' }}>
                   Contactar para subir a PRO
-                </Link>
+                </a>
               </div>
             </ScrollAnimation>
 
@@ -207,9 +207,9 @@ export default function PlanesPage() {
                   <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.95rem', margin: 0 }}>Planes personalizados para cadenas de barberías.</p>
                 </div>
               </div>
-              <Link href="#" className="saas-btn-outlined" style={{ whiteSpace: 'nowrap' }}>
+              <a href="mailto:contacto@barberia.club?subject=Consulta%20de%20ventas" className="saas-btn-outlined" style={{ whiteSpace: 'nowrap' }}>
                 Hablar con ventas
-              </Link>
+              </a>
             </div>
           </ScrollAnimation>
         </div>
