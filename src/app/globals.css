@@ -12,6 +12,13 @@
   --accent-danger: #e74c3c;
   --accent-success: #2ecc71;
   
+  /* SaaS Landing Variables */
+  --saas-bg: #0b0f14;
+  --saas-red: #E63946;
+  --saas-red-hover: #d62d3a;
+  --saas-border: #1e2532;
+  --saas-text-muted: #a3b3cc;
+  
   --border-color: #333333;
   
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -249,4 +256,58 @@ button {
 @keyframes panRight {
   0% { transform: scale(1.15) translateX(-3%); }
   100% { transform: scale(1.15) translateX(3%); }
+}
+
+/* --- SaaS Landing Classes --- */
+.saas-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--saas-red);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+.saas-btn-primary:hover {
+  background-color: var(--saas-red-hover);
+  transform: translateY(-1px);
+}
+
+.saas-btn-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.saas-btn-outlined:hover {
+  border-color: rgba(255,255,255,0.5);
+  background-color: rgba(255,255,255,0.05);
+}
+
+.saas-dashed-line {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 40px);
+  right: calc(-50% + 40px);
+  height: 1px;
+  border-top: 1px dashed rgba(255,255,255,0.2);
+  z-index: 0;
+}
+@media (max-width: 768px) {
+  .saas-dashed-line {
+    display: none;
+  }
 }

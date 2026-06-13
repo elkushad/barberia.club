@@ -1,74 +1,166 @@
-import Navbar from '@/components/Navbar';
-import Hero from '@/components/Hero';
-import ServiceCard from '@/components/ServiceCard';
-import Footer from '@/components/Footer';
+import PublicNavbar from '@/components/PublicNavbar';
+import PublicFooter from '@/components/PublicFooter';
+import Link from 'next/link';
 
-export default function Home() {
-  const services = [
-    {
-      title: 'Corte Clásico',
-      description: 'Corte a tijera o máquina, lavado con champú premium, masaje capilar y peinado con productos de alta gama.',
-      price: '$25',
-      delay: 'delay-100'
-    },
-    {
-      title: 'Diseño de Barba',
-      description: 'Perfilado de barba con navaja libre, toalla caliente, aceites esenciales y bálsamo hidratante.',
-      price: '$15',
-      delay: 'delay-200'
-    },
-    {
-      title: 'Experiencia Royal',
-      description: 'El servicio definitivo. Corte clásico, diseño de barba, tratamiento facial exfoliante y mascarilla.',
-      price: '$45',
-      delay: 'delay-300'
-    }
-  ];
-
+export default function SaaSLanding() {
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar />
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--saas-bg)', color: 'white' }}>
+      <PublicNavbar />
       
-      <main style={{ flexGrow: 1 }}>
-        <Hero />
-        
-        <section id="servicios" className="page-container" style={{ padding: '6rem 2rem' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <h2 className="text-gradient" style={{ fontSize: '3rem', marginBottom: '1rem' }}>Nuestros Servicios</h2>
-            <div style={{ width: '60px', height: '4px', backgroundColor: 'var(--accent-primary)', margin: '0 auto', borderRadius: '2px' }}></div>
-          </div>
+      <main style={{ flexGrow: 1, paddingTop: '80px' }}>
+        {/* HERO SECTION */}
+        <section id="inicio" style={{ padding: '6rem 2rem', maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '4rem', flexWrap: 'wrap' }}>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-            {services.map((service, index) => (
-              <ServiceCard 
-                key={index}
-                title={service.title}
-                description={service.description}
-                price={service.price}
-                delay={service.delay}
-              />
-            ))}
-          </div>
-        </section>
-
-        <section id="galeria" style={{ backgroundColor: 'var(--bg-secondary)', padding: '6rem 0' }}>
-          <div className="page-container">
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-              <h2 className="text-gold-gradient" style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>La Experiencia Barber.Club</h2>
-              <p className="text-secondary" style={{ maxWidth: '700px', marginBottom: '3rem', fontSize: '1.1rem' }}>
-                No solo cortamos el pelo, creamos un estilo que define tu personalidad. Relájate con una bebida de cortesía mientras nuestros expertos se encargan de tu imagen.
-              </p>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <a href="/login" className="premium-btn">
-                  Únete al Club
-                </a>
+          <div style={{ flex: '1 1 500px' }}>
+            <h1 style={{ fontSize: '3.5rem', lineHeight: 1.1, marginBottom: '1.5rem', fontWeight: 800 }}>
+              Tu barbería.<br/>
+              Tus clientes.<br/>
+              <span style={{ color: 'var(--saas-red)' }}>Su lealtad.</span>
+            </h1>
+            <p style={{ fontSize: '1.1rem', color: 'var(--saas-text-muted)', marginBottom: '2.5rem', maxWidth: '500px', lineHeight: 1.6 }}>
+              Crea tu cuenta gratis, obtiene tu flyer con código QR listo para imprimir y comienza a premiar la fidelidad de tus clientes.
+            </p>
+            
+            <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
+              <Link href="/login" className="saas-btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.05rem' }}>
+                Registrar mi barbería gratis &rarr;
+              </Link>
+              <Link href="#" className="saas-btn-outlined" style={{ padding: '1rem 2rem', fontSize: '1.05rem' }}>
+                Ver demo <span style={{ marginLeft: '8px' }}>&#9658;</span>
+              </Link>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', fontSize: '0.85rem', color: 'var(--saas-text-muted)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', maxWidth: '140px' }}>
+                <div style={{ padding: '8px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3h6v6H3z"/><path d="M15 3h6v6h-6z"/><path d="M3 15h6v6H3z"/><path d="M15 15h6v6h-6z"/></svg>
+                </div>
+                <span>Flyer con QR listo para imprimir</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', maxWidth: '150px' }}>
+                <div style={{ padding: '8px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                </div>
+                <span>Sistema de recompensas por fidelización</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', maxWidth: '140px' }}>
+                <div style={{ padding: '8px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <span>Registro de clientes y contactos</span>
               </div>
             </div>
           </div>
+          
+          <div style={{ flex: '1 1 400px', display: 'flex', justifyContent: 'center' }}>
+            {/* PLACEHOLDER FOR THE HERO IMAGE */}
+            <div style={{ 
+              width: '100%', 
+              height: '500px', 
+              backgroundColor: 'rgba(255,255,255,0.02)', 
+              border: '1px dashed rgba(255,255,255,0.2)',
+              borderRadius: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              color: 'var(--saas-text-muted)'
+            }}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" style={{ marginBottom: '1rem' }}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <p>Espacio para la imagen Hero (Flyer + Teléfono)</p>
+            </div>
+          </div>
+          
         </section>
+
+        {/* HOW IT WORKS SECTION */}
+        <section id="como-funciona" style={{ padding: '5rem 2rem', backgroundColor: '#090C10' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '2.5rem', marginBottom: '4rem', fontWeight: 700 }}>Así de fácil funciona</h2>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '2rem', position: 'relative' }}>
+              <div className="saas-dashed-line"></div>
+              
+              {/* Step 1 */}
+              <div style={{ position: 'relative', zIndex: 1, backgroundColor: '#090C10', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--saas-border)', textAlign: 'left', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--saas-red)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', fontWeight: 'bold' }}>1</div>
+                  <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Registra tu barbería</h3>
+                </div>
+                <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', flexGrow: 1 }}>Crea tu cuenta en segundos y configura tu barbería.</p>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: 'var(--saas-text-muted)' }}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </div>
+
+              {/* Step 2 */}
+              <div style={{ position: 'relative', zIndex: 1, backgroundColor: '#090C10', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--saas-border)', textAlign: 'left', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--saas-red)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', fontWeight: 'bold' }}>2</div>
+                  <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Descarga tu flyer</h3>
+                </div>
+                <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', flexGrow: 1 }}>Obtén tu flyer con código QR listo para imprimir y colocar en tu local.</p>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: 'var(--saas-text-muted)' }}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M8 8h8v8H8z"/><path d="M8 8v8"/><path d="M16 8v8"/><path d="M8 16h8"/><path d="M8 8h8"/></svg>
+              </div>
+
+              {/* Step 3 */}
+              <div style={{ position: 'relative', zIndex: 1, backgroundColor: '#090C10', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--saas-border)', textAlign: 'left', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--saas-red)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', fontWeight: 'bold' }}>3</div>
+                  <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Tus clientes escanean</h3>
+                </div>
+                <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', flexGrow: 1 }}>Escanean el QR, se registran y comienzan a acumular puntos automáticamente.</p>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: 'var(--saas-text-muted)' }}><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+              </div>
+
+              {/* Step 4 */}
+              <div style={{ position: 'relative', zIndex: 1, backgroundColor: '#090C10', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--saas-border)', textAlign: 'left', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--saas-red)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', fontWeight: 'bold' }}>4</div>
+                  <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Premia y fideliza</h3>
+                </div>
+                <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', flexGrow: 1 }}>Ofrece recompensas, lleva el registro de tus clientes y haz crecer tu negocio.</p>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: 'var(--saas-text-muted)' }}><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* BENEFITS SECTION */}
+        <section id="beneficios" style={{ padding: '2rem 2rem 6rem' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto', border: '1px solid var(--saas-border)', borderRadius: '16px', padding: '3rem', backgroundColor: 'rgba(255,255,255,0.02)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '3rem' }}>
+              
+              <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0 }}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                <div>
+                  <h4 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Más clientes frecuentes</h4>
+                  <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.95rem' }}>Aumenta la lealtad y las visitas recurrentes a tu barbería.</p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0 }}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <div>
+                  <h4 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Conoce a tus clientes</h4>
+                  <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.95rem' }}>Lleva el registro de contactos, visitas y preferencias.</p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0 }}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                <div>
+                  <h4 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Haz crecer tu negocio</h4>
+                  <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.95rem' }}>Promociona ofertas y premios para impulsar tus ventas.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+        
       </main>
 
-      <Footer />
+      <PublicFooter />
     </div>
   );
 }
