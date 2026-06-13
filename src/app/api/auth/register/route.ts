@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 
 function generateSlug(name: string): string {
@@ -42,11 +43,14 @@ export async function POST(req: Request) {
       counter++;
     }
 
+    // Hashear la contraseña antes de guardarla (nunca en texto plano)
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // Create User and Barbershop
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email,
-        password, // Stored in plain text for MVP as requested, replace with bcrypt later
+        password: hashedPassword,
         role: 'OWNER',
         name: barberName, // use barberName as default owner name
         barbershops: {

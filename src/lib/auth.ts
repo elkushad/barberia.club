@@ -2,6 +2,7 @@ import { NextAuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { redirect } from "next/navigation";
 import { cache } from "react";
+import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
 export const authOptions: NextAuthOptions = {
@@ -25,9 +26,15 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // For MVP, simple plain text comparison as set in seed. 
-        // In production, use bcrypt: await bcrypt.compare(credentials.password, user.password)
-        if (user.password !== credentials.password) {
+        if (!user.password) {
+          return null;
+        }
+
+        const passwordMatches = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+        if (!passwordMatches) {
           return null;
         }
 
@@ -62,7 +69,9 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET || "super-secret-barberia-club-key",
+  // Sin fallback: NextAuth exige NEXTAUTH_SECRET en producción y lo genera
+  // automáticamente en desarrollo. Nunca embeber un secreto en el repo.
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 /**
