@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 
 export default async function OwnerLayout({
   children,
@@ -32,15 +31,6 @@ export default async function OwnerLayout({
   if (role !== "ADMIN" && barbershop.ownerId !== userId) {
     return <div>Acceso denegado</div>;
   }
-
-  const navLinks = [
-    { label: "Dashboard", href: `/admin/${slug}` },
-    { label: "Clientes", href: `/admin/${slug}/clientes` },
-    { label: "Visitas", href: `/admin/${slug}/visitas` },
-    { label: "Recompensas", href: `/admin/${slug}/recompensas` },
-    { label: "Configuración", href: `/admin/${slug}/configuracion` },
-    { label: "QR y Promoción", href: `/admin/${slug}/qr` },
-  ];
 
   return (
     <div>

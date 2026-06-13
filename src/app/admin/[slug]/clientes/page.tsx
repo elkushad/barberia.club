@@ -249,6 +249,7 @@ export default async function ClientesPage({
                   <a 
                     href={`https://wa.me/${customer.phone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMessage)}`}
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="premium-btn-secondary"
                     style={{ padding: '6px 12px', fontSize: '0.75rem', borderRadius: '6px' }}
                   >
