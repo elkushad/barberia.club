@@ -35,8 +35,21 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     const logoFile = formData.get("logo") as File | null;
     const bannerFiles = formData.getAll("banners") as File[];
 
-    let logoUrl = barbershop!.logo;
-    let newBanners = [...existingBanners];
+    // Fetch fresh from DB to avoid closure serialization of massive base64 strings
+    const currentBarbershop = await prisma.barbershop.findUnique({ where: { slug } });
+    if (!currentBarbershop) return;
+
+    let currentBanners: string[] = [];
+    try {
+      const parsed = JSON.parse(currentBarbershop.banner || "[]");
+      if (Array.isArray(parsed)) currentBanners = parsed;
+      else if (currentBarbershop.banner) currentBanners = [currentBarbershop.banner];
+    } catch {
+      if (currentBarbershop.banner) currentBanners = [currentBarbershop.banner];
+    }
+
+    let logoUrl = currentBarbershop.logo;
+    let newBanners = [...currentBanners];
 
     if (logoFile && logoFile.size > 0) {
       const buffer = Buffer.from(await logoFile.arrayBuffer());
@@ -56,7 +69,7 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     }
 
     await prisma.barbershop.update({
-      where: { id: barbershop!.id },
+      where: { id: currentBarbershop.id },
       data: { name, description, brandColor, whatsapp, logo: logoUrl, banner: JSON.stringify(newBanners) }
     });
     
@@ -67,10 +80,23 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
   async function deleteBanner(formData: FormData) {
     "use server";
     const urlToDelete = formData.get("url") as string;
-    const filteredBanners = existingBanners.filter(url => url !== urlToDelete);
+    
+    const currentBarbershop = await prisma.barbershop.findUnique({ where: { slug } });
+    if (!currentBarbershop) return;
+
+    let currentBanners: string[] = [];
+    try {
+      const parsed = JSON.parse(currentBarbershop.banner || "[]");
+      if (Array.isArray(parsed)) currentBanners = parsed;
+      else if (currentBarbershop.banner) currentBanners = [currentBarbershop.banner];
+    } catch {
+      if (currentBarbershop.banner) currentBanners = [currentBarbershop.banner];
+    }
+
+    const filteredBanners = currentBanners.filter(url => url !== urlToDelete);
     
     await prisma.barbershop.update({
-      where: { id: barbershop!.id },
+      where: { id: currentBarbershop.id },
       data: { banner: JSON.stringify(filteredBanners) }
     });
     

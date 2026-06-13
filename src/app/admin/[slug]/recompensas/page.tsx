@@ -25,6 +25,10 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
 
     if (!name || !visitsRequired) return;
 
+    // Fetch minimal data to avoid Next.js serializing massive Base64 objects into the action closure
+    const currentBarbershop = await prisma.barbershop.findUnique({ where: { slug }, select: { id: true } });
+    if (!currentBarbershop) return;
+
     let imageUrl = null;
 
     if (imageFile && imageFile.size > 0) {
@@ -36,7 +40,7 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
 
     await prisma.reward.create({
       data: {
-        barbershopId: barbershop!.id,
+        barbershopId: currentBarbershop.id,
         name,
         visitsRequired,
         image: imageUrl
