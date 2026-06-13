@@ -41,7 +41,7 @@ export default async function CustomerDashboardPage({ params }: { params: Promis
   const brandColor = barbershop.brandColor || "#eab308";
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflowY: 'auto', backgroundColor: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
       
       {/* Header Area */}
       <div style={{ backgroundColor: 'var(--bg-secondary)', padding: '2rem', textAlign: 'center' }}>
