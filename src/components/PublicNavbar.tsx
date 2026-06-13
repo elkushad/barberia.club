@@ -36,7 +36,7 @@ export default function PublicNavbar() {
             Iniciar sesión
           </Link>
           <Link href="/login" className="saas-btn-primary nav-btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>
-            Registrar mi barbería
+            Empezar ahora
           </Link>
         </div>
         
@@ -51,7 +51,7 @@ export default function PublicNavbar() {
             display: none !important;
           }
           .public-nav {
-            padding: 0.5rem 1rem;
+            padding: 0.5rem; /* Menos padding para pegar el logo más a la izquierda */
           }
           .nav-logo {
             width: 120px !important;
