@@ -240,3 +240,13 @@ button {
   70% { box-shadow: 0 0 15px 10px rgba(46, 204, 113, 0); border-color: rgba(46, 204, 113, 1); }
   100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); border-color: rgba(46, 204, 113, 0.5); }
 }
+
+@keyframes panLeft {
+  0% { transform: scale(1.15) translateX(3%); }
+  100% { transform: scale(1.15) translateX(-3%); }
+}
+
+@keyframes panRight {
+  0% { transform: scale(1.15) translateX(-3%); }
+  100% { transform: scale(1.15) translateX(3%); }
+}
