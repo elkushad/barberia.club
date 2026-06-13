@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
 import Image from "next/image";
-import styles from "../admin.module.css";
+import styles from "../../admin.module.css";
 
 export default async function RecompensasPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
