@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# barberia.club
 
-## Getting Started
+SaaS de fidelización para barberías: registro de la barbería, generación de un
+flyer con código QR imprimible, sistema de visitas y recompensas, y una base de
+datos de clientes. Incluye un panel para el dueño (`/admin`) y un panel de
+super‑administración (`/godmode`).
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router, Server Components) + **React 19**
+- **NextAuth** (credenciales, sesión JWT)
+- **Prisma** ORM — **SQLite** en desarrollo
+- **TypeScript**, **lucide-react**, **recharts**, **qrcode**
+
+## Requisitos
+
+- Node.js 18+ y **pnpm**
+
+## Puesta en marcha
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# 1. Instalar dependencias
+pnpm install
+
+# 2. Variables de entorno
+cp .env.example .env   # y completa los valores (ver .env.example)
+
+# 3. Crear la base de datos local (SQLite) a partir del esquema
+pnpm prisma db push
+
+# 4. (Opcional) Datos de prueba: cuenta ADMIN, dueño demo y barbería "demo"
+node scripts/seed.mjs
+
+# 5. Arrancar en desarrollo
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> Tras cambiar el esquema de Prisma, ejecuta `pnpm prisma generate`.
+> Si cambias de contraseñas (ahora se guardan con bcrypt), vuelve a correr el seed.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Script | Descripción |
+|---|---|
+| `pnpm dev` | Servidor de desarrollo |
+| `pnpm build` | `prisma generate` + build de producción |
+| `pnpm start` | Servir el build de producción |
+| `pnpm lint` | ESLint |
+| `node scripts/seed.mjs` | Sembrar datos de prueba |
 
-To learn more about Next.js, take a look at the following resources:
+## Variables de entorno
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Todas se documentan en [`.env.example`](.env.example): `DATABASE_URL`,
+`NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `NEXT_PUBLIC_APP_URL` y las credenciales del
+seed (`SEED_*`).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Estructura
 
-## Deploy on Vercel
+```
+src/
+  app/
+    page.tsx            Landing pública
+    planes/             Precios
+    login/ register/    Acceso y alta de barbería
+    [slug]/             Landing pública de cada barbería (QR)
+    c/[uniqueCode]/     Tarjeta de recompensas del cliente
+    admin/[slug]/       Panel del dueño (clientes, visitas, recompensas, QR, config)
+    godmode/            Panel de super-admin (solo rol ADMIN)
+    api/                NextAuth, registro y endpoints de clientes
+  components/           UI compartida
+  lib/                  auth (NextAuth + guards) y cliente Prisma
+prisma/schema.prisma    Modelo de datos
+scripts/seed.mjs        Seed
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Despliegue
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+El proyecto está pensado para Vercel. **Importante:** SQLite no funciona en
+entornos serverless (sistema de archivos efímero); para producción migra
+`DATABASE_URL` a Postgres (Neon, Supabase) o Turso/libSQL.
+
+## Auditoría
+
+Ver [`AUDIT.md`](AUDIT.md) para el informe técnico (seguridad, SEO, rendimiento,
+accesibilidad, etc.) y el estado de las mejoras.
