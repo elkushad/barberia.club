@@ -12,7 +12,7 @@ interface AdminNavbarProps {
   shopLogo?: string;
   shopName?: string;
   shopSlug?: string;
-  navLinks?: { label: string; href: string }[];
+  navLinks?: { label: string; href: string; badge?: number }[];
 }
 
 export default function AdminNavbar({ userName, role, shopLogo, shopName, shopSlug, navLinks }: AdminNavbarProps) {
@@ -53,8 +53,23 @@ export default function AdminNavbar({ userName, role, shopLogo, shopName, shopSl
                   href={link.href}
                   className={styles.navLinkItem}
                   onClick={() => setIsOpen(false)}
+                  style={{ display: 'flex', alignItems: 'center' }}
                 >
                   {link.label}
+                  {link.badge !== undefined && link.badge > 0 && (
+                    <span style={{ 
+                      marginLeft: '6px', 
+                      backgroundColor: 'var(--accent-danger)', 
+                      color: 'white', 
+                      fontSize: '0.7rem', 
+                      padding: '2px 6px', 
+                      borderRadius: '10px',
+                      fontWeight: 'bold',
+                      lineHeight: '1'
+                    }}>
+                      {link.badge}
+                    </span>
+                  )}
                 </Link>
               ))}
               {shopSlug && (

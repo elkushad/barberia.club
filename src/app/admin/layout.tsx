@@ -24,17 +24,21 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (role === "OWNER") {
     const barbershop = await prisma.barbershop.findFirst({
       where: { ownerId: userId },
-      select: { logo: true, name: true, slug: true }
+      select: { logo: true, name: true, slug: true, id: true }
     });
     if (barbershop) {
       if (barbershop.logo) barbershopLogo = barbershop.logo;
       barbershopName = barbershop.name;
       barbershopSlug = barbershop.slug;
       
+      const pendingVisitsCount = await prisma.visit.count({
+        where: { barbershopId: barbershop.id, status: "PENDING" }
+      });
+
       navLinks = [
         { label: "Dashboard", href: `/admin/${barbershop.slug}` },
         { label: "Clientes", href: `/admin/${barbershop.slug}/clientes` },
-        { label: "Visitas", href: `/admin/${barbershop.slug}/visitas` },
+        { label: "Visitas", href: `/admin/${barbershop.slug}/visitas`, badge: pendingVisitsCount },
         { label: "Recompensas", href: `/admin/${barbershop.slug}/recompensas` },
         { label: "Configuración", href: `/admin/${barbershop.slug}/configuracion` },
         { label: "QR / Promoción", href: `/admin/${barbershop.slug}/qr` },
