@@ -189,6 +189,29 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
         </div>
       )}
 
+      {customerData && (
+        <button
+          onClick={() => {
+            localStorage.removeItem(`barberia_customer_${barbershopId}`);
+            window.location.reload();
+          }}
+          style={{
+            position: 'fixed',
+            bottom: '15px',
+            left: '15px',
+            background: 'transparent',
+            border: 'none',
+            color: 'rgba(255,255,255,0.4)',
+            fontSize: '0.75rem',
+            cursor: 'pointer',
+            zIndex: 100,
+            textDecoration: 'underline'
+          }}
+        >
+          Salir
+        </button>
+      )}
+
     </div>
   );
 }
