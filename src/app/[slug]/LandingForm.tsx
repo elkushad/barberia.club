@@ -47,7 +47,7 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
           setStep(3); // Existing customer flow
         }
       } else {
-        setStep(2); // New customer registration
+        setStep(1); // They don't exist, show the form so they can type their name
       }
     } catch (err) {
       setError("Error al verificar el teléfono");
@@ -55,25 +55,52 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
     setLoading(false);
   };
 
-  const checkPhone = async (e: React.FormEvent) => {
+  const processFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem(`barberia_customer_${barbershopId}`, JSON.stringify({ phone }));
-    await checkPhoneByNumber(phone);
-  };
+    if (!name) {
+      setError("Por favor ingresa tu nombre");
+      return;
+    }
 
-  const registerCustomer = async (e: React.FormEvent) => {
-    e.preventDefault();
     setLoading(true);
+    setError("");
+    localStorage.setItem(`barberia_customer_${barbershopId}`, JSON.stringify({ phone }));
+    
     try {
-      await fetch(`/api/customer/register`, {
+      // Primero revisamos si el teléfono ya existe
+      const res = await fetch(`/api/customer/check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, name, barbershopId })
+        body: JSON.stringify({ phone, barbershopId })
       });
-      setMessage("¡Registro enviado! El dueño aprobará tu cuenta pronto.");
-      setStep(4);
-    } catch (err) {
-      setError("Error al registrar");
+      const data = await res.json();
+      
+      if (data.exists) {
+        setCustomerData(data.customer);
+        if (data.customer.status === 'PENDING') {
+          setMessage("Tu cuenta está pendiente de aprobación por el dueño.");
+          setStep(4);
+        } else {
+          setStep(3); // Flujo de cliente existente
+        }
+      } else {
+        // Cliente nuevo, lo registramos inmediatamente usando el nombre y teléfono provistos
+        const regRes = await fetch(`/api/customer/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, name, barbershopId })
+        });
+        
+        if (!regRes.ok) {
+           const errData = await regRes.json();
+           throw new Error(errData.error || "Error al registrar");
+        }
+        
+        setMessage("¡Registro enviado! El dueño aprobará tu cuenta pronto.");
+        setStep(4);
+      }
+    } catch (err: any) {
+      setError(err.message || "Error al procesar la solicitud");
     }
     setLoading(false);
   };
@@ -99,37 +126,11 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
       {error && <div style={{ color: 'var(--accent-danger)', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
       
       {step === 1 && (
-        <form onSubmit={checkPhone} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <h3 style={{ marginBottom: '0.5rem', textAlign: 'center' }}>Ingresa tu teléfono</h3>
+        <form onSubmit={processFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <h3 style={{ marginBottom: '0.5rem', textAlign: 'center' }}>Regístrate o Ingresa</h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', textAlign: 'center', marginBottom: '1rem' }}>
-            Para registrarte o sumar una visita
+            Un solo paso para unirte a nuestro club o sumar visitas
           </p>
-          <input 
-            type="tel" 
-            className="premium-input" 
-            placeholder="ej: +34 600 000 000" 
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required
-          />
-          <button type="submit" className="premium-btn" disabled={loading} style={{ backgroundColor: brandColor }}>
-            {loading ? "Verificando..." : "Continuar"}
-          </button>
-        </form>
-      )}
-
-      {step === 2 && (
-        <form onSubmit={registerCustomer} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <h3 style={{ marginBottom: '0.5rem', textAlign: 'center' }}>¡Hola, nuevo cliente!</h3>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', textAlign: 'center', marginBottom: '1rem' }}>
-            Completa tus datos para unirte al club
-          </p>
-          <input 
-            type="tel" 
-            className="premium-input" 
-            value={phone}
-            disabled
-          />
           <input 
             type="text" 
             className="premium-input" 
@@ -138,8 +139,16 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
             onChange={(e) => setName(e.target.value)}
             required
           />
+          <input 
+            type="tel" 
+            className="premium-input" 
+            placeholder="Tu teléfono (ej: +34 600 000 000)" 
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            required
+          />
           <button type="submit" className="premium-btn" disabled={loading} style={{ backgroundColor: brandColor }}>
-            {loading ? "Registrando..." : "Unirme al Club"}
+            {loading ? "Procesando..." : "Continuar"}
           </button>
         </form>
       )}
