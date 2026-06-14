@@ -3,6 +3,7 @@ import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import MetaPixel from "@/components/MetaPixel";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -44,6 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const gaId = process.env.NEXT_PUBLIC_GA_ID || "G-50KZN1XZB9";
+  const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || "2085967502318437";
 
   return (
     <html lang="es" className={`${inter.variable} ${outfit.variable}`}>
@@ -52,6 +54,7 @@ export default function RootLayout({
           {children}
         </AuthProvider>
         {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
+        {metaPixelId ? <MetaPixel pixelId={metaPixelId} /> : null}
       </body>
     </html>
   );
