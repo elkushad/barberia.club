@@ -50,7 +50,6 @@ export default function GodmodeShell({ children }: { children: React.ReactNode }
           width: '260px',
           backgroundColor: 'var(--bg-secondary)',
           borderRight: '1px solid var(--border-color)',
-          transform: sidebarOpen ? 'translateX(0)' : 'translateX(0)', // Actually we'll let CSS handle the responsive hiding or just make it always fixed for desktop, but we need a media query.
           zIndex: 50,
           display: 'flex',
           flexDirection: 'column'
