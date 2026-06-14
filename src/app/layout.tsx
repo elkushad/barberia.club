@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import MetaPixel from "@/components/MetaPixel";
+import TikTokPixel from "@/components/TikTokPixel";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -46,6 +47,7 @@ export default function RootLayout({
 }>) {
   const gaId = process.env.NEXT_PUBLIC_GA_ID || "G-50KZN1XZB9";
   const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || "2085967502318437";
+  const tiktokPixelId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID || "D8NCPU3C77UAV4NU4ANG";
 
   return (
     <html lang="es" className={`${inter.variable} ${outfit.variable}`}>
@@ -55,6 +57,7 @@ export default function RootLayout({
         </AuthProvider>
         {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
         {metaPixelId ? <MetaPixel pixelId={metaPixelId} /> : null}
+        {tiktokPixelId ? <TikTokPixel pixelId={tiktokPixelId} /> : null}
       </body>
     </html>
   );
