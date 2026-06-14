@@ -8,6 +8,7 @@ const RegisterSchema = z.object({
   barberName: z.string().trim().min(2).max(80),
   email: z.string().trim().email().max(120),
   password: z.string().min(6).max(200),
+  whatsapp: z.string().trim().min(5).max(30),
 });
 
 function generateSlug(name: string): string {
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 });
     }
-    const { barberName, email, password } = parsed.data;
+    const { barberName, email, password, whatsapp } = parsed.data;
 
     if (!barberName || !email || !password) {
       return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
@@ -73,6 +74,7 @@ export async function POST(req: Request) {
           create: {
             name: barberName,
             slug,
+            whatsapp,
           }
         }
       },
