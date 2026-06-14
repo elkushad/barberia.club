@@ -22,7 +22,6 @@ export async function POST(req: Request) {
 
     const role = (session.user as { role?: string })?.role;
     const userId = (session.user as { id?: string })?.id;
-    const userEmail = (session.user as { email?: string })?.email || undefined;
 
     const barbershop = await prisma.barbershop.findUnique({ where: { slug } });
     if (!barbershop) return NextResponse.json({ error: "Barbería no encontrada" }, { status: 404 });
@@ -36,7 +35,6 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         reason: "barberia.club Pro",
         external_reference: barbershop.id,
-        payer_email: userEmail,
         back_url: `${APP_URL}/admin/${slug}/mi-plan?mp=ok`,
         notification_url: `${APP_URL}/api/mercadopago/webhook`,
         auto_recurring: {
