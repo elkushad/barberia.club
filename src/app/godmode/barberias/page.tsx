@@ -4,11 +4,27 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { Eye, Power } from "lucide-react";
 import DeleteBarbershopButton from "./DeleteBarbershopButton";
+import FilterPill from "./FilterPill";
+import PlanPill from "./PlanPill";
+import type { Prisma } from "@prisma/client";
 
-export default async function GodmodeBarberiasPage() {
+export default async function GodmodeBarberiasPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ filtro?: string }>;
+}) {
   await requireAdmin();
+  const { filtro } = await searchParams;
+
+  const where: Prisma.BarbershopWhereInput =
+    filtro === "free" ? { plan: "FREE" }
+    : filtro === "pro" ? { plan: "PRO" }
+    : filtro === "activas" ? { status: "ACTIVE" }
+    : filtro === "inactivas" ? { status: "SUSPENDED" }
+    : {};
 
   const barbershops = await prisma.barbershop.findMany({
+    where,
     include: {
       _count: {
         select: { customers: true }
@@ -19,6 +35,11 @@ export default async function GodmodeBarberiasPage() {
     },
     orderBy: { createdAt: 'desc' }
   });
+
+  // Server Component: la hora actual se evalúa por petición.
+  // eslint-disable-next-line react-hooks/purity
+  const now = Date.now();
+  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 
   async function toggleStatus(formData: FormData) {
     "use server";
@@ -41,6 +62,21 @@ export default async function GodmodeBarberiasPage() {
     revalidatePath("/godmode/barberias");
   }
 
+  async function changePlan(formData: FormData) {
+    "use server";
+    await requireAdmin();
+    const id = formData.get("id") as string;
+    const newPlan = formData.get("plan") === "PRO" ? "PRO" : "FREE";
+    await prisma.barbershop.update({
+      where: { id },
+      data: {
+        plan: newPlan,
+        expiresAt: newPlan === "PRO" ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : null,
+      },
+    });
+    revalidatePath("/godmode/barberias");
+  }
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -48,6 +84,10 @@ export default async function GodmodeBarberiasPage() {
           <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Barberías</h1>
           <p style={{ color: 'var(--text-secondary)' }}>Gestiona todas las barberías registradas en la plataforma.</p>
         </div>
+      </div>
+
+      <div style={{ marginBottom: '1rem' }}>
+        <FilterPill currentFiltro={filtro || 'recientes'} />
       </div>
 
       <div className="premium-card" style={{ padding: 0, overflowX: 'auto' }}>
@@ -65,6 +105,9 @@ export default async function GodmodeBarberiasPage() {
           <tbody>
             {barbershops.map(b => {
               const totalVisits = b.customers.reduce((acc, c) => acc + c._count.visits, 0);
+              const msLeft = b.expiresAt ? b.expiresAt.getTime() - now : null;
+              const expiringSoon = b.plan === "PRO" && msLeft !== null && msLeft > 0 && msLeft <= THREE_DAYS_MS;
+              const daysLeft = msLeft !== null ? Math.ceil(msLeft / (24 * 60 * 60 * 1000)) : null;
               
               return (
                 <tr key={b.id} style={{ borderBottom: '1px solid var(--border-color)', transition: 'background-color 0.2s' }}>
@@ -76,22 +119,15 @@ export default async function GodmodeBarberiasPage() {
                         <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--bg-tertiary)' }} />
                       )}
                       <div>
-                        <p style={{ fontWeight: 'bold' }}>{b.name}</p>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{b.slug}</p>
+                        <p style={{ fontWeight: 'bold', color: expiringSoon ? '#eab308' : undefined }}>{b.name}</p>
+                        <p style={{ fontSize: '0.75rem', color: expiringSoon ? '#eab308' : 'var(--text-secondary)' }}>
+                          {b.slug}{expiringSoon ? ` · vence en ${daysLeft}d` : ''}
+                        </p>
                       </div>
                     </div>
                   </td>
                   <td style={{ padding: '1rem' }}>
-                    <span style={{ 
-                      padding: '4px 8px', 
-                      borderRadius: '4px', 
-                      fontSize: '0.75rem', 
-                      fontWeight: 'bold',
-                      backgroundColor: b.plan === 'PRO' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(156, 163, 175, 0.1)',
-                      color: b.plan === 'PRO' ? '#3b82f6' : 'var(--text-secondary)'
-                    }}>
-                      {b.plan}
-                    </span>
+                    <PlanPill id={b.id} plan={b.plan} action={changePlan} />
                   </td>
                   <td style={{ padding: '1rem' }}>
                     <span style={{ 
