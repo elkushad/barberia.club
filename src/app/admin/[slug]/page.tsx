@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import UpgradeToPro from "@/components/UpgradeToPro";
 
 export default async function OwnerDashboard({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -65,13 +64,12 @@ export default async function OwnerDashboard({ params }: { params: Promise<{ slu
       {barbershop.plan === "FREE" && (
         <div className="premium-card" style={{ marginTop: '2rem' }}>
           <h3 style={{ marginBottom: '0.5rem' }}>Sube al plan Pro 💈</h3>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-            Clientes ilimitados, hasta 10 recompensas, WhatsApp integrado y más.
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+            Clientes ilimitados, hasta 10 recompensas, WhatsApp integrado y más. Desde <strong>S/ 29.90/mes</strong>.
           </p>
-          <p style={{ fontSize: '0.85rem', marginBottom: '1rem' }}>
-            <strong>$10 USD/mes</strong> (≈ S/ 38) · se renueva automáticamente · cancela cuando quieras.
-          </p>
-          <UpgradeToPro slug={barbershop.slug} />
+          <Link href={`/admin/${barbershop.slug}/mi-plan`} className="premium-btn" style={{ display: 'inline-block', textDecoration: 'none' }}>
+            Ver planes y pagar
+          </Link>
         </div>
       )}
     </div>

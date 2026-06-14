@@ -2,8 +2,30 @@ import Link from "next/link";
 import PublicNavbar from "@/components/PublicNavbar";
 import PublicFooter from "@/components/PublicFooter";
 import ScrollAnimation from "@/components/ScrollAnimation";
+import { getSession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { detectCountryCode, currencyForCode, usdToLocal } from "@/lib/pricing";
 
-export default function PlanesPage() {
+export default async function PlanesPage() {
+  const session = await getSession();
+  let countryCode: string | null = null;
+  let slug: string | null = null;
+  if (session) {
+    const userId = (session.user as { id?: string })?.id;
+    if (userId) {
+      const shop = await prisma.barbershop.findFirst({ where: { ownerId: userId } });
+      if (shop) {
+        countryCode = detectCountryCode(shop.whatsapp);
+        slug = shop.slug;
+      }
+    }
+  }
+  const peru = countryCode === "+51";
+  const cur = currencyForCode(countryCode);
+  const localApprox = !peru && cur && cur.currency !== "USD" ? await usdToLocal(cur.currency) : null;
+  const freeHref = session ? "/admin" : "/register";
+  const proHref = slug ? `/admin/${slug}/mi-plan` : "/register";
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--saas-bg)', color: 'white' }}>
       <PublicNavbar />
@@ -101,7 +123,7 @@ export default function PlanesPage() {
                   </li>
                 </ul>
 
-                <Link href="/register" className="saas-btn-outlined" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center' }}>
+                <Link href={freeHref} className="saas-btn-outlined" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center' }}>
                   Elegir plan Gratis
                 </Link>
               </div>
@@ -126,11 +148,25 @@ export default function PlanesPage() {
                 
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem', color: 'white' }}>Pro</h3>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '0.25rem' }}>
-                  <span style={{ fontSize: '3rem', fontWeight: 700, fontFamily: 'var(--font-serif)', color: 'white' }}>$10</span>
-                  <span style={{ color: 'var(--saas-text-muted)' }}>USD/mes</span>
+                  {peru ? (
+                    <>
+                      <span style={{ fontSize: '3rem', fontWeight: 700, fontFamily: 'var(--font-serif)', color: 'white' }}>S/ 29.90</span>
+                      <span style={{ color: 'var(--saas-text-muted)' }}>/mes</span>
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ fontSize: '3rem', fontWeight: 700, fontFamily: 'var(--font-serif)', color: 'white' }}>$10</span>
+                      <span style={{ color: 'var(--saas-text-muted)' }}>USD/mes</span>
+                    </>
+                  )}
                 </div>
+                {!peru && localApprox !== null && cur && (
+                  <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
+                    ≈ {cur.symbol} {localApprox.toLocaleString('es', { maximumFractionDigits: 0 })} en tu moneda (aprox.)
+                  </p>
+                )}
                 <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
-                  ≈ S/ 38 · se renueva automáticamente · cancela cuando quieras
+                  Se renueva automáticamente · cancela cuando quieras
                 </p>
                 <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: '1.4' }}>
                   Todo lo que necesitas<br/>para hacer crecer tu negocio.
@@ -167,7 +203,7 @@ export default function PlanesPage() {
                   </li>
                 </ul>
 
-                <Link href="/register" className="saas-btn-primary" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center', animation: 'none' }}>
+                <Link href={proHref} className="saas-btn-primary" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center', animation: 'none' }}>
                   Empezar con Pro
                 </Link>
               </div>
