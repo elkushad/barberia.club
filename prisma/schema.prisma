@@ -32,8 +32,9 @@ model Barbershop {
   brandColor  String?    @default("#000000")
   ownerId     String
   owner       User       @relation(fields: [ownerId], references: [id])
-  customers   Customer[]
-  rewards     Reward[]
+  customers    Customer[]
+  rewards      Reward[]
+  appointments Appointment[]
   plan        String     @default("FREE") // FREE or PRO
   status      String     @default("ACTIVE") // ACTIVE, SUSPENDED
   expiresAt   DateTime?
@@ -52,10 +53,24 @@ model Customer {
   barbershop   Barbershop   @relation(fields: [barbershopId], references: [id])
   visits       Visit[]
   redemptions  Redemption[]
+  appointments Appointment[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
   @@unique([phone, barbershopId]) // Phone must be unique per barbershop
+}
+
+model Appointment {
+  id           String     @id @default(cuid())
+  date         String     // Fecha elegida por el cliente (YYYY-MM-DD)
+  time         String     // Hora elegida (HH:mm)
+  status       String     @default("PENDING") // PENDING, APPROVED, COMPLETED, CANCELLED
+  customerId   String
+  customer     Customer   @relation(fields: [customerId], references: [id])
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
 
 model Visit {

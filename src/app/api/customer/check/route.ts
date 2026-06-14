@@ -29,6 +29,9 @@ export async function POST(req: Request) {
     });
 
     if (customer) {
+      const activeAppointment = await prisma.appointment.findFirst({
+        where: { customerId: customer.id, status: { in: ["PENDING", "APPROVED"] } },
+      });
       return NextResponse.json({
         exists: true,
         customer: {
@@ -36,6 +39,7 @@ export async function POST(req: Request) {
           name: customer.name,
           status: customer.status,
           uniqueCode: customer.uniqueCode,
+          hasActiveAppointment: !!activeAppointment,
         },
       });
     } else {

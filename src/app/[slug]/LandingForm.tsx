@@ -11,6 +11,12 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [showApptModal, setShowApptModal] = useState(false);
+  const [apptDate, setApptDate] = useState("");
+  const [apptTime, setApptTime] = useState("");
+  const [apptError, setApptError] = useState("");
+  const [apptLoading, setApptLoading] = useState(false);
+  const [today] = useState(() => new Date().toISOString().split("T")[0]);
   const router = useRouter();
 
   useEffect(() => {
@@ -121,6 +127,53 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
     setLoading(false);
   };
 
+  const formatDate = (d: string) => {
+    const [y, m, day] = d.split("-");
+    return `${day}/${m}/${y}`;
+  };
+
+  const openApptModal = () => {
+    setApptError("");
+    setApptDate("");
+    setApptTime("");
+    setShowApptModal(true);
+  };
+
+  const bookViaWhatsApp = () => {
+    if (!apptDate || !apptTime) { setApptError("Elige fecha y hora."); return; }
+    const msg = `Hola ${barbershopName || "barbería"} 👋\nSoy ${customerData?.name}.\n\nQuisiera agendar una cita para:\n📅 Fecha: ${formatDate(apptDate)}\n🕒 Hora: ${apptTime}\n\nGracias.`;
+    const url = `https://wa.me/${(barbershopWhatsapp || "").replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`;
+    window.open(url, "_blank");
+    setShowApptModal(false);
+    setMessage("Te abrimos WhatsApp para confirmar tu cita. 💈");
+    setStep(4);
+  };
+
+  const bookInSystem = async () => {
+    if (!apptDate || !apptTime) { setApptError("Elige fecha y hora."); return; }
+    setApptLoading(true);
+    setApptError("");
+    try {
+      const res = await fetch(`/api/customer/appointment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerId: customerData.id, barbershopId, date: apptDate, time: apptTime }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setApptError(data.error || "No se pudo agendar la cita.");
+      } else {
+        setCustomerData({ ...customerData, hasActiveAppointment: true });
+        setShowApptModal(false);
+        setMessage("¡Cita registrada! La barbería la confirmará pronto.");
+        setStep(4);
+      }
+    } catch {
+      setApptError("Error de red, intenta de nuevo.");
+    }
+    setApptLoading(false);
+  };
+
   return (
     <div style={{ width: '100%', padding: '0 10px' }}>
       {error && <div style={{ color: 'var(--accent-danger)', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
@@ -157,25 +210,19 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', textAlign: 'center' }}>
           <h3 style={{ marginBottom: '0.25rem', fontSize: '1.2rem' }}>¡Bienvenido de nuevo, {customerData.name}! 👋</h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>
-            ¿Estás aquí para tu corte?
+            ¿Qué quieres hacer hoy?
           </p>
           
           <button onClick={registerVisit} className="premium-btn" disabled={loading} style={{ backgroundColor: brandColor, padding: '10px 20px', fontSize: '0.9rem' }}>
-            {loading ? "Registrando..." : "Registrar Visita"}
+            {loading ? "Registrando..." : "Registrar visita"}
           </button>
 
-          <a 
-            href={`https://wa.me/${(barbershopWhatsapp || "").replace(/\D/g, '')}?text=Hola ${barbershopName || "barbería"} quiero agendar una cita`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="premium-btn"
-            style={{ backgroundColor: '#25D366', textDecoration: 'none', color: 'white', padding: '10px 20px', fontSize: '0.9rem' }}
-          >
-            Agendar (WhatsApp)
-          </a>
+          <button onClick={openApptModal} className="premium-btn" style={{ backgroundColor: '#25D366', color: 'white', padding: '10px 20px', fontSize: '0.9rem' }}>
+            Agendar cita
+          </button>
 
           <button onClick={() => router.push(`/c/${customerData.uniqueCode}`)} className="premium-btn-secondary" style={{ marginTop: '0.25rem', padding: '10px 20px', fontSize: '0.9rem' }}>
-            Ver mis Recompensas
+            Ver mis recompensas
           </button>
         </div>
       )}
@@ -219,6 +266,50 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
         >
           Salir
         </button>
+      )}
+
+      {showApptModal && (
+        <div
+          onClick={() => setShowApptModal(false)}
+          style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: '1rem' }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ backgroundColor: 'var(--bg-secondary)', borderRadius: '16px', padding: '1.5rem', width: '100%', maxWidth: '360px', border: '1px solid var(--border-color)' }}
+          >
+            <h3 style={{ marginBottom: '1rem', textAlign: 'center' }}>Agenda tu próxima visita</h3>
+
+            {customerData?.hasActiveAppointment ? (
+              <>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '1rem' }}>
+                  Ya tienes una cita agendada. Cancela o espera a que se complete para crear otra.
+                </p>
+                <button onClick={() => setShowApptModal(false)} className="premium-btn-secondary" style={{ width: '100%', padding: '10px' }}>
+                  Cerrar
+                </button>
+              </>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Fecha</label>
+                <input type="date" className="premium-input" min={today} value={apptDate} onChange={(e) => setApptDate(e.target.value)} />
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Hora</label>
+                <input type="time" className="premium-input" value={apptTime} onChange={(e) => setApptTime(e.target.value)} />
+
+                {apptError && <p style={{ color: 'var(--accent-danger)', fontSize: '0.85rem', textAlign: 'center', margin: 0 }}>{apptError}</p>}
+
+                <button onClick={bookViaWhatsApp} className="premium-btn" style={{ backgroundColor: '#25D366', color: 'white', padding: '12px', marginTop: '0.5rem' }}>
+                  Agendar por WhatsApp
+                </button>
+                <button onClick={bookInSystem} disabled={apptLoading} className="premium-btn-secondary" style={{ padding: '12px' }}>
+                  {apptLoading ? "Agendando..." : "Agendar en barberia.club"}
+                </button>
+                <button onClick={() => setShowApptModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', textDecoration: 'underline', marginTop: '0.25rem' }}>
+                  Cancelar
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       )}
 
     </div>

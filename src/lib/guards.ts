@@ -54,6 +54,20 @@ export async function assertRewardAccess(rewardId: string) {
   return reward;
 }
 
+/** Exige que la cita pertenezca a una barbería del usuario (o ADMIN). */
+export async function assertAppointmentAccess(appointmentId: string) {
+  const me = await currentUser();
+  const appointment = await prisma.appointment.findUnique({
+    where: { id: appointmentId },
+    include: { barbershop: { select: { ownerId: true } } },
+  });
+  if (!me || !appointment) throw new Error("No autorizado");
+  if (me.role !== "ADMIN" && appointment.barbershop.ownerId !== me.id) {
+    throw new Error("No autorizado");
+  }
+  return appointment;
+}
+
 // Alfabeto sin caracteres ambiguos (0/O, 1/I/L) para códigos legibles.
 const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 
