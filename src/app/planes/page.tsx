@@ -125,10 +125,13 @@ export default function PlanesPage() {
                 </div>
                 
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem', color: 'white' }}>Pro</h3>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '0.5rem' }}>
-                  <span style={{ fontSize: '3rem', fontWeight: 700, fontFamily: 'var(--font-serif)', color: 'white' }}>S/.50</span>
-                  <span style={{ color: 'var(--saas-text-muted)' }}>/mes</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '0.25rem' }}>
+                  <span style={{ fontSize: '3rem', fontWeight: 700, fontFamily: 'var(--font-serif)', color: 'white' }}>$10</span>
+                  <span style={{ color: 'var(--saas-text-muted)' }}>USD/mes</span>
                 </div>
+                <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
+                  ≈ S/ 38 · se renueva automáticamente · cancela cuando quieras
+                </p>
                 <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: '1.4' }}>
                   Todo lo que necesitas<br/>para hacer crecer tu negocio.
                 </p>
@@ -164,9 +167,9 @@ export default function PlanesPage() {
                   </li>
                 </ul>
 
-                <a href="mailto:contacto@barberia.club?subject=Quiero%20el%20plan%20Pro" className="saas-btn-primary" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center', animation: 'none' }}>
-                  Contactar para subir a PRO
-                </a>
+                <Link href="/register" className="saas-btn-primary" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center', animation: 'none' }}>
+                  Empezar con Pro
+                </Link>
               </div>
             </ScrollAnimation>
 
