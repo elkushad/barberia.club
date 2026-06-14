@@ -38,6 +38,7 @@ model Barbershop {
   plan        String     @default("FREE") // FREE or PRO
   status      String     @default("ACTIVE") // ACTIVE, SUSPENDED
   expiresAt   DateTime?
+  paypalSubscriptionId String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   payments    Payment[]

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@next/third-parties": "^16.2.9",
+    "@paypal/react-paypal-js": "^10.0.0",
     "@prisma/client": "^5.22.0",
     "@vercel/blob": "^2.4.0",
     "bcryptjs": "^3.0.3",
