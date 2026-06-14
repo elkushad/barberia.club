@@ -1,5 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
+import { upload } from "@vercel/blob/client";
 
 interface ImageUploadPreviewProps {
   name: string;
@@ -10,53 +12,66 @@ interface ImageUploadPreviewProps {
 }
 
 export default function ImageUploadPreview({ name, accept = "image/*", multiple = false, className, style }: ImageUploadPreviewProps) {
-  const [previews, setPreviews] = useState<{ url: string, isVideo: boolean }[]>([]);
+  const [items, setItems] = useState<{ url: string; isVideo: boolean }[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || files.length === 0) {
-      setPreviews([]);
-      return;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    setError("");
+
+    try {
+      const uploaded: { url: string; isVideo: boolean }[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const blob = await upload(file.name, file, {
+          access: "public",
+          handleUploadUrl: "/api/blob/upload",
+        });
+        uploaded.push({ url: blob.url, isVideo: file.type.startsWith("video/") });
+      }
+      // Logo (single): reemplaza. Fondos (multiple): acumula.
+      setItems((prev) => (multiple ? [...prev, ...uploaded] : uploaded));
+    } catch {
+      setError("No se pudo subir el archivo. Revisa el tamaño/formato e intenta de nuevo.");
     }
 
-    const newPreviews: { url: string, isVideo: boolean }[] = [];
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      newPreviews.push({
-        url: URL.createObjectURL(file),
-        isVideo: file.type.startsWith("video/")
-      });
-    }
-    setPreviews(newPreviews);
+    setUploading(false);
+    e.target.value = "";
   };
 
-  // Cleanup object URLs to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      previews.forEach(p => URL.revokeObjectURL(p.url));
-    };
-  }, [previews]);
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <input 
-        type="file" 
-        name={name} 
-        accept={accept} 
-        multiple={multiple} 
-        className={className} 
-        style={style} 
-        onChange={handleFileChange} 
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <input
+        type="file"
+        accept={accept}
+        multiple={multiple}
+        className={className}
+        style={style}
+        onChange={handleFileChange}
+        disabled={uploading}
       />
-      
-      {previews.length > 0 && (
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
-          {previews.map((preview, idx) => (
-            <div key={idx} style={{ width: '100px', height: '100px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)', position: 'relative' }}>
-              {preview.isVideo ? (
-                <video src={preview.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted />
+
+      {uploading && <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Subiendo…</p>}
+      {error && <p style={{ fontSize: "0.8rem", color: "var(--accent-danger)" }}>{error}</p>}
+
+      {/* Inputs ocultos: llevan las URLs ya subidas al formulario (server action). */}
+      {items.map((item, idx) => (
+        <input key={`${name}-${idx}`} type="hidden" name={name} value={item.url} />
+      ))}
+
+      {items.length > 0 && (
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
+          {items.map((item, idx) => (
+            <div key={idx} style={{ width: "100px", height: "100px", borderRadius: "8px", overflow: "hidden", border: "1px solid var(--border-color)" }}>
+              {item.isVideo ? (
+                <video src={item.url} style={{ width: "100%", height: "100%", objectFit: "cover" }} muted />
               ) : (
-                <img src={preview.url} alt={`Preview ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={item.url} alt={`Vista previa ${idx + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               )}
             </div>
           ))}

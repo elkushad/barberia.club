@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { assertBarbershopAccessBySlug } from "@/lib/guards";
-import { uploadToBlob } from "@/lib/storage";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
 
@@ -33,11 +32,12 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     const description = formData.get("description") as string;
     const brandColor = formData.get("brandColor") as string;
     const whatsapp = formData.get("whatsapp") as string;
-    
-    const logoFile = formData.get("logo") as File | null;
-    const bannerFiles = formData.getAll("banners") as File[];
 
-    // Fetch fresh from DB to avoid closure serialization of massive base64 strings
+    // Las imágenes/videos se suben en el cliente a Vercel Blob; aquí solo
+    // llegan las URLs ya subidas (evita el límite de tamaño de las server actions).
+    const newLogoUrl = formData.get("logo") as string | null;
+    const newBannerUrls = (formData.getAll("banners") as string[]).filter(Boolean);
+
     const currentBarbershop = await prisma.barbershop.findUnique({ where: { slug } });
     if (!currentBarbershop) return;
 
@@ -50,18 +50,8 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
       if (currentBarbershop.banner) currentBanners = [currentBarbershop.banner];
     }
 
-    let logoUrl = currentBarbershop.logo;
-    const newBanners = [...currentBanners];
-
-    if (logoFile && logoFile.size > 0) {
-      logoUrl = await uploadToBlob(logoFile, `${slug}/logo`);
-    }
-
-    for (const file of bannerFiles) {
-      if (file.size > 0) {
-        newBanners.push(await uploadToBlob(file, `${slug}/banner`));
-      }
-    }
+    const logoUrl = newLogoUrl || currentBarbershop.logo;
+    const newBanners = [...currentBanners, ...newBannerUrls];
 
     await prisma.barbershop.update({
       where: { id: currentBarbershop.id },

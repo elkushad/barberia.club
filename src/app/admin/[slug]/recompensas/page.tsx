@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { assertBarbershopAccessBySlug, assertRewardAccess } from "@/lib/guards";
-import { uploadToBlob } from "@/lib/storage";
 import Link from "next/link";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
@@ -25,19 +24,14 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
     await assertBarbershopAccessBySlug(slug);
     const name = formData.get("name") as string;
     const visitsRequired = parseInt(formData.get("visitsRequired") as string);
-    const imageFile = formData.get("image") as File | null;
 
     if (!name || !visitsRequired) return;
 
-    // Fetch minimal data to avoid Next.js serializing massive Base64 objects into the action closure
+    // La imagen se sube en el cliente a Vercel Blob; aquí llega la URL ya subida.
+    const imageUrl = (formData.get("image") as string) || null;
+
     const currentBarbershop = await prisma.barbershop.findUnique({ where: { slug }, select: { id: true } });
     if (!currentBarbershop) return;
-
-    let imageUrl = null;
-
-    if (imageFile && imageFile.size > 0) {
-      imageUrl = await uploadToBlob(imageFile, `${slug}/reward`);
-    }
 
     await prisma.reward.create({
       data: {
