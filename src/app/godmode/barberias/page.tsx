@@ -119,7 +119,9 @@ export default async function GodmodeBarberiasPage({
                         <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--bg-tertiary)' }} />
                       )}
                       <div>
-                        <p style={{ fontWeight: 'bold', color: expiringSoon ? '#eab308' : undefined }}>{b.name}</p>
+                        <Link href={`/godmode/barberias/${b.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                          <p style={{ fontWeight: 'bold', color: expiringSoon ? '#eab308' : undefined }}>{b.name}</p>
+                        </Link>
                         <p style={{ fontSize: '0.75rem', color: expiringSoon ? '#eab308' : 'var(--text-secondary)' }}>
                           {b.slug}{expiringSoon ? ` · vence en ${daysLeft}d` : ''}
                         </p>

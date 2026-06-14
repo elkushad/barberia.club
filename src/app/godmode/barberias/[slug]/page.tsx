@@ -156,6 +156,44 @@ export default async function GodmodeBarbershopDetail({ params }: { params: Prom
         </div>
 
       </div>
+
+      {/* Lista de clientes */}
+      <div className="premium-card" style={{ marginTop: '2rem', padding: 0, overflowX: 'auto' }}>
+        <h3 style={{ padding: '1.5rem 1.5rem 0.75rem', margin: 0 }}>Clientes ({barbershop.customers.length})</h3>
+        {barbershop.customers.length === 0 ? (
+          <p style={{ padding: '0 1.5rem 1.5rem', color: 'var(--text-secondary)' }}>Esta barbería aún no tiene clientes.</p>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-tertiary)' }}>
+                <th style={{ padding: '0.75rem 1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Cliente</th>
+                <th style={{ padding: '0.75rem 1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Teléfono</th>
+                <th style={{ padding: '0.75rem 1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Estado</th>
+                <th style={{ padding: '0.75rem 1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Código</th>
+                <th style={{ padding: '0.75rem 1rem', fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'right' }}>Visitas</th>
+              </tr>
+            </thead>
+            <tbody>
+              {barbershop.customers.map((c) => (
+                <tr key={c.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                  <td style={{ padding: '0.75rem 1rem', fontWeight: 'bold' }}>{c.name}</td>
+                  <td style={{ padding: '0.75rem 1rem', fontSize: '0.875rem' }}>
+                    <a href={`https://wa.me/${c.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)' }}>
+                      {c.phone}
+                    </a>
+                  </td>
+                  <td style={{ padding: '0.75rem 1rem', fontSize: '0.8rem', color: c.status === 'ACTIVE' ? 'var(--accent-success)' : 'var(--text-secondary)' }}>
+                    {c.status === 'ACTIVE' ? 'Activo' : 'Pendiente'}
+                  </td>
+                  <td style={{ padding: '0.75rem 1rem', fontSize: '0.8rem', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{c.uniqueCode || '—'}</td>
+                  <td style={{ padding: '0.75rem 1rem', textAlign: 'right', fontWeight: 'bold' }}>{c._count.visits}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
     </div>
   );
 }
