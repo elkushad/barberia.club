@@ -2,7 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
-import { Eye, Power, Trash2 } from "lucide-react";
+import { Eye, Power } from "lucide-react";
+import DeleteBarbershopButton from "./DeleteBarbershopButton";
 
 export default async function GodmodeBarberiasPage() {
   await requireAdmin();
@@ -125,14 +126,7 @@ export default async function GodmodeBarberiasPage() {
                         </button>
                       </form>
 
-                      <form action={deleteBarbershop} onSubmit={(e) => {
-                        if(!confirm("¿Estás seguro de eliminar esta barbería? Esta acción es irreversible.")) e.preventDefault();
-                      }}>
-                        <input type="hidden" name="id" value={b.id} />
-                        <button type="submit" title="Eliminar" style={{ padding: '6px', backgroundColor: 'var(--bg-tertiary)', border: 'none', borderRadius: '6px', color: 'var(--text-secondary)', cursor: 'pointer' }}>
-                          <Trash2 size={16} />
-                        </button>
-                      </form>
+                      <DeleteBarbershopButton id={b.id} action={deleteBarbershop} />
                     </div>
                   </td>
                 </tr>
