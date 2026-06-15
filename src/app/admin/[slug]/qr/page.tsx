@@ -28,7 +28,7 @@ export default async function QRPage({ params }: { params: Promise<{ slug: strin
     <div>
       <h2 style={{ marginBottom: '1.5rem' }}>Material Promocional y QR</h2>
       
-      <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: '1fr 1fr' }}>
+      <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
         
         <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <h3 style={{ marginBottom: '1rem', color: 'var(--accent-primary)' }}>Tu Flyer con QR</h3>
