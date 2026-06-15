@@ -114,7 +114,7 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
               <Image src={barbershop.logo} alt="Logo actual" width={100} height={100} style={{ borderRadius: '0', objectFit: 'contain' }} />
             </div>
           )}
-          <ImageUploadPreview name="logo" accept="image/*" className="premium-input" style={{ padding: '8px' }} />
+          <ImageUploadPreview name="logo" accept="image/*" variant="logo" className="premium-input" style={{ padding: '8px' }} />
         </div>
 
         <div>
