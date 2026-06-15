@@ -33,7 +33,7 @@ export default function ImageUploadPreview({ name, accept = "image/*", multiple 
         // así una subida lenta pero constante termina; solo se cancela si se
         // traba de verdad (sin avance por 30s).
         const controller = new AbortController();
-        let stall: ReturnType<typeof setTimeout>;
+        let stall: ReturnType<typeof setTimeout> | undefined;
         const resetStall = () => {
           clearTimeout(stall);
           stall = setTimeout(() => controller.abort(), 30_000);
