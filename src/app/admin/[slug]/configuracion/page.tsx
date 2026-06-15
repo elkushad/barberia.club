@@ -12,6 +12,8 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
 
   if (!barbershop) return null;
 
+  const isPro = barbershop.plan === "PRO";
+
   // Parse existing banners as array
   let existingBanners: string[] = [];
   try {
@@ -51,7 +53,11 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     }
 
     const logoUrl = newLogoUrl || currentBarbershop.logo;
-    const newBanners = [...currentBanners, ...newBannerUrls];
+    // Fondos del landing: solo plan Pro y máximo 5 imágenes en total.
+    const isProShop = currentBarbershop.plan === "PRO";
+    const newBanners = isProShop
+      ? [...currentBanners, ...newBannerUrls].slice(0, 5)
+      : currentBanners;
 
     await prisma.barbershop.update({
       where: { id: currentBarbershop.id },
@@ -118,11 +124,22 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
         </div>
 
         <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Añadir Fondos (Imágenes/Videos)</label>
-          <ImageUploadPreview name="banners" accept="image/*,video/*" multiple className="premium-input" style={{ padding: '8px' }} />
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
-            Puedes subir varios archivos. Estos se mostrarán en un carrusel dinámico en tu página pública.
-          </p>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Fondos del Landing (máx. 5 imágenes)</label>
+          {isPro ? (
+            <>
+              <ImageUploadPreview name="banners" accept="image/*" multiple variant="photo" maxItems={5} existingCount={existingBanners.length} className="premium-input" style={{ padding: '8px' }} />
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+                Hasta 5 imágenes. Se mostrarán en un carrusel en tu página pública.
+              </p>
+            </>
+          ) : (
+            <div style={{ padding: '1rem', borderRadius: '8px', border: '1px dashed var(--border-color)', backgroundColor: 'var(--bg-secondary)' }}>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>
+                Los fondos del landing están disponibles en el <strong style={{ color: 'var(--text-primary)' }}>plan Pro</strong>.{' '}
+                <a href={`/admin/${slug}/mi-plan`} style={{ color: 'var(--accent-primary)', textDecoration: 'underline' }}>Mejora tu plan</a>.
+              </p>
+            </div>
+          )}
         </div>
 
         <div>
