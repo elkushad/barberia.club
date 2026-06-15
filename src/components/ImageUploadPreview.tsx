@@ -9,9 +9,56 @@ interface ImageUploadPreviewProps {
   multiple?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  // "logo": pequeño y nítido, conserva transparencia. "photo": fondos/galería.
+  variant?: "logo" | "photo";
 }
 
-export default function ImageUploadPreview({ name, accept = "image/*", multiple = false, className, style }: ImageUploadPreviewProps) {
+// Tope de tamaño para videos (no se comprimen en el navegador).
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+
+// Comprime imágenes en el navegador antes de subir: redimensiona al lado mayor
+// indicado y reencoda. Reduce mucho los MB (una foto de móvil 6-8 MB → ~200 KB)
+// sin pérdida visible. No toca GIF/SVG ni videos, y si no mejora deja el original.
+async function compressImage(file: File, maxDim: number): Promise<File> {
+  if (!file.type.startsWith("image/")) return file;
+  if (file.type === "image/gif" || file.type === "image/svg+xml") return file;
+
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    return file; // si el navegador no puede decodificarla, sube el original
+  }
+
+  const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+  const width = Math.round(bitmap.width * scale);
+  const height = Math.round(bitmap.height * scale);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    bitmap.close();
+    return file;
+  }
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
+
+  // PNG/WebP pueden tener transparencia → salida WebP (la conserva y pesa poco).
+  // El resto → JPEG.
+  const keepsAlpha = file.type === "image/png" || file.type === "image/webp";
+  const outType = keepsAlpha ? "image/webp" : "image/jpeg";
+
+  const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, outType, 0.82));
+  if (!blob || blob.size >= file.size) return file; // no mejoró: deja el original
+
+  const baseName = file.name.replace(/\.[^.]+$/, "");
+  const ext = outType === "image/webp" ? "webp" : "jpg";
+  return new File([blob], `${baseName}.${ext}`, { type: outType });
+}
+
+export default function ImageUploadPreview({ name, accept = "image/*", multiple = false, className, style, variant = "photo" }: ImageUploadPreviewProps) {
   const [items, setItems] = useState<{ url: string; isVideo: boolean }[]>([]);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -27,8 +74,18 @@ export default function ImageUploadPreview({ name, accept = "image/*", multiple 
 
     try {
       const uploaded: { url: string; isVideo: boolean }[] = [];
+      const maxDim = variant === "logo" ? 512 : 1600;
       for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+        const original = files[i];
+        const isVideo = original.type.startsWith("video/");
+
+        if (isVideo && original.size > MAX_VIDEO_BYTES) {
+          throw new Error("El video supera los 50 MB. Súbelo más liviano o comprímelo antes.");
+        }
+
+        // Las imágenes se comprimen en el navegador; videos van tal cual.
+        const file = isVideo ? original : await compressImage(original, maxDim);
+
         // Timeout por INACTIVIDAD: se reinicia mientras el progreso avance,
         // así una subida lenta pero constante termina; solo se cancela si se
         // traba de verdad (sin avance por 30s).
@@ -50,7 +107,7 @@ export default function ImageUploadPreview({ name, accept = "image/*", multiple 
               resetStall();
             },
           });
-          uploaded.push({ url: blob.url, isVideo: file.type.startsWith("video/") });
+          uploaded.push({ url: blob.url, isVideo });
         } finally {
           clearTimeout(stall);
         }
