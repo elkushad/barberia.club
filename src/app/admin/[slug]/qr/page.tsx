@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import QRCode from "qrcode";
+import FlyerWithQR from "./FlyerWithQR";
 
 export default async function QRPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -15,8 +16,8 @@ export default async function QRPage({ params }: { params: Promise<{ slug: strin
   
   // Generate QR as Data URI
   const qrDataUrl = await QRCode.toDataURL(landingUrl, {
-    width: 400,
-    margin: 2,
+    width: 600,
+    margin: 1,
     color: {
       dark: '#000000',
       light: '#ffffff'
@@ -30,17 +31,15 @@ export default async function QRPage({ params }: { params: Promise<{ slug: strin
       <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: '1fr 1fr' }}>
         
         <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-          <h3 style={{ marginBottom: '1rem', color: 'var(--accent-primary)' }}>Tu Código QR Oficial</h3>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.875rem' }}>
-            Imprime este código y colócalo en tu barbería. Los clientes lo escanearán para registrarse y sumar visitas.
+          <h3 style={{ marginBottom: '1rem', color: 'var(--accent-primary)' }}>Tu Flyer con QR</h3>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
+            Descárgalo e imprímelo. El QR lleva a tus clientes a tu página para registrarse y sumar visitas.
           </p>
-          
-          <div style={{ background: 'white', padding: '1rem', borderRadius: '16px', marginBottom: '1.5rem' }}>
-            <img src={qrDataUrl} alt={`QR Code for ${barbershop.name}`} style={{ width: '100%', maxWidth: '300px' }} />
-          </div>
-          
-          <a href={qrDataUrl} download={`QR_${barbershop.slug}.png`} className="premium-btn">
-            Descargar Imagen QR
+
+          <FlyerWithQR qrDataUrl={qrDataUrl} slug={barbershop.slug} />
+
+          <a href={qrDataUrl} download={`QR_${barbershop.slug}.png`} style={{ marginTop: '1rem', fontSize: '0.85rem', color: 'var(--text-secondary)', textDecoration: 'underline' }}>
+            Descargar solo el QR
           </a>
         </div>
 
