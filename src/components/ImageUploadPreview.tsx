@@ -14,6 +14,7 @@ interface ImageUploadPreviewProps {
 export default function ImageUploadPreview({ name, accept = "image/*", multiple = false, className, style }: ImageUploadPreviewProps) {
   const [items, setItems] = useState<{ url: string; isVideo: boolean }[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,22 +22,37 @@ export default function ImageUploadPreview({ name, accept = "image/*", multiple 
     if (!files || files.length === 0) return;
 
     setUploading(true);
+    setProgress(0);
     setError("");
 
     try {
       const uploaded: { url: string; isVideo: boolean }[] = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const blob = await upload(file.name, file, {
-          access: "public",
-          handleUploadUrl: "/api/blob/upload",
-        });
-        uploaded.push({ url: blob.url, isVideo: file.type.startsWith("video/") });
+        // Aborta a los 45s: el SDK reintenta hasta 10 veces con backoff
+        // (>15 min) si el storage no responde, lo que parece un cuelgue.
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 45_000);
+        try {
+          const blob = await upload(file.name, file, {
+            access: "public",
+            handleUploadUrl: "/api/blob/upload",
+            abortSignal: controller.signal,
+            onUploadProgress: (p) => setProgress(Math.round(p.percentage)),
+          });
+          uploaded.push({ url: blob.url, isVideo: file.type.startsWith("video/") });
+        } finally {
+          clearTimeout(timeout);
+        }
       }
       // Logo (single): reemplaza. Fondos (multiple): acumula.
       setItems((prev) => (multiple ? [...prev, ...uploaded] : uploaded));
     } catch (err) {
-      setError(err instanceof Error ? `Error al subir: ${err.message}` : "No se pudo subir el archivo.");
+      if (err instanceof Error && (err.name === "AbortError" || /abort/i.test(err.message))) {
+        setError("La subida tardó demasiado y se canceló. Revisa tu conexión e inténtalo de nuevo.");
+      } else {
+        setError(err instanceof Error ? `Error al subir: ${err.message}` : "No se pudo subir el archivo.");
+      }
     }
 
     setUploading(false);
@@ -55,7 +71,7 @@ export default function ImageUploadPreview({ name, accept = "image/*", multiple 
         disabled={uploading}
       />
 
-      {uploading && <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Subiendo…</p>}
+      {uploading && <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Subiendo… {progress}%</p>}
       {error && <p style={{ fontSize: "0.8rem", color: "var(--accent-danger)" }}>{error}</p>}
 
       {/* Inputs ocultos: llevan las URLs ya subidas al formulario (server action). */}
