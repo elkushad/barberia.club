@@ -76,16 +76,20 @@ export default async function ClientesPage({
     while (await prisma.customer.findUnique({ where: { uniqueCode } })) {
       uniqueCode = generateUniqueCode();
     }
-    
-    await prisma.customer.update({
-      where: { id },
+
+    // Aprueba SOLO si sigue PENDING (atómico). Así clics repetidos o simultáneos
+    // no vuelven a aprobar ni suman visitas extra.
+    const result = await prisma.customer.updateMany({
+      where: { id, status: "PENDING" },
       data: { status: "ACTIVE", uniqueCode }
     });
 
-    // Aprobar el registro cuenta como su primera visita/corte (sin fricción).
-    await prisma.visit.create({
-      data: { customerId: id, status: "CONFIRMED" }
-    });
+    // Solo el clic que realmente aprobó (count > 0) crea la primera visita/corte.
+    if (result.count > 0) {
+      await prisma.visit.create({
+        data: { customerId: id, status: "CONFIRMED" }
+      });
+    }
 
     revalidatePath(`/admin/${slug}/clientes`);
   }
