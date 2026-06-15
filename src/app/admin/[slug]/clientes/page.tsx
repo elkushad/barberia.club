@@ -81,6 +81,12 @@ export default async function ClientesPage({
       where: { id },
       data: { status: "ACTIVE", uniqueCode }
     });
+
+    // Aprobar el registro cuenta como su primera visita/corte (sin fricción).
+    await prisma.visit.create({
+      data: { customerId: id, status: "CONFIRMED" }
+    });
+
     revalidatePath(`/admin/${slug}/clientes`);
   }
 
