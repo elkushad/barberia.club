@@ -4,7 +4,7 @@ import { useState } from "react";
 
 // Posición y tamaño del QR sobre el flyer, en % del ancho/alto. Ajustable.
 const QR_LEFT_PCT = 52;
-const QR_TOP_PCT = 68;
+const QR_TOP_PCT = 67.8;
 const QR_SIZE_PCT = 19;
 
 function loadImage(src: string): Promise<HTMLImageElement> {
