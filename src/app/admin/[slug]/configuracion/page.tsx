@@ -66,11 +66,14 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     let newBanners = currentBanners;
     if (isProShop) {
       const capped: string[] = [];
+      const seen = new Set<string>();
       let vids = 0;
       for (const u of [...currentBanners, ...newBannerUrls]) {
+        if (seen.has(u)) continue; // dedup: reenviar la misma URL no la duplica
         if (capped.length >= 5) break;
         const vid = isVideoUrl(u);
         if (vid && vids >= 2) continue;
+        seen.add(u);
         capped.push(u);
         if (vid) vids++;
       }
@@ -144,7 +147,7 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
         <div>
           <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Fondos del Landing</label>
           {isPro ? (
-            <BannerUpload name="banners" existingImages={existingImages} existingVideos={existingVideos} />
+            <BannerUpload key={`${existingImages}-${existingVideos}`} name="banners" existingImages={existingImages} existingVideos={existingVideos} />
           ) : (
             <div style={{ padding: '1rem', borderRadius: '8px', border: '1px dashed var(--border-color)', backgroundColor: 'var(--bg-secondary)' }}>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>
