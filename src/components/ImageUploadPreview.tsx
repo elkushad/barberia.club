@@ -100,7 +100,8 @@ export default function ImageUploadPreview({ name, accept = "image/*", multiple 
           const blob = await upload(file.name, file, {
             access: "public",
             handleUploadUrl: "/api/blob/upload",
-            multipart: true, // parte el archivo, sube en paralelo y reintenta trozos
+            // PUT simple (sin multipart): es el camino que sí reportaba progreso.
+            // Multipart hacía varias peticiones y se trababa en 0% con archivos chicos.
             abortSignal: controller.signal,
             onUploadProgress: (p) => {
               setProgress(Math.round(p.percentage));
