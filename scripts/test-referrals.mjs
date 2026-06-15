@@ -22,41 +22,36 @@ function assert(cond, msg) {
   }
 }
 
-// Réplica de applyCredit/welcomeDiscount (lógica pura) para no importar TS.
+// Lógica pura (réplica para no importar TS).
 const REWARD = 5;
 const RATE = 0.2;
 const PRO_PEN = 29.9;
+const MIN_WITHDRAWAL = 50;
 const round2 = (n) => Math.round(n * 100) / 100;
-function applyCredit(price, available) {
-  const applied = Math.min(price, available);
-  return { applied, total: Math.max(0, price - applied), remainingCredit: Math.max(0, available - applied) };
-}
 const welcomeDiscount = () => round2(PRO_PEN * RATE);
+// Saldo disponible = Σ de movimientos (créditos +, retiros −), clamp a 0.
+const balance = (movs) => Math.max(0, movs.reduce((a, m) => a + m, 0));
+const canWithdraw = (available) => available >= MIN_WITHDRAWAL;
 
 console.log("\nParte A — lógica pura\n");
 
-// Descuento de bienvenida 20%.
+// Descuento de bienvenida 20% (invitado).
 assert(welcomeDiscount() === 5.98, "20% de S/29.90 = S/5.98");
-assert(round2(PRO_PEN - welcomeDiscount()) === 23.92, "Total con descuento = S/23.92");
+assert(round2(PRO_PEN - welcomeDiscount()) === 23.92, "Primer mes con descuento = S/23.92");
 
 // Recompensa del referente.
 assert(REWARD === 5, "Recompensa por referido = S/5");
 
-// Caso borde: crédito mayor al monto de renovación.
-let c = applyCredit(29.9, 50);
-assert(c.applied === 29.9, "Crédito > monto: consume solo S/29.90");
-assert(round2(c.remainingCredit) === 20.1, "Crédito > monto: quedan S/20.10");
-assert(c.total === 0, "Crédito > monto: total a pagar S/0");
+// Saldo retirable: suma del libro mayor.
+assert(balance([5, 5, 5]) === 15, "3 recompensas liberadas = S/15 disponible");
+assert(balance([5, 5, 5, 5, 5, 5, 5, 5, 5, 5]) === 50, "10 referidos liberados = S/50");
+assert(balance([50, -50]) === 0, "Tras pagar el retiro, saldo vuelve a S/0");
+assert(balance([50, -20]) === 30, "Retiro parcial de S/20 deja S/30");
 
-// Caso borde: pago parcialmente cubierto con créditos.
-c = applyCredit(29.9, 10);
-assert(c.applied === 10, "Crédito parcial: aplica S/10");
-assert(round2(c.total) === 19.9, "Crédito parcial: total S/19.90");
-assert(c.remainingCredit === 0, "Crédito parcial: saldo restante S/0");
-
-// Sin saldo: paga completo.
-c = applyCredit(29.9, 0);
-assert(c.total === 29.9 && c.applied === 0, "Sin saldo: paga S/29.90 completo");
+// Mínimo de retiro S/50.
+assert(canWithdraw(50) === true, "Con S/50 se puede retirar");
+assert(canWithdraw(49.99) === false, "Con S/49.99 NO se puede retirar");
+assert(canWithdraw(0) === false, "Sin saldo no se puede retirar");
 
 // ---------------------------------------------------------------------------
 async function dbTests() {

@@ -3,7 +3,9 @@ import {
   getReferralSummary,
   getReferralRows,
   reconcileReferrals,
+  withdrawalWhatsAppLink,
   REFERRAL_REWARD,
+  MIN_WITHDRAWAL,
 } from "@/lib/referrals";
 import CopyReferralLink from "./CopyReferralLink";
 
@@ -27,6 +29,9 @@ export default async function ReferidosPage({ params }: { params: Promise<{ slug
 
   const summary = await getReferralSummary(barbershop.id);
   const rows = await getReferralRows(barbershop.id);
+
+  const canWithdraw = summary.availableBalance >= MIN_WITHDRAWAL;
+  const waLink = withdrawalWhatsAppLink(barbershop.name, summary.availableBalance);
 
   return (
     <div style={{ maxWidth: "880px" }}>
@@ -66,6 +71,37 @@ export default async function ReferidosPage({ params }: { params: Promise<{ slug
           <h3 style={{ color: "var(--text-secondary)", fontSize: "0.8rem" }}>Referidos</h3>
           <p style={{ fontSize: "1.8rem", fontWeight: "bold" }}>{summary.referralCount}</p>
         </div>
+      </div>
+
+      {/* Retiro de saldo */}
+      <div className="premium-card" style={{ marginBottom: "1.5rem" }}>
+        <h3 style={{ marginBottom: "0.25rem" }}>Retirar saldo</h3>
+        <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginBottom: "0.75rem" }}>
+          Tu saldo disponible se transfiere a tu cuenta bancaria. El retiro se solicita por el
+          WhatsApp oficial de barberia.club a partir de <strong>{money(MIN_WITHDRAWAL)}</strong>.
+        </p>
+        {canWithdraw && waLink ? (
+          <a
+            href={waLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="premium-btn"
+            style={{ display: "inline-block", textDecoration: "none", backgroundColor: "#25D366", color: "white" }}
+          >
+            Solicitar retiro por WhatsApp ({money(summary.availableBalance)})
+          </a>
+        ) : (
+          <button
+            disabled
+            className="premium-btn"
+            style={{ opacity: 0.5, cursor: "not-allowed" }}
+            title={`Disponible desde ${money(MIN_WITHDRAWAL)}`}
+          >
+            {summary.availableBalance > 0
+              ? `Te faltan ${money(MIN_WITHDRAWAL - summary.availableBalance)} para retirar`
+              : `Disponible desde ${money(MIN_WITHDRAWAL)}`}
+          </button>
+        )}
       </div>
 
       {/* Link de referido */}

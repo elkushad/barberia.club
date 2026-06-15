@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { PRO_PRICE_USD } from "@/lib/pricing";
 
 // Recompensa fija para el referente por cada barbería referida válida.
 export const REFERRAL_REWARD = 5; // S/5
@@ -7,6 +6,21 @@ export const REFERRAL_REWARD = 5; // S/5
 export const REFERRAL_DISCOUNT_RATE = 0.2; // 20%
 // Días que la referida debe mantenerse Pro para liberar la recompensa.
 export const UNLOCK_DAYS = 30;
+// Saldo mínimo para poder solicitar un retiro a cuenta bancaria.
+export const MIN_WITHDRAWAL = 50; // S/50
+
+// WhatsApp oficial de barberia.club para tramitar retiros (configurable por env).
+const SUPPORT_WHATSAPP = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "";
+
+/** Link de WhatsApp para solicitar un retiro (mensaje prellenado). Null si no hay número. */
+export function withdrawalWhatsAppLink(shopName: string, amount: number): string | null {
+  if (!SUPPORT_WHATSAPP) return null;
+  const phone = SUPPORT_WHATSAPP.replace(/\D/g, "");
+  const msg =
+    `Hola, soy ${shopName}. Quiero solicitar el retiro de mi saldo de referidos ` +
+    `(S/${amount.toFixed(2)}) a mi cuenta bancaria.`;
+  return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+}
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -248,13 +262,11 @@ export interface ReferralSummary {
 export async function getReferralSummary(barbershopId: string): Promise<ReferralSummary> {
   const code = await ensureReferralCode(barbershopId);
 
-  const [released, used, pending, totalEarnedAgg, count] = await Promise.all([
+  const [movements, pending, totalEarnedAgg, count] = await Promise.all([
+    // Saldo disponible = Σ de todos los movimientos (créditos liberados positivos,
+    // retiros pagados negativos).
     prisma.creditMovement.aggregate({
-      where: { barbershopId, reason: "REWARD_RELEASED" },
-      _sum: { amount: true },
-    }),
-    prisma.creditMovement.aggregate({
-      where: { barbershopId, reason: "CREDIT_USED" },
+      where: { barbershopId },
       _sum: { amount: true },
     }),
     prisma.referral.aggregate({
@@ -268,9 +280,7 @@ export async function getReferralSummary(barbershopId: string): Promise<Referral
     prisma.referral.count({ where: { referrerId: barbershopId } }),
   ]);
 
-  const releasedSum = released._sum.amount ?? 0;
-  const usedSum = Math.abs(used._sum.amount ?? 0); // los débitos se guardan negativos
-  const availableBalance = Math.max(0, releasedSum - usedSum);
+  const availableBalance = Math.max(0, movements._sum.amount ?? 0);
 
   return {
     availableBalance,
@@ -308,21 +318,7 @@ export async function getReferralRows(barbershopId: string) {
   });
 }
 
-/** Aplica saldo disponible a un monto a pagar. Devuelve el cálculo (no cobra). */
-export function applyCredit(price: number, available: number) {
-  const applied = Math.min(price, available);
-  return {
-    applied,
-    total: Math.max(0, price - applied),
-    remainingCredit: Math.max(0, available - applied),
-  };
-}
-
 /** Monto del descuento de bienvenida del invitado (20% del precio Pro en PEN). */
 export function welcomeDiscountPEN(): number {
   return Math.round(29.9 * REFERRAL_DISCOUNT_RATE * 100) / 100; // 5.98
-}
-
-export function welcomeDiscountUSD(): number {
-  return Math.round(PRO_PRICE_USD * REFERRAL_DISCOUNT_RATE * 100) / 100; // 2.00
 }

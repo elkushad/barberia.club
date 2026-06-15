@@ -9,6 +9,7 @@ import {
   Users,
   CircleDollarSign,
   Network,
+  Gift,
   Settings,
   Menu,
   X
@@ -24,6 +25,7 @@ export default function GodmodeShell({ children }: { children: React.ReactNode }
     { name: "Clientes", href: "/godmode/clientes", icon: Users },
     { name: "Finanzas", href: "/godmode/finanzas", icon: CircleDollarSign },
     { name: "Revendedores", href: "/godmode/revendedores", icon: Network },
+    { name: "Referidos", href: "/godmode/referidos", icon: Gift },
     { name: "Sistema", href: "/godmode/sistema", icon: Settings },
   ];
 

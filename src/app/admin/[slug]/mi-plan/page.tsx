@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import UpgradeToPro from "@/components/UpgradeToPro";
 import MercadoPagoButton from "@/components/MercadoPagoButton";
-import { getReferralSummary, applyCredit, welcomeDiscountPEN } from "@/lib/referrals";
+import { welcomeDiscountPEN } from "@/lib/referrals";
 
 const PRO_PEN = 29.9;
 
@@ -12,12 +12,10 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
 
   const isPro = barbershop.plan === "PRO";
 
-  // Beneficios de referidos aplicables al checkout (en PEN, referencia visual).
-  const summary = await getReferralSummary(barbershop.id);
+  // Descuento de bienvenida del invitado (20% del primer mes Pro).
   const hasWelcomeDiscount = barbershop.discountEligible && !barbershop.discountUsed && !isPro;
   const discount = hasWelcomeDiscount ? welcomeDiscountPEN() : 0;
-  const priceAfterDiscount = Math.max(0, PRO_PEN - discount);
-  const credit = applyCredit(priceAfterDiscount, summary.availableBalance);
+  const totalFirstMonth = Math.max(0, PRO_PEN - discount);
 
   return (
     <div style={{ maxWidth: "640px" }}>
@@ -45,7 +43,7 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
             <strong>S/ 29.90/mes</strong> (Perú) · <strong>$10 USD/mes</strong> (otros países) · se renueva automáticamente · cancela cuando quieras.
           </p>
 
-          {(hasWelcomeDiscount || summary.availableBalance > 0) && (
+          {hasWelcomeDiscount && (
             <div
               style={{
                 background: "rgba(34,197,94,0.08)",
@@ -60,29 +58,16 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
                 <span>Plan Pro (Perú)</span>
                 <span>S/ {PRO_PEN.toFixed(2)}</span>
               </div>
-              {hasWelcomeDiscount && (
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.3rem", color: "var(--accent-success, #22c55e)" }}>
-                  <span>Descuento referido (20%)</span>
-                  <span>− S/ {discount.toFixed(2)}</span>
-                </div>
-              )}
-              {credit.applied > 0 && (
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.3rem", color: "var(--accent-success, #22c55e)" }}>
-                  <span>Saldo de referidos</span>
-                  <span>− S/ {credit.applied.toFixed(2)}</span>
-                </div>
-              )}
-              <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, borderTop: "1px solid var(--border-color)", paddingTop: "0.4rem", marginTop: "0.4rem" }}>
-                <span>Total a pagar</span>
-                <span>S/ {credit.total.toFixed(2)}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.3rem", color: "var(--accent-success, #22c55e)" }}>
+                <span>Descuento por invitación (20%)</span>
+                <span>− S/ {discount.toFixed(2)}</span>
               </div>
-              {credit.remainingCredit > 0 && (
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.78rem", marginTop: "0.5rem" }}>
-                  Te quedarán S/ {credit.remainingCredit.toFixed(2)} de saldo para próximas renovaciones.
-                </p>
-              )}
+              <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, borderTop: "1px solid var(--border-color)", paddingTop: "0.4rem", marginTop: "0.4rem" }}>
+                <span>Tu primer mes</span>
+                <span>S/ {totalFirstMonth.toFixed(2)}</span>
+              </div>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.78rem", marginTop: "0.5rem" }}>
-                El descuento y el saldo se aplican a tu cuenta al confirmar el pago.
+                🎁 Llegaste por una invitación: 20% de descuento en tu primer mes del Plan Pro.
               </p>
             </div>
           )}
@@ -90,7 +75,7 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
           <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             <div>
               <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>
-                🇵🇪 Perú — Mercado Pago (S/ 29.90)
+                🇵🇪 Perú — Mercado Pago (S/ 29.90) · <strong style={{ color: "var(--accent-success, #22c55e)" }}>7 días gratis</strong>
               </p>
               <MercadoPagoButton slug={barbershop.slug} />
             </div>
