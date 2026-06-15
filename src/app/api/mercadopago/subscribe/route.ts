@@ -5,8 +5,11 @@ import { prisma } from "@/lib/prisma";
 
 const Schema = z.object({ slug: z.string().min(1) });
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.barberia.club";
-// Plan de suscripción de Mercado Pago (público; sobreescribible por env).
-const PLAN_ID = process.env.MERCADOPAGO_PLAN_ID || "05ca87e1eeb24969a9401242780b973e";
+// Plan CON 7 días gratis: beneficio exclusivo de barberías referidas.
+const PLAN_ID_TRIAL = process.env.MERCADOPAGO_PLAN_ID || "05ca87e1eeb24969a9401242780b973e";
+// Plan SIN prueba gratis: default para barberías no referidas.
+// Si no está configurado, cae al plan con trial (comportamiento actual).
+const PLAN_ID_NOTRIAL = process.env.MERCADOPAGO_PLAN_ID_NOTRIAL || PLAN_ID_TRIAL;
 
 export async function POST(req: Request) {
   try {
@@ -25,12 +28,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
+    // Las barberías referidas (con el beneficio de bienvenida disponible) van al
+    // plan con 7 días gratis; el resto, al plan sin prueba.
+    const eligible = barbershop.discountEligible && !barbershop.discountUsed;
+    const planId = eligible ? PLAN_ID_TRIAL : PLAN_ID_NOTRIAL;
+
     // Checkout del plan de suscripción de MP. external_reference identifica la
     // barbería (lo lee el webhook para activar el Pro). El comprador inicia
     // sesión con la cuenta que quiera (no fijamos payer_email).
     const backUrl = `${APP_URL}/admin/${slug}/mi-plan?mp=ok`;
     const initPoint =
-      `https://www.mercadopago.com.pe/subscriptions/checkout?preapproval_plan_id=${PLAN_ID}` +
+      `https://www.mercadopago.com.pe/subscriptions/checkout?preapproval_plan_id=${planId}` +
       `&external_reference=${encodeURIComponent(barbershop.id)}` +
       `&back_url=${encodeURIComponent(backUrl)}`;
 

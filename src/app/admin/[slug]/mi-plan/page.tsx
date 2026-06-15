@@ -62,7 +62,10 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
           <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             <div>
               <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>
-                🇵🇪 Perú — Mercado Pago (S/ 29.90) · <strong style={{ color: "var(--accent-success, #22c55e)" }}>7 días gratis</strong>
+                🇵🇪 Perú — Mercado Pago (S/ 29.90)
+                {hasWelcomeDiscount && (
+                  <> · <strong style={{ color: "var(--accent-success, #22c55e)" }}>7 días gratis</strong></>
+                )}
               </p>
               <MercadoPagoButton slug={barbershop.slug} />
             </div>
