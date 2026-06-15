@@ -17,15 +17,6 @@ export async function POST(request: Request): Promise<NextResponse> {
           throw new Error("No autorizado");
         }
         return {
-          allowedContentTypes: [
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-            "image/gif",
-            "video/mp4",
-            "video/webm",
-            "video/quicktime",
-          ],
           addRandomSuffix: true,
           maximumSizeInBytes: 50 * 1024 * 1024, // 50 MB
         };

@@ -35,8 +35,8 @@ export default function ImageUploadPreview({ name, accept = "image/*", multiple 
       }
       // Logo (single): reemplaza. Fondos (multiple): acumula.
       setItems((prev) => (multiple ? [...prev, ...uploaded] : uploaded));
-    } catch {
-      setError("No se pudo subir el archivo. Revisa el tamaño/formato e intenta de nuevo.");
+    } catch (err) {
+      setError(err instanceof Error ? `Error al subir: ${err.message}` : "No se pudo subir el archivo.");
     }
 
     setUploading(false);
