@@ -50,6 +50,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         { label: "Recompensas", href: `/admin/${barbershop.slug}/recompensas` },
         { label: "Configuración", href: `/admin/${barbershop.slug}/configuracion` },
         { label: "QR / Promoción", href: `/admin/${barbershop.slug}/qr` },
+        { label: "Referidos", href: `/admin/${barbershop.slug}/referidos` },
         { label: "Mi Plan", href: `/admin/${barbershop.slug}/mi-plan` },
       ];
     }

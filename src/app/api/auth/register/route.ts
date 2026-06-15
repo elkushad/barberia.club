@@ -3,12 +3,14 @@ import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { rateLimit, clientIp } from '@/lib/rate-limit';
+import { generateUniqueReferralCode, linkReferral, audit } from '@/lib/referrals';
 
 const RegisterSchema = z.object({
   barberName: z.string().trim().min(2).max(80),
   email: z.string().trim().email().max(120),
   password: z.string().min(6).max(200),
   whatsapp: z.string().trim().min(5).max(30),
+  ref: z.string().trim().max(20).optional(),
 });
 
 function generateSlug(name: string): string {
@@ -30,7 +32,7 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 });
     }
-    const { barberName, email, password, whatsapp } = parsed.data;
+    const { barberName, email, password, whatsapp, ref } = parsed.data;
 
     if (!barberName || !email || !password) {
       return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
@@ -63,8 +65,11 @@ export async function POST(req: Request) {
     // Hashear la contraseña antes de guardarla (nunca en texto plano)
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Cada barbería nace con su propio código de referido único.
+    const referralCode = await generateUniqueReferralCode();
+
     // Create User and Barbershop
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
@@ -75,12 +80,30 @@ export async function POST(req: Request) {
             name: barberName,
             slug,
             whatsapp,
+            referralCode,
           }
         }
       },
+      include: { barbershops: true },
     });
 
-    return NextResponse.json({ success: true, message: 'Barbería registrada exitosamente' }, { status: 201 });
+    const newShop = user.barbershops[0];
+
+    // Asociación de referido (con todas las validaciones antifraude).
+    if (ref && newShop) {
+      await linkReferral({
+        referredId: newShop.id,
+        referredOwnerId: user.id,
+        referredEmail: email,
+        referredWhatsapp: whatsapp,
+        code: ref,
+      });
+    }
+
+    return NextResponse.json(
+      { success: true, message: 'Barbería registrada exitosamente', slug },
+      { status: 201 }
+    );
 
   } catch (error) {
     console.error('Registration Error:', error);

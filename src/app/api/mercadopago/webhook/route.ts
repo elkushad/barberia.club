@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { onReferredProPayment, onReferredCancelled } from "@/lib/referrals";
 
 const MP_API = "https://api.mercadopago.com";
 
@@ -56,8 +57,12 @@ export async function POST(req: Request) {
                 },
               });
             }
+            // Referidos: crea la recompensa PENDING si vino por un enlace (idempotente).
+            await onReferredProPayment(barbershopId);
           } else if (status === "cancelled") {
             await prisma.barbershop.update({ where: { id: barbershopId }, data: { plan: "FREE" } });
+            // Referidos: cancela la recompensa si aún no se había liberado.
+            await onReferredCancelled(barbershopId, "MP_CANCELLED");
           }
         }
       }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
@@ -31,7 +31,15 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [ref, setRef] = useState("");
   const router = useRouter();
+
+  // Capturar el código de referido del enlace (?ref=ABC123).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const r = params.get("ref");
+    if (r) setRef(r.trim());
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +50,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ barberName, email, password, whatsapp: `${countryCode} ${phone}`.trim() }),
+        body: JSON.stringify({ barberName, email, password, whatsapp: `${countryCode} ${phone}`.trim(), ref: ref || undefined }),
       });
 
       const data = await res.json();
@@ -79,6 +87,20 @@ export default function RegisterPage() {
       <div className={styles.loginCard} style={{ maxWidth: '420px', width: '100%' }}>
         <h1 className={`${styles.title} text-gradient`} style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>barberia.club</h1>
         <p className={styles.subtitle} style={{ marginBottom: '2rem' }}>Crea tu cuenta y empieza a premiar a tus clientes.</p>
+
+        {ref && (
+          <div style={{
+            background: 'rgba(34,197,94,0.12)',
+            border: '1px solid var(--accent-success, #22c55e)',
+            borderRadius: '8px',
+            padding: '0.85rem 1rem',
+            marginBottom: '1.25rem',
+            fontSize: '0.9rem',
+            color: 'var(--accent-success, #22c55e)',
+          }}>
+            🎁 Llegaste por una invitación. Obtienes <strong>20% de descuento</strong> en tu primer mes del Plan Pro.
+          </div>
+        )}
 
         {error && <div className={styles.error}>{error}</div>}
 

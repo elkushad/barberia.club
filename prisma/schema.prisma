@@ -42,6 +42,53 @@ model Barbershop {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   payments    Payment[]
+
+  // --- Referidos ---
+  referralCode       String?      @unique // código único de referido (ej "ABC123")
+  referredById       String?               // barbería que la refirió (asociación permanente)
+  referredBy         Barbershop?  @relation("Refs", fields: [referredById], references: [id])
+  referidos          Barbershop[] @relation("Refs")
+  discountEligible   Boolean      @default(false) // 20% del primer mes Pro disponible
+  discountUsed       Boolean      @default(false) // ya consumió el descuento
+  referralsMade      Referral[]   @relation("Referrer")
+  referralAsReferred Referral?    @relation("Referred")
+  creditMovements    CreditMovement[]
+}
+
+// Recompensa para el referente: S/5 por cada barbería referida que paga Pro.
+// Se libera (AVAILABLE) recién a los 30 días si la suscripción sigue vigente.
+model Referral {
+  id           String     @id @default(cuid())
+  referrerId   String
+  referrer     Barbershop @relation("Referrer", fields: [referrerId], references: [id])
+  referredId   String     @unique // 1 sola recompensa por barbería referida (antifraude)
+  referred     Barbershop @relation("Referred", fields: [referredId], references: [id])
+  status       String     @default("PENDING") // PENDING | AVAILABLE | CANCELLED
+  rewardAmount Float      @default(5)
+  proPaidAt    DateTime?  // momento del pago Pro (arranca el reloj de 30 días)
+  unlockAt     DateTime?  // proPaidAt + 30 días
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+// Libro mayor de créditos. Saldo disponible = Σ(créditos liberados) − Σ(usados).
+model CreditMovement {
+  id           String     @id @default(cuid())
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
+  amount       Float      // + = crédito liberado, − = usado en un pago
+  reason       String     // REWARD_RELEASED | CREDIT_USED
+  referralId   String?    // referencia opcional a la recompensa de origen
+  createdAt    DateTime   @default(now())
+}
+
+// Auditoría de eventos del sistema de referidos (con timestamps).
+model AuditEvent {
+  id           String   @id @default(cuid())
+  barbershopId String?  // barbería afectada (si aplica)
+  type         String   // REFERRAL_CREATED, REFERRAL_SIGNUP, REFERRAL_PRO_PAYMENT, ...
+  meta         String?  // JSON con detalle del evento
+  createdAt    DateTime @default(now())
 }
 
 model Customer {

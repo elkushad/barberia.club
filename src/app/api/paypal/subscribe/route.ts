@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getPayPalSubscription } from "@/lib/paypal";
+import { onReferredProPayment } from "@/lib/referrals";
 
 const Schema = z.object({
   subscriptionID: z.string().min(1),
@@ -52,6 +53,9 @@ export async function POST(req: Request) {
     await prisma.payment.create({
       data: { amount: 10, currency: "USD", status: "PAID", method: "PAYPAL", barbershopId: barbershop.id },
     });
+
+    // Referidos: si vino por un enlace, crea la recompensa PENDING (idempotente).
+    await onReferredProPayment(barbershop.id);
 
     return NextResponse.json({ success: true });
   } catch {

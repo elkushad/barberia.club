@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getPayPalAccessToken } from "@/lib/paypal";
+import { onReferredProPayment, onReferredCancelled } from "@/lib/referrals";
 
 const PAYPAL_API = process.env.PAYPAL_API_BASE || "https://api-m.sandbox.paypal.com";
 const WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID || "9AF55025PS586635F";
@@ -82,6 +83,8 @@ export async function POST(req: Request) {
             },
           });
         }
+        // Referidos: crea la recompensa PENDING si vino por un enlace (idempotente).
+        await onReferredProPayment(shop.id);
       }
     } else if (
       type === "BILLING.SUBSCRIPTION.CANCELLED" ||
@@ -95,6 +98,8 @@ export async function POST(req: Request) {
         });
         if (shop) {
           await prisma.barbershop.update({ where: { id: shop.id }, data: { plan: "FREE" } });
+          // Referidos: cancela la recompensa si aún no se había liberado.
+          await onReferredCancelled(shop.id, "PAYPAL_" + (type ?? "CANCELLED"));
         }
       }
     }
