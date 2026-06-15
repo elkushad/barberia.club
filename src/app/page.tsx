@@ -38,31 +38,31 @@ export default function SaaSLanding() {
               </div>
             </ScrollAnimation>
             
-            <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem', fontSize: '0.85rem', color: 'var(--saas-text-muted)', flexWrap: 'wrap' }}>
-              <ScrollAnimation delay="delay-300">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <div style={{ padding: '8px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '50%', color: 'var(--saas-text-muted)', display: 'flex' }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3h6v6H3z"/><path d="M15 3h6v6h-6z"/><path d="M3 15h6v6H3z"/><path d="M15 15h6v6h-6z"/></svg>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: '1rem', fontSize: '0.85rem', color: 'var(--saas-text-muted)', flexWrap: 'nowrap' }}>
+              <ScrollAnimation delay="delay-300" style={{ flex: 1 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.75rem', padding: '1rem 0.5rem', borderRadius: '12px', transition: 'background-color 0.3s ease, transform 0.3s ease' }} className="feature-item-hover">
+                  <div style={{ padding: '12px', background: 'linear-gradient(135deg, rgba(255,51,102,0.1) 0%, rgba(255,51,102,0.05) 100%)', borderRadius: '50%', color: 'var(--saas-red)', display: 'flex', boxShadow: '0 4px 12px rgba(255,51,102,0.1)' }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3h6v6H3z"/><path d="M15 3h6v6h-6z"/><path d="M3 15h6v6H3z"/><path d="M15 15h6v6h-6z"/></svg>
                   </div>
-                  <span style={{ maxWidth: '120px', lineHeight: 1.3 }}>Flyer con QR<br/>listo para imprimir</span>
+                  <span style={{ lineHeight: 1.4, fontWeight: 500, color: '#e2e8f0' }}>Flyer con QR<br/>listo para imprimir</span>
                 </div>
               </ScrollAnimation>
-              
-              <ScrollAnimation delay="delay-400">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <div style={{ padding: '8px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '50%', color: 'var(--saas-text-muted)', display: 'flex' }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+
+              <ScrollAnimation delay="delay-400" style={{ flex: 1 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.75rem', padding: '1rem 0.5rem', borderRadius: '12px', transition: 'background-color 0.3s ease, transform 0.3s ease' }} className="feature-item-hover">
+                  <div style={{ padding: '12px', background: 'linear-gradient(135deg, rgba(255,51,102,0.1) 0%, rgba(255,51,102,0.05) 100%)', borderRadius: '50%', color: 'var(--saas-red)', display: 'flex', boxShadow: '0 4px 12px rgba(255,51,102,0.1)' }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
                   </div>
-                  <span style={{ maxWidth: '140px', lineHeight: 1.3 }}>Sistema de recompensas<br/>por fidelización</span>
+                  <span style={{ lineHeight: 1.4, fontWeight: 500, color: '#e2e8f0' }}>Sistema de recompensas<br/>por fidelización</span>
                 </div>
               </ScrollAnimation>
-              
-              <ScrollAnimation delay="delay-400">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <div style={{ padding: '8px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '50%', color: 'var(--saas-text-muted)', display: 'flex' }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+
+              <ScrollAnimation delay="delay-500" style={{ flex: 1 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.75rem', padding: '1rem 0.5rem', borderRadius: '12px', transition: 'background-color 0.3s ease, transform 0.3s ease' }} className="feature-item-hover">
+                  <div style={{ padding: '12px', background: 'linear-gradient(135deg, rgba(255,51,102,0.1) 0%, rgba(255,51,102,0.05) 100%)', borderRadius: '50%', color: 'var(--saas-red)', display: 'flex', boxShadow: '0 4px 12px rgba(255,51,102,0.1)' }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                   </div>
-                  <span style={{ maxWidth: '130px', lineHeight: 1.3 }}>Registro de clientes<br/>y contactos</span>
+                  <span style={{ lineHeight: 1.4, fontWeight: 500, color: '#e2e8f0' }}>Registro de clientes<br/>y contactos</span>
                 </div>
               </ScrollAnimation>
             </div>
@@ -242,6 +242,10 @@ export default function SaaSLanding() {
           .hero-image-container {
             width: 100%;
           }
+        }
+        .feature-item-hover:hover {
+          background-color: rgba(255,255,255,0.03);
+          transform: translateY(-4px);
         }
       `}</style>
     </div>
