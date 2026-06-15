@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function LandingForm({ barbershopId, brandColor, barbershopName, barbershopWhatsapp }: { barbershopId: string, brandColor: string, barbershopName?: string, barbershopWhatsapp?: string }) {
+export default function LandingForm({ barbershopId, brandColor, barbershopName, barbershopWhatsapp, barbershopInstagram, barbershopTiktok, barbershopFacebook }: { barbershopId: string, brandColor: string, barbershopName?: string, barbershopWhatsapp?: string, barbershopInstagram?: string, barbershopTiktok?: string, barbershopFacebook?: string }) {
   const [step, setStep] = useState(1);
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
@@ -224,6 +224,29 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
           <button onClick={() => router.push(`/c/${customerData.uniqueCode}`)} className="premium-btn-secondary" style={{ marginTop: '0.25rem', padding: '10px 20px', fontSize: '0.9rem' }}>
             Ver mis recompensas
           </button>
+
+          {(barbershopInstagram || barbershopTiktok || barbershopFacebook) && (
+            <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>Sigue mi trabajo</p>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                {barbershopInstagram && (
+                  <a href={barbershopInstagram} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', transition: 'transform 0.2s', display: 'inline-block' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                  </a>
+                )}
+                {barbershopTiktok && (
+                  <a href={barbershopTiktok} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', transition: 'transform 0.2s', display: 'inline-block' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
+                  </a>
+                )}
+                {barbershopFacebook && (
+                  <a href={barbershopFacebook} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', transition: 'transform 0.2s', display: 'inline-block' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -234,13 +257,38 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{message}</p>
           
           {customerData && customerData.status === 'ACTIVE' && (
-            <button 
-              onClick={() => router.push(`/c/${customerData.uniqueCode}`)} 
-              className="premium-btn"
-              style={{ marginTop: '1rem', width: '100%', backgroundColor: brandColor, padding: '10px 20px', fontSize: '0.9rem' }}
-            >
-              Ver mis recompensas
-            </button>
+            <>
+              <button 
+                onClick={() => router.push(`/c/${customerData.uniqueCode}`)} 
+                className="premium-btn"
+                style={{ marginTop: '1rem', width: '100%', backgroundColor: brandColor, padding: '10px 20px', fontSize: '0.9rem' }}
+              >
+                Ver mis recompensas
+              </button>
+
+              {(barbershopInstagram || barbershopTiktok || barbershopFacebook) && (
+                <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>Sigue mi trabajo</p>
+                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                    {barbershopInstagram && (
+                      <a href={barbershopInstagram} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', transition: 'transform 0.2s', display: 'inline-block' }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                      </a>
+                    )}
+                    {barbershopTiktok && (
+                      <a href={barbershopTiktok} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', transition: 'transform 0.2s', display: 'inline-block' }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
+                      </a>
+                    )}
+                    {barbershopFacebook && (
+                      <a href={barbershopFacebook} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', transition: 'transform 0.2s', display: 'inline-block' }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

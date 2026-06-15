@@ -76,6 +76,9 @@ export default async function PublicLandingPage({ params }: { params: Promise<{ 
               brandColor={brandColor} 
               barbershopName={barbershop.name}
               barbershopWhatsapp={barbershop.whatsapp || ""}
+              barbershopInstagram={barbershop.instagram || ""}
+              barbershopTiktok={barbershop.tiktok || ""}
+              barbershopFacebook={barbershop.facebook || ""}
             />
           )}
         </div>

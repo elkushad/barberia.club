@@ -46,27 +46,27 @@ export default async function PlanesPage() {
           <ScrollAnimation delay="delay-100">
             <div style={{
               display: 'flex',
-              flexWrap: 'wrap',
+              flexDirection: 'row',
               justifyContent: 'center',
-              gap: '1.5rem',
+              gap: '1rem',
               border: '1px solid var(--saas-border)',
               borderRadius: '12px',
-              padding: '1.25rem 2rem',
-              maxWidth: 'fit-content',
+              padding: '1.25rem 1.5rem',
+              maxWidth: '500px',
               margin: '0 auto 4rem auto',
               backgroundColor: 'transparent'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.5rem' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <span style={{ fontSize: '0.95rem', color: '#e2e8f0' }}>Sin contratos</span>
+                <span style={{ fontSize: '0.95rem', color: '#e2e8f0', lineHeight: 1.3 }}>Sin contratos</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.5rem' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <span style={{ fontSize: '0.95rem', color: '#e2e8f0' }}>Cancela cuando quieras</span>
+                <span style={{ fontSize: '0.95rem', color: '#e2e8f0', lineHeight: 1.3 }}>Cancela cuando quieras</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.5rem' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <span style={{ fontSize: '0.95rem', color: '#e2e8f0' }}>Soporte humano</span>
+                <span style={{ fontSize: '0.95rem', color: '#e2e8f0', lineHeight: 1.3 }}>Soporte humano</span>
               </div>
             </div>
           </ScrollAnimation>

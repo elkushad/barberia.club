@@ -39,6 +39,9 @@ model Barbershop {
   status      String     @default("ACTIVE") // ACTIVE, SUSPENDED
   expiresAt   DateTime?
   paypalSubscriptionId String?
+  instagram   String?
+  tiktok      String?
+  facebook    String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   payments    Payment[]

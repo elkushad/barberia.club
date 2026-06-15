@@ -42,6 +42,9 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     const description = formData.get("description") as string;
     const brandColor = formData.get("brandColor") as string;
     const whatsapp = formData.get("whatsapp") as string;
+    const instagram = formData.get("instagram") as string;
+    const tiktok = formData.get("tiktok") as string;
+    const facebook = formData.get("facebook") as string;
 
     // Las imágenes/videos se suben en el cliente a Vercel Blob; aquí solo
     // llegan las URLs ya subidas (evita el límite de tamaño de las server actions).
@@ -82,7 +85,7 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
 
     await prisma.barbershop.update({
       where: { id: currentBarbershop.id },
-      data: { name, description, brandColor, whatsapp, logo: logoUrl, banner: JSON.stringify(newBanners) }
+      data: { name, description, brandColor, whatsapp, instagram, tiktok, facebook, logo: logoUrl, banner: JSON.stringify(newBanners) }
     });
     
     revalidatePath(`/admin/${slug}/configuracion`);
@@ -131,6 +134,21 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
         <div>
           <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Número de WhatsApp (con código de país)</label>
           <input type="tel" name="whatsapp" defaultValue={barbershop.whatsapp || ""} className="premium-input" placeholder="ej: +34 600 000 000" />
+        </div>
+
+        <div>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Instagram</label>
+          <input type="url" name="instagram" defaultValue={barbershop.instagram || ""} className="premium-input" placeholder="ej: https://instagram.com/tubarberia" />
+        </div>
+
+        <div>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>TikTok</label>
+          <input type="url" name="tiktok" defaultValue={barbershop.tiktok || ""} className="premium-input" placeholder="ej: https://tiktok.com/@tubarberia" />
+        </div>
+
+        <div>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Facebook</label>
+          <input type="url" name="facebook" defaultValue={barbershop.facebook || ""} className="premium-input" placeholder="ej: https://facebook.com/tubarberia" />
         </div>
 
         <div>
