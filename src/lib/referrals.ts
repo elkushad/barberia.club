@@ -9,8 +9,8 @@ export const UNLOCK_DAYS = 30;
 // Saldo mínimo para poder solicitar un retiro a cuenta bancaria.
 export const MIN_WITHDRAWAL = 50; // S/50
 
-// WhatsApp oficial de barberia.club para tramitar retiros (configurable por env).
-const SUPPORT_WHATSAPP = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "";
+// WhatsApp oficial de barberia.club para tramitar retiros (override por env).
+const SUPPORT_WHATSAPP = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "51997237775";
 
 /** Link de WhatsApp para solicitar un retiro (mensaje prellenado). Null si no hay número. */
 export function withdrawalWhatsAppLink(shopName: string, amount: number): string | null {
@@ -318,7 +318,15 @@ export async function getReferralRows(barbershopId: string) {
   });
 }
 
-/** Monto del descuento de bienvenida del invitado (20% del precio Pro en PEN). */
-export function welcomeDiscountPEN(): number {
-  return Math.round(29.9 * REFERRAL_DISCOUNT_RATE * 100) / 100; // 5.98
+/** Precio Pro en USD (PayPal). */
+export const PRO_PRICE_USD = 10;
+
+/** Monto del descuento de bienvenida del invitado (20% del primer mes en USD/PayPal). */
+export function welcomeDiscountUSD(): number {
+  return Math.round(PRO_PRICE_USD * REFERRAL_DISCOUNT_RATE * 100) / 100; // 2.00
+}
+
+/** Precio del primer mes con el 20% de descuento (USD/PayPal). */
+export function firstMonthUSD(): number {
+  return Math.round((PRO_PRICE_USD - welcomeDiscountUSD()) * 100) / 100; // 8.00
 }

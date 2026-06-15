@@ -1,9 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import UpgradeToPro from "@/components/UpgradeToPro";
 import MercadoPagoButton from "@/components/MercadoPagoButton";
-import { welcomeDiscountPEN } from "@/lib/referrals";
-
-const PRO_PEN = 29.9;
+import { welcomeDiscountUSD, firstMonthUSD, PRO_PRICE_USD } from "@/lib/referrals";
 
 export default async function MiPlanPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -12,10 +10,10 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
 
   const isPro = barbershop.plan === "PRO";
 
-  // Descuento de bienvenida del invitado (20% del primer mes Pro).
+  // Descuento de bienvenida del invitado: 20% del primer mes.
+  // Solo es cobrable de forma nativa en PayPal (USD). En Mercado Pago el gancho
+  // del invitado son los 7 días gratis del plan.
   const hasWelcomeDiscount = barbershop.discountEligible && !barbershop.discountUsed && !isPro;
-  const discount = hasWelcomeDiscount ? welcomeDiscountPEN() : 0;
-  const totalFirstMonth = Math.max(0, PRO_PEN - discount);
 
   return (
     <div style={{ maxWidth: "640px" }}>
@@ -52,23 +50,12 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
                 padding: "1rem",
                 marginBottom: "1.5rem",
                 fontSize: "0.9rem",
+                color: "var(--accent-success, #22c55e)",
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.3rem" }}>
-                <span>Plan Pro (Perú)</span>
-                <span>S/ {PRO_PEN.toFixed(2)}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.3rem", color: "var(--accent-success, #22c55e)" }}>
-                <span>Descuento por invitación (20%)</span>
-                <span>− S/ {discount.toFixed(2)}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, borderTop: "1px solid var(--border-color)", paddingTop: "0.4rem", marginTop: "0.4rem" }}>
-                <span>Tu primer mes</span>
-                <span>S/ {totalFirstMonth.toFixed(2)}</span>
-              </div>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.78rem", marginTop: "0.5rem" }}>
-                🎁 Llegaste por una invitación: 20% de descuento en tu primer mes del Plan Pro.
-              </p>
+              🎁 Llegaste por una invitación. Tu beneficio de bienvenida:
+              <strong> 20% de descuento</strong> en tu primer mes con PayPal (${firstMonthUSD().toFixed(2)} el
+              primer mes, luego ${PRO_PRICE_USD}/mes) o <strong>7 días gratis</strong> con Mercado Pago.
             </div>
           )}
 
@@ -81,9 +68,16 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
             </div>
             <div>
               <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>
-                🌎 Otros países — PayPal ($10 USD)
+                🌎 Otros países — PayPal{" "}
+                {hasWelcomeDiscount ? (
+                  <strong style={{ color: "var(--accent-success, #22c55e)" }}>
+                    (primer mes ${firstMonthUSD().toFixed(2)}, 20% dcto · luego ${PRO_PRICE_USD})
+                  </strong>
+                ) : (
+                  <>(${PRO_PRICE_USD} USD)</>
+                )}
               </p>
-              <UpgradeToPro slug={barbershop.slug} />
+              <UpgradeToPro slug={barbershop.slug} discountEligible={hasWelcomeDiscount} />
             </div>
           </div>
         </div>

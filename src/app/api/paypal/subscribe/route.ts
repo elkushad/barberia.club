@@ -11,6 +11,7 @@ const Schema = z.object({
 });
 
 const PLAN_ID = process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID || "P-34R99602CN3659501NIXNLOI";
+const PLAN_ID_DISCOUNT = process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_DISCOUNT || "";
 
 export async function POST(req: Request) {
   try {
@@ -37,7 +38,8 @@ export async function POST(req: Request) {
     }
 
     const okStatus = subscription.status === "ACTIVE" || subscription.status === "APPROVED";
-    const okPlan = subscription.plan_id === PLAN_ID;
+    const usedDiscountPlan = !!PLAN_ID_DISCOUNT && subscription.plan_id === PLAN_ID_DISCOUNT;
+    const okPlan = subscription.plan_id === PLAN_ID || usedDiscountPlan;
     if (!okStatus || !okPlan) {
       return NextResponse.json({ error: "Suscripción no válida" }, { status: 400 });
     }
@@ -47,7 +49,13 @@ export async function POST(req: Request) {
 
     await prisma.barbershop.update({
       where: { id: barbershop.id },
-      data: { plan: "PRO", expiresAt, paypalSubscriptionId: subscriptionID },
+      data: {
+        plan: "PRO",
+        expiresAt,
+        paypalSubscriptionId: subscriptionID,
+        // El descuento de invitado es de un solo uso.
+        ...(usedDiscountPlan ? { discountUsed: true } : {}),
+      },
     });
 
     await prisma.payment.create({
