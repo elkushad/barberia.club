@@ -29,20 +29,30 @@ export default function ImageUploadPreview({ name, accept = "image/*", multiple 
       const uploaded: { url: string; isVideo: boolean }[] = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        // Aborta a los 45s: el SDK reintenta hasta 10 veces con backoff
-        // (>15 min) si el storage no responde, lo que parece un cuelgue.
+        // Timeout por INACTIVIDAD: se reinicia mientras el progreso avance,
+        // así una subida lenta pero constante termina; solo se cancela si se
+        // traba de verdad (sin avance por 30s).
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 45_000);
+        let stall: ReturnType<typeof setTimeout>;
+        const resetStall = () => {
+          clearTimeout(stall);
+          stall = setTimeout(() => controller.abort(), 30_000);
+        };
+        resetStall();
         try {
           const blob = await upload(file.name, file, {
             access: "public",
             handleUploadUrl: "/api/blob/upload",
+            multipart: true, // parte el archivo, sube en paralelo y reintenta trozos
             abortSignal: controller.signal,
-            onUploadProgress: (p) => setProgress(Math.round(p.percentage)),
+            onUploadProgress: (p) => {
+              setProgress(Math.round(p.percentage));
+              resetStall();
+            },
           });
           uploaded.push({ url: blob.url, isVideo: file.type.startsWith("video/") });
         } finally {
-          clearTimeout(timeout);
+          clearTimeout(stall);
         }
       }
       // Logo (single): reemplaza. Fondos (multiple): acumula.
