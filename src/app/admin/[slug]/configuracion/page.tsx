@@ -3,6 +3,11 @@ import { revalidatePath } from "next/cache";
 import { assertBarbershopAccessBySlug } from "@/lib/guards";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
+import BannerUpload from "@/components/BannerUpload";
+
+function isVideoUrl(u: string) {
+  return /\.(mp4|webm|mov|m4v|ogg)$/i.test(u) || u.startsWith("data:video/");
+}
 
 export default async function ConfiguracionPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -26,6 +31,9 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
   } catch {
     if (barbershop.banner) existingBanners = [barbershop.banner];
   }
+
+  const existingVideos = existingBanners.filter(isVideoUrl).length;
+  const existingImages = existingBanners.length - existingVideos;
 
   async function updateConfig(formData: FormData) {
     "use server";
@@ -53,11 +61,21 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     }
 
     const logoUrl = newLogoUrl || currentBarbershop.logo;
-    // Fondos del landing: solo plan Pro y máximo 5 imágenes en total.
+    // Fondos del landing: solo plan Pro. Máximo 5 en total y máximo 2 videos.
     const isProShop = currentBarbershop.plan === "PRO";
-    const newBanners = isProShop
-      ? [...currentBanners, ...newBannerUrls].slice(0, 5)
-      : currentBanners;
+    let newBanners = currentBanners;
+    if (isProShop) {
+      const capped: string[] = [];
+      let vids = 0;
+      for (const u of [...currentBanners, ...newBannerUrls]) {
+        if (capped.length >= 5) break;
+        const vid = isVideoUrl(u);
+        if (vid && vids >= 2) continue;
+        capped.push(u);
+        if (vid) vids++;
+      }
+      newBanners = capped;
+    }
 
     await prisma.barbershop.update({
       where: { id: currentBarbershop.id },
@@ -124,14 +142,9 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
         </div>
 
         <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Fondos del Landing (máx. 5 imágenes)</label>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Fondos del Landing</label>
           {isPro ? (
-            <>
-              <ImageUploadPreview name="banners" accept="image/*" multiple variant="photo" maxItems={5} existingCount={existingBanners.length} className="premium-input" style={{ padding: '8px' }} />
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
-                Hasta 5 imágenes. Se mostrarán en un carrusel en tu página pública.
-              </p>
-            </>
+            <BannerUpload name="banners" existingImages={existingImages} existingVideos={existingVideos} />
           ) : (
             <div style={{ padding: '1rem', borderRadius: '8px', border: '1px dashed var(--border-color)', backgroundColor: 'var(--bg-secondary)' }}>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>
