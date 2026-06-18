@@ -4,7 +4,8 @@ import PublicFooter from "@/components/PublicFooter";
 import ScrollAnimation from "@/components/ScrollAnimation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { detectCountryCode, currencyForCode, usdToLocal } from "@/lib/pricing";
+import { headers } from "next/headers";
+import { detectCountryCode, currencyForCode, usdToLocal, defaultCurrency } from "@/lib/pricing";
 import ProPriceSelector from "@/components/ProPriceSelector";
 
 export default async function PlanesPage() {
@@ -27,8 +28,11 @@ export default async function PlanesPage() {
   const freeHref = session ? "/admin" : "/register";
   const proHref = slug ? `/admin/${slug}/mi-plan` : "/register";
 
-  // Moneda por defecto del selector: soles para barberías de Perú, dólares para el resto.
-  const defaultCurrency = peru ? "PEN" : "USD";
+  // Moneda por defecto del selector según región del visitante:
+  // LATAM (menos Brasil) → soles; Brasil y resto del mundo → dólares.
+  // Si el dueño está logueado se usa el país de su WhatsApp; si no, el geo-IP (header de Vercel).
+  const geoCountry = (await headers()).get("x-vercel-ip-country");
+  const defaultCur = defaultCurrency({ callingCode: countryCode, iso: geoCountry });
   // Conversión aproximada del precio en USD a la moneda local del usuario extranjero.
   const approxLabel =
     localApprox !== null && cur
@@ -156,7 +160,7 @@ export default async function PlanesPage() {
                 </div>
                 
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem', color: 'white' }}>Pro</h3>
-                <ProPriceSelector defaultCurrency={defaultCurrency} approxLabel={approxLabel} />
+                <ProPriceSelector defaultCurrency={defaultCur} approxLabel={approxLabel} />
                 <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
                   Se renueva automáticamente · cancela cuando quieras
                 </p>

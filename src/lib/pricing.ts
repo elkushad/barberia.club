@@ -22,6 +22,28 @@ const COUNTRY_CURRENCY: Record<string, { currency: string; symbol: string }> = {
   "+507": { currency: "USD", symbol: "$" }, // Panamá
 };
 
+// Región LATAM. Brasil queda EXCLUIDO a propósito: paga en USD (PayPal).
+// ISO-2 (para geolocalización por IP) y códigos de llamada (para el WhatsApp del dueño).
+const LATAM_ISO = new Set(["AR", "BO", "CL", "CO", "CR", "CU", "DO", "EC", "SV", "GT", "HN", "MX", "NI", "PA", "PY", "PE", "UY", "VE"]);
+const LATAM_CALLING = new Set(["+51", "+54", "+52", "+56", "+57", "+598", "+591", "+593", "+58", "+507"]);
+
+/**
+ * Moneda por defecto del selector según el país del visitante.
+ * LATAM (menos Brasil) → PEN (soles). Brasil y el resto del mundo → USD.
+ * Prioriza el código de llamada del dueño (si está logueado); si no, usa el ISO-2 de geo-IP.
+ */
+export function defaultCurrency({
+  callingCode,
+  iso,
+}: {
+  callingCode?: string | null;
+  iso?: string | null;
+}): "PEN" | "USD" {
+  if (callingCode) return LATAM_CALLING.has(callingCode) ? "PEN" : "USD";
+  if (iso) return LATAM_ISO.has(iso.toUpperCase()) ? "PEN" : "USD";
+  return "USD";
+}
+
 /** Deduce el código de país a partir del WhatsApp guardado (con código de país). */
 export function detectCountryCode(whatsapp?: string | null): string | null {
   if (!whatsapp) return null;
