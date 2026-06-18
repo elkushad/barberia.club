@@ -5,6 +5,7 @@ import ScrollAnimation from "@/components/ScrollAnimation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { detectCountryCode, currencyForCode, usdToLocal } from "@/lib/pricing";
+import ProPriceSelector from "@/components/ProPriceSelector";
 
 export default async function PlanesPage() {
   const session = await getSession();
@@ -25,6 +26,14 @@ export default async function PlanesPage() {
   const localApprox = !peru && cur && cur.currency !== "USD" ? await usdToLocal(cur.currency) : null;
   const freeHref = session ? "/admin" : "/register";
   const proHref = slug ? `/admin/${slug}/mi-plan` : "/register";
+
+  // Moneda por defecto del selector: soles para barberías de Perú, dólares para el resto.
+  const defaultCurrency = peru ? "PEN" : "USD";
+  // Conversión aproximada del precio en USD a la moneda local del usuario extranjero.
+  const approxLabel =
+    localApprox !== null && cur
+      ? `≈ ${cur.symbol} ${localApprox.toLocaleString("es", { maximumFractionDigits: 0 })} en tu moneda (aprox.)`
+      : null;
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--saas-bg)', color: 'white' }}>
@@ -147,24 +156,7 @@ export default async function PlanesPage() {
                 </div>
                 
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem', color: 'white' }}>Pro</h3>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '0.25rem' }}>
-                  {peru ? (
-                    <>
-                      <span style={{ fontSize: '3rem', fontWeight: 700, fontFamily: 'var(--font-serif)', color: 'white' }}>S/ 29.90</span>
-                      <span style={{ color: 'var(--saas-text-muted)' }}>/mes</span>
-                    </>
-                  ) : (
-                    <>
-                      <span style={{ fontSize: '3rem', fontWeight: 700, fontFamily: 'var(--font-serif)', color: 'white' }}>$10</span>
-                      <span style={{ color: 'var(--saas-text-muted)' }}>USD/mes</span>
-                    </>
-                  )}
-                </div>
-                {!peru && localApprox !== null && cur && (
-                  <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
-                    ≈ {cur.symbol} {localApprox.toLocaleString('es', { maximumFractionDigits: 0 })} en tu moneda (aprox.)
-                  </p>
-                )}
+                <ProPriceSelector defaultCurrency={defaultCurrency} approxLabel={approxLabel} />
                 <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
                   Se renueva automáticamente · cancela cuando quieras
                 </p>
