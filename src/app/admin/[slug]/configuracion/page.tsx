@@ -4,6 +4,7 @@ import { assertBarbershopAccessBySlug } from "@/lib/guards";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
 import BannerUpload from "@/components/BannerUpload";
+import { hasProAccess } from "@/lib/plans";
 
 function isVideoUrl(u: string) {
   return /\.(mp4|webm|mov|m4v|ogg)$/i.test(u) || u.startsWith("data:video/");
@@ -17,7 +18,7 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
 
   if (!barbershop) return null;
 
-  const isPro = barbershop.plan === "PRO";
+  const isPro = hasProAccess(barbershop);
 
   // Parse existing banners as array
   let existingBanners: string[] = [];
@@ -65,7 +66,7 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
 
     const logoUrl = newLogoUrl || currentBarbershop.logo;
     // Fondos del landing: solo plan Pro. Máximo 5 en total y máximo 2 videos.
-    const isProShop = currentBarbershop.plan === "PRO";
+    const isProShop = hasProAccess(currentBarbershop);
     let newBanners = currentBanners;
     if (isProShop) {
       const capped: string[] = [];

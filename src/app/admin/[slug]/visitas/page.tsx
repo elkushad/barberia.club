@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
+import { hasProAccess } from "@/lib/plans";
 
 export default async function VisitasPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -20,7 +21,7 @@ export default async function VisitasPage({ params }: { params: Promise<{ slug: 
     where: { customer: { barbershopId: barbershop.id }, status: "CONFIRMED" }
   });
 
-  const isFreePlan = barbershop.plan === "FREE";
+  const isFreePlan = !hasProAccess(barbershop);
   
   const historyVisits = await prisma.visit.findMany({
     where: { customer: { barbershopId: barbershop.id }, status: "CONFIRMED" },

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
+import { hasProAccess } from "@/lib/plans";
 
 const RegisterCustomerSchema = z.object({
   phone: z.string().trim().min(3).max(30),
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Barbería no encontrada" }, { status: 404 });
     }
 
-    if (barbershop.plan === "FREE" && barbershop._count.customers >= 3) {
+    if (!hasProAccess(barbershop) && barbershop._count.customers >= 3) {
       return NextResponse.json({ error: "La barbería no acepta más clientes en este momento." }, { status: 403 });
     }
 

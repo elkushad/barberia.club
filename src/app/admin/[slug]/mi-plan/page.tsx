@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import UpgradeToPro from "@/components/UpgradeToPro";
 import MercadoPagoButton from "@/components/MercadoPagoButton";
 import { welcomeDiscountUSD, firstMonthUSD, PRO_PRICE_USD } from "@/lib/referrals";
+import { isOnTrial, trialDaysLeft } from "@/lib/plans";
 
 export default async function MiPlanPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -9,6 +10,8 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
   if (!barbershop) return null;
 
   const isPro = barbershop.plan === "PRO";
+  const onTrial = isOnTrial(barbershop);
+  const daysLeft = trialDaysLeft(barbershop);
 
   // Descuento de bienvenida del invitado: 20% del primer mes.
   // Solo es cobrable de forma nativa en PayPal (USD). En Mercado Pago el gancho
@@ -21,12 +24,19 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
 
       <div className="premium-card" style={{ marginBottom: "2rem" }}>
         <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>Plan actual</p>
-        <p style={{ fontSize: "1.5rem", fontWeight: "bold", color: isPro ? "var(--accent-primary)" : "var(--text-primary)" }}>
-          {isPro ? "Pro 💈" : "Gratis"}
+        <p style={{ fontSize: "1.5rem", fontWeight: "bold", color: isPro || onTrial ? "var(--accent-primary)" : "var(--text-primary)" }}>
+          {isPro ? "Pro 💈" : onTrial ? "Prueba gratuita Pro 💈" : "Gratis"}
         </p>
         {isPro && barbershop.expiresAt && (
           <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
             Activo hasta {barbershop.expiresAt.toLocaleDateString()}
+          </p>
+        )}
+        {onTrial && (
+          <p style={{ color: "var(--accent-success, #22c55e)", fontSize: "0.85rem", fontWeight: 600 }}>
+            🎁 Estás probando todos los beneficios Pro gratis. Te {daysLeft === 1 ? "queda 1 día" : `quedan ${daysLeft} días`} de prueba
+            {barbershop.trialEndsAt ? ` (hasta el ${barbershop.trialEndsAt.toLocaleDateString()})` : ""}.
+            Suscríbete para no perderlos.
           </p>
         )}
       </div>

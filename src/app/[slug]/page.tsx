@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import LandingForm from "./LandingForm";
 import CarouselBackground from "./CarouselBackground";
+import { hasProAccess } from "@/lib/plans";
 
 export default async function PublicLandingPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -66,7 +67,7 @@ export default async function PublicLandingPage({ params }: { params: Promise<{ 
 
         {/* Formulario / Botones */}
         <div style={{ width: '100%', maxWidth: '400px', flexShrink: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          {barbershop.plan === "FREE" && barbershop._count.customers >= 3 ? (
+          {!hasProAccess(barbershop) && barbershop._count.customers >= 3 ? (
             <div style={{ padding: '1rem', backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: '12px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
               <p style={{ color: 'var(--text-secondary)', marginBottom: '0' }}>La barbería no acepta más clientes por el momento.</p>
             </div>

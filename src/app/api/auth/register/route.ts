@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { rateLimit, clientIp } from '@/lib/rate-limit';
 import { generateUniqueReferralCode, linkReferral, audit } from '@/lib/referrals';
+import { newTrialEndsAt } from '@/lib/plans';
 
 const RegisterSchema = z.object({
   barberName: z.string().trim().min(2).max(80),
@@ -81,6 +82,8 @@ export async function POST(req: Request) {
             slug,
             whatsapp,
             referralCode,
+            // Prueba gratuita: 7 días de beneficios PRO para barberías nuevas (plan sigue FREE).
+            trialEndsAt: newTrialEndsAt(),
           }
         }
       },

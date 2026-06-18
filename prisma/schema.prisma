@@ -37,7 +37,8 @@ model Barbershop {
   appointments Appointment[]
   plan        String     @default("FREE") // FREE or PRO
   status      String     @default("ACTIVE") // ACTIVE, SUSPENDED
-  expiresAt   DateTime?
+  expiresAt   DateTime?  // Vencimiento del PRO pagado (lo setean los webhooks de pago)
+  trialEndsAt DateTime?  // Fin de la prueba gratuita PRO de 7 días (plan sigue siendo FREE)
   paypalSubscriptionId String?
   instagram   String?
   tiktok      String?

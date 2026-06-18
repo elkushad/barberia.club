@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import styles from "@/app/admin/admin.module.css";
 import LogoutButton from "@/app/admin/LogoutButton";
+import NotificationBell from "@/components/NotificationBell";
 
 interface AdminNavbarProps {
   userName: string;
@@ -87,6 +88,7 @@ export default function AdminNavbar({ userName, role, shopLogo, shopName, shopSl
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: isOpen ? '1rem' : '0', width: isOpen ? '100%' : 'auto', justifyContent: isOpen ? 'space-between' : 'flex-end', paddingTop: isOpen ? '1rem' : '0', borderTop: isOpen ? '1px solid var(--border-color)' : 'none' }}>
+            {shopSlug && <NotificationBell slug={shopSlug} />}
             <span className={styles.userName}>{userName} ({role})</span>
             <LogoutButton />
           </div>

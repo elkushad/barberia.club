@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
 import styles from "../../admin.module.css";
+import { hasProAccess } from "@/lib/plans";
 
 export default async function RecompensasPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -52,7 +53,7 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
     revalidatePath(`/admin/${slug}/recompensas`);
   }
 
-  const isFreePlan = barbershop.plan === "FREE";
+  const isFreePlan = !hasProAccess(barbershop);
   const limitReached = isFreePlan && rewards.length >= 1;
 
   return (
