@@ -13,12 +13,12 @@ export interface FlyerTemplate {
   qr: { x: number; y: number; size: number };
 }
 
-// Las 3 plantillas comparten layout/dimensiones, por lo que el recuadro del QR
-// es el mismo. Si en el futuro un diseño mueve el QR, basta ajustar su `qr` aquí.
+// Cada diseño tiene su propio recuadro de QR (detectado sobre la imagen real,
+// QR centrado dentro del placeholder blanco). Si cambias un arte, recalibra su `qr`.
 export const FLYER_TEMPLATES: FlyerTemplate[] = [
-  { id: "flyer", label: "Clásico", src: "/flyer.png", width: 1054, height: 1492, qr: { x: 559, y: 939, size: 245 } },
-  { id: "flyer2", label: "Diseño 2", src: "/flyer2.png", width: 1054, height: 1492, qr: { x: 559, y: 939, size: 245 } },
-  { id: "flyer3", label: "Diseño 3", src: "/flyer3.png", width: 1054, height: 1492, qr: { x: 559, y: 939, size: 245 } },
+  { id: "flyer", label: "Diseño oscuro", src: "/flyer.png", width: 1024, height: 1536, qr: { x: 305, y: 587, size: 380 } },
+  { id: "flyer2", label: "Diseño claro", src: "/flyer2.png", width: 1024, height: 1536, qr: { x: 307, y: 637, size: 395 } },
+  { id: "flyer3", label: "Clásico", src: "/flyer3.png", width: 1054, height: 1492, qr: { x: 559, y: 939, size: 245 } },
 ];
 
 // Si la barbería nunca eligió una plantilla, se usa flyer2 por defecto.
