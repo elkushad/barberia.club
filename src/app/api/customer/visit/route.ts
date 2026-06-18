@@ -28,6 +28,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Cliente no encontrado" }, { status: 404 });
     }
 
+    // Servicio principal de la barbería (default de la visita; el precio se guarda como snapshot).
+    const primaryService = await prisma.service.findFirst({
+      where: { barbershopId: customer.barbershopId, isPrimary: true },
+      select: { id: true, price: true },
+    });
+
     // Check if there's already a pending visit recently to avoid spam
     const recentPending = await prisma.visit.findFirst({
       where: { 
@@ -47,6 +53,8 @@ export async function POST(req: Request) {
       data: {
         customerId,
         status: "PENDING",
+        serviceId: primaryService?.id ?? null,
+        servicePrice: primaryService?.price ?? null,
       }
     });
 

@@ -42,6 +42,8 @@ export default async function OwnerDashboard({ params }: { params: Promise<{ slu
     referralsThisMonth,
     newThisWeek,
     referral,
+    earningsTotalAgg,
+    earningsMonthAgg,
     recentVisits,
     recentCustomers,
     recentRewards,
@@ -54,12 +56,18 @@ export default async function OwnerDashboard({ params }: { params: Promise<{ slu
     prisma.referral.count({ where: { referrerId: barbershop.id, createdAt: { gte: startOfMonth } } }),
     prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: { gte: startOfWeek } } }),
     getReferralSummary(barbershop.id),
+    // Ganancias = suma del precio (snapshot) de las visitas confirmadas.
+    prisma.visit.aggregate({ where: shopVisitWhere, _sum: { servicePrice: true } }),
+    prisma.visit.aggregate({ where: { ...shopVisitWhere, createdAt: { gte: startOfMonth } }, _sum: { servicePrice: true } }),
     prisma.visit.findMany({ where: shopVisitWhere, include: { customer: { select: { name: true } } }, orderBy: { createdAt: "desc" }, take: 5 }),
     prisma.customer.findMany({ where: { barbershopId: barbershop.id }, orderBy: { createdAt: "desc" }, take: 5 }),
     prisma.reward.findMany({ where: { barbershopId: barbershop.id }, orderBy: { createdAt: "desc" }, take: 3 }),
     prisma.visit.findMany({ where: { ...shopVisitWhere, createdAt: { gte: last30 } }, select: { createdAt: true } }),
     prisma.customer.findMany({ where: { barbershopId: barbershop.id, createdAt: { gte: last30 } }, select: { createdAt: true } }),
   ]);
+
+  const earningsTotal = Math.round(earningsTotalAgg._sum.servicePrice ?? 0);
+  const earningsMonth = Math.round(earningsMonthAgg._sum.servicePrice ?? 0);
 
   const customersTotal = barbershop._count.customers;
   const isPro = hasProAccess(barbershop);
@@ -165,7 +173,7 @@ export default async function OwnerDashboard({ params }: { params: Promise<{ slu
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "0.75rem" }}>
         <Stat label="CLIENTES" value={String(customersTotal)} delta={customersThisMonth > 0 ? `+${customersThisMonth}` : null} />
         <Stat label="VISITAS REGISTRADAS" value={String(visitsConfirmed)} delta={visitsThisMonth > 0 ? `+${visitsThisMonth}` : null} />
-        <Stat label="GANANCIAS (REFERIDOS)" value={`S/ ${referral.availableBalance}`} delta={referral.pendingBalance > 0 ? `+S/ ${referral.pendingBalance}` : null} />
+        <Stat label="GANANCIAS" value={`S/ ${earningsTotal}`} delta={earningsMonth > 0 ? `+S/ ${earningsMonth}` : null} />
         <Stat label="REFERIDOS" value={String(referral.referralCount)} delta={referralsThisMonth > 0 ? `+${referralsThisMonth}` : null} />
       </div>
 

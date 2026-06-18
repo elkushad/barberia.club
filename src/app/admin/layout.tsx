@@ -47,6 +47,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         { label: "Clientes", href: `/admin/${barbershop.slug}/clientes` },
         { label: "Visitas", href: `/admin/${barbershop.slug}/visitas`, badge: pendingVisitsCount },
         { label: "Citas", href: `/admin/${barbershop.slug}/citas`, badge: pendingAppointmentsCount },
+        { label: "Servicios", href: `/admin/${barbershop.slug}/servicios` },
         { label: "Recompensas", href: `/admin/${barbershop.slug}/recompensas` },
         { label: "Configuración", href: `/admin/${barbershop.slug}/configuracion` },
         { label: "QR / Promoción", href: `/admin/${barbershop.slug}/qr` },

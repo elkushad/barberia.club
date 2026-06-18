@@ -25,7 +25,8 @@ model Barbershop {
   logo        String?
   banner      String?
   description String?
-  services    String?    // JSON string for simplicity in MVP
+  servicesLegacy String? @map("services") // legacy (JSON), sin uso; se conserva la columna
+  serviceList Service[]  // servicios con precio configurables por la barbería
   hours       String?    // JSON string for simplicity in MVP
   address     String?
   whatsapp    String?
@@ -131,6 +132,21 @@ model Visit {
   status       String     @default("PENDING") // PENDING, CONFIRMED, REJECTED
   customerId   String
   customer     Customer   @relation(fields: [customerId], references: [id])
+  serviceId    String?
+  service      Service?   @relation(fields: [serviceId], references: [id])
+  servicePrice Float?     // precio del servicio al momento de la visita (snapshot)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Service {
+  id           String     @id @default(cuid())
+  name         String
+  price        Float      @default(0)
+  isPrimary    Boolean    @default(false) // servicio principal (default al registrar visitas)
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
+  visits       Visit[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }
