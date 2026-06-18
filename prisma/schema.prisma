@@ -39,6 +39,7 @@ model Barbershop {
   status      String     @default("ACTIVE") // ACTIVE, SUSPENDED
   expiresAt   DateTime?  // Vencimiento del PRO pagado (lo setean los webhooks de pago)
   trialEndsAt DateTime?  // Fin de la prueba gratuita PRO de 7 días (plan sigue siendo FREE)
+  flyerTemplate String?  // Plantilla de flyer elegida (flyer | flyer2 | flyer3); null = default
   paypalSubscriptionId String?
   instagram   String?
   tiktok      String?

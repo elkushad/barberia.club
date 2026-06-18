@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import QRCode from "qrcode";
+import { revalidatePath } from "next/cache";
+import { assertBarbershopAccessBySlug } from "@/lib/guards";
+import { getFlyerTemplate, isFlyerTemplateId } from "@/lib/flyer-templates";
 import FlyerWithQR from "./FlyerWithQR";
 
 export default async function QRPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -9,6 +12,20 @@ export default async function QRPage({ params }: { params: Promise<{ slug: strin
   });
 
   if (!barbershop) return null;
+
+  const selectedTemplate = getFlyerTemplate(barbershop.flyerTemplate);
+
+  // Persiste la plantilla elegida por la barbería.
+  async function saveFlyerTemplate(templateId: string) {
+    "use server";
+    await assertBarbershopAccessBySlug(slug);
+    if (!isFlyerTemplateId(templateId)) return;
+    await prisma.barbershop.update({
+      where: { slug },
+      data: { flyerTemplate: templateId },
+    });
+    revalidatePath(`/admin/${slug}/qr`);
+  }
 
   // Ideally this would use an environment variable for the domain
   const domain = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -36,7 +53,12 @@ export default async function QRPage({ params }: { params: Promise<{ slug: strin
             Descárgalo e imprímelo. El QR lleva a tus clientes a tu página para registrarse y sumar visitas.
           </p>
 
-          <FlyerWithQR qrDataUrl={qrDataUrl} slug={barbershop.slug} />
+          <FlyerWithQR
+            qrDataUrl={qrDataUrl}
+            slug={barbershop.slug}
+            initialTemplate={selectedTemplate.id}
+            onSaveTemplate={saveFlyerTemplate}
+          />
 
           <a href={qrDataUrl} download={`QR_${barbershop.slug}.png`} style={{ marginTop: '1rem', fontSize: '0.85rem', color: 'var(--text-secondary)', textDecoration: 'underline' }}>
             Descargar solo el QR
