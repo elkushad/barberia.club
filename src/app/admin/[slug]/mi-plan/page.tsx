@@ -2,7 +2,8 @@ import { prisma } from "@/lib/prisma";
 import UpgradeToPro from "@/components/UpgradeToPro";
 import MercadoPagoButton from "@/components/MercadoPagoButton";
 import { welcomeDiscountUSD, firstMonthUSD, PRO_PRICE_USD } from "@/lib/referrals";
-import { isOnTrial, trialDaysLeft } from "@/lib/plans";
+import { isOnTrial } from "@/lib/plans";
+import TrialCountdown from "@/components/TrialCountdown";
 
 export default async function MiPlanPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -11,7 +12,6 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
 
   const isPro = barbershop.plan === "PRO";
   const onTrial = isOnTrial(barbershop);
-  const daysLeft = trialDaysLeft(barbershop);
 
   // Descuento de bienvenida del invitado: 20% del primer mes.
   // Solo es cobrable de forma nativa en PayPal (USD). En Mercado Pago el gancho
@@ -32,12 +32,8 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
             Activo hasta {barbershop.expiresAt.toLocaleDateString()}
           </p>
         )}
-        {onTrial && (
-          <p style={{ color: "var(--accent-success, #22c55e)", fontSize: "0.85rem", fontWeight: 600 }}>
-            🎁 Estás probando todos los beneficios Pro gratis. Te {daysLeft === 1 ? "queda 1 día" : `quedan ${daysLeft} días`} de prueba
-            {barbershop.trialEndsAt ? ` (hasta el ${barbershop.trialEndsAt.toLocaleDateString()})` : ""}.
-            Suscríbete para no perderlos.
-          </p>
+        {onTrial && barbershop.trialEndsAt && (
+          <TrialCountdown endsAt={barbershop.trialEndsAt.toISOString()} />
         )}
       </div>
 
