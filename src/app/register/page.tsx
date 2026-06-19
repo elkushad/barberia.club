@@ -5,29 +5,15 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import styles from "../login/login.module.css"; // Reuse login styles
-
-const COUNTRY_CODES = [
-  { code: "+51", flag: "🇵🇪", name: "Perú" },
-  { code: "+54", flag: "🇦🇷", name: "Argentina" },
-  { code: "+55", flag: "🇧🇷", name: "Brasil" },
-  { code: "+52", flag: "🇲🇽", name: "México" },
-  { code: "+56", flag: "🇨🇱", name: "Chile" },
-  { code: "+57", flag: "🇨🇴", name: "Colombia" },
-  { code: "+598", flag: "🇺🇾", name: "Uruguay" },
-  { code: "+1", flag: "🇺🇸", name: "USA/Canadá" },
-  { code: "+34", flag: "🇪🇸", name: "España" },
-  { code: "+44", flag: "🇬🇧", name: "Reino Unido" },
-  { code: "+593", flag: "🇪🇨", name: "Ecuador" },
-  { code: "+591", flag: "🇧🇴", name: "Bolivia" },
-  { code: "+58", flag: "🇻🇪", name: "Venezuela" },
-  { code: "+507", flag: "🇵🇦", name: "Panamá" },
-];
+import CountryCodePicker from "./CountryCodePicker";
 
 export default function RegisterPage() {
   const [barberName, setBarberName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [countryCode, setCountryCode] = useState("+51");
+  const [countryName, setCountryName] = useState("Perú");
+  const [countryFlag, setCountryFlag] = useState("🇵🇪");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -141,17 +127,16 @@ export default function RegisterPage() {
               WhatsApp (con código de país)
             </label>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <select
+              <CountryCodePicker
                 value={countryCode}
-                onChange={(e) => setCountryCode(e.target.value)}
-                className="premium-input"
-                style={{ width: 'auto', flexShrink: 0 }}
-                aria-label="Código de país"
-              >
-                {COUNTRY_CODES.map((c) => (
-                  <option key={c.code + c.name} value={c.code}>{c.flag} {c.code}</option>
-                ))}
-              </select>
+                selectedName={countryName}
+                selectedFlag={countryFlag}
+                onChange={(code, name, flag) => {
+                  setCountryCode(code);
+                  setCountryName(name);
+                  setCountryFlag(flag);
+                }}
+              />
               <input
                 id="phone"
                 type="tel"
