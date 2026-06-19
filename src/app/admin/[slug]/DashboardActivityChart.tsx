@@ -10,7 +10,7 @@ export interface ActivityPoint {
 
 export default function DashboardActivityChart({ data }: { data: ActivityPoint[] }) {
   return (
-    <ResponsiveContainer width="100%" height={200}>
+    <ResponsiveContainer width="100%" height={220}>
       <AreaChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
         <defs>
           <linearGradient id="gradVisitas" x1="0" y1="0" x2="0" y2="1">
@@ -22,15 +22,21 @@ export default function DashboardActivityChart({ data }: { data: ActivityPoint[]
             <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <XAxis dataKey="label" hide />
+        <XAxis
+          dataKey="label"
+          interval={6}
+          tick={{ fontSize: 11, fill: "#666" }}
+          axisLine={false}
+          tickLine={false}
+        />
         <Tooltip
           contentStyle={{
-            backgroundColor: "#1f1f1f",
+            backgroundColor: "#1a1a1a",
             border: "1px solid #333",
             borderRadius: "8px",
             fontSize: "0.8rem",
           }}
-          labelStyle={{ color: "#a3a3a3" }}
+          labelStyle={{ color: "#a3a3a3", fontWeight: 600 }}
         />
         <Area
           type="monotone"
