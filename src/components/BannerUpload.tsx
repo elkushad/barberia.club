@@ -7,11 +7,11 @@ interface BannerUploadProps {
   name: string;
   existingImages: number;
   existingVideos: number;
+  maxTotal?: number;
+  maxVideos?: number;
 }
 
-const MAX_TOTAL = 5;
-const MAX_VIDEOS = 2;
-const MAX_VIDEO_SECONDS = 4;
+const MAX_VIDEO_SECONDS = 5;
 
 // ── Imágenes: comprime con canvas (1600px, q0.82) ──────────────────────────
 async function compressImage(file: File): Promise<File> {
@@ -160,7 +160,9 @@ async function uploadVideo(file: File, onProgress: (pct: number) => void): Promi
   }
 }
 
-export default function BannerUpload({ name, existingImages, existingVideos }: BannerUploadProps) {
+export default function BannerUpload({ name, existingImages, existingVideos, maxTotal = 5, maxVideos = 2 }: BannerUploadProps) {
+  const MAX_TOTAL = maxTotal;
+  const MAX_VIDEOS = maxVideos;
   const [items, setItems] = useState<{ url: string; isVideo: boolean }[]>([]);
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState("");

@@ -2,7 +2,8 @@ import { prisma } from "@/lib/prisma";
 import QRCode from "qrcode";
 import { revalidatePath } from "next/cache";
 import { assertBarbershopAccessBySlug } from "@/lib/guards";
-import { getFlyerTemplate, isFlyerTemplateId } from "@/lib/flyer-templates";
+import { hasProAccess } from "@/lib/plans";
+import { getFlyerTemplate, isFlyerTemplateId, FLYER_TEMPLATES } from "@/lib/flyer-templates";
 import FlyerWithQR from "./FlyerWithQR";
 
 export default async function QRPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -13,13 +14,17 @@ export default async function QRPage({ params }: { params: Promise<{ slug: strin
 
   if (!barbershop) return null;
 
+  const isPro = hasProAccess(barbershop);
   const selectedTemplate = getFlyerTemplate(barbershop.flyerTemplate);
 
-  // Persiste la plantilla elegida por la barbería.
+  // Persiste la plantilla elegida por la barbería. Las plantillas PRO solo
+  // pueden guardarse si la barbería tiene acceso PRO (defensa en servidor).
   async function saveFlyerTemplate(templateId: string) {
     "use server";
-    await assertBarbershopAccessBySlug(slug);
+    const shop = await assertBarbershopAccessBySlug(slug);
     if (!isFlyerTemplateId(templateId)) return;
+    const tpl = FLYER_TEMPLATES.find((t) => t.id === templateId);
+    if (tpl?.pro && !hasProAccess(shop)) return; // Free no puede usar plantillas PRO
     await prisma.barbershop.update({
       where: { slug },
       data: { flyerTemplate: templateId },
@@ -58,6 +63,7 @@ export default async function QRPage({ params }: { params: Promise<{ slug: strin
             slug={barbershop.slug}
             initialTemplate={selectedTemplate.id}
             onSaveTemplate={saveFlyerTemplate}
+            isPro={isPro}
           />
 
           <a href={qrDataUrl} download={`QR_${barbershop.slug}.png`} style={{ marginTop: '1rem', fontSize: '0.85rem', color: 'var(--text-secondary)', textDecoration: 'underline' }}>

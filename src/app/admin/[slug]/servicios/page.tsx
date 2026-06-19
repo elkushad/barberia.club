@@ -2,16 +2,25 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { assertBarbershopAccessBySlug } from "@/lib/guards";
+import { hasProAccess } from "@/lib/plans";
+import ProLock from "@/components/ProLock";
+
+const FREE_SERVICE_LIMIT = 1;
 
 export default async function ServiciosPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const barbershop = await prisma.barbershop.findUnique({ where: { slug } });
   if (!barbershop) return null;
 
+  const isPro = hasProAccess(barbershop);
+
   const services = await prisma.service.findMany({
     where: { barbershopId: barbershop.id },
     orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
   });
+
+  // Free: 1 servicio. PRO: ilimitados.
+  const atFreeLimit = !isPro && services.length >= FREE_SERVICE_LIMIT;
 
   async function createService(formData: FormData) {
     "use server";
@@ -21,6 +30,8 @@ export default async function ServiciosPage({ params }: { params: Promise<{ slug
     if (!name || isNaN(price) || price < 0) return;
 
     const count = await prisma.service.count({ where: { barbershopId: shop.id } });
+    // Defensa en servidor: Free no puede superar el límite de servicios.
+    if (!hasProAccess(shop) && count >= FREE_SERVICE_LIMIT) return;
     await prisma.service.create({
       data: { name, price, barbershopId: shop.id, isPrimary: count === 0 }, // el 1ro es principal
     });
@@ -86,20 +97,26 @@ export default async function ServiciosPage({ params }: { params: Promise<{ slug
         Las ganancias del dashboard se calculan con el precio de cada visita.
       </p>
 
-      {/* Nuevo servicio */}
-      <div className="premium-card" style={{ marginBottom: "2rem" }}>
-        <h3 style={{ marginBottom: "1rem", color: "var(--accent-primary)" }}>Agregar servicio</h3>
-        <form action={createService} style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", alignItems: "flex-end" }}>
-          <div style={{ flex: "2 1 180px" }}>
-            <label style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Nombre</label>
-            <input name="name" required placeholder="Ej: Corte clásico" className="premium-input" style={{ width: "100%" }} />
+      {/* Nuevo servicio — en Free queda bloqueado tras el 1er servicio */}
+      <div style={{ marginBottom: "2rem" }}>
+        <ProLock locked={atFreeLimit} slug={slug} radius={16}>
+          <div className="premium-card">
+            <h3 style={{ marginBottom: "1rem", color: "var(--accent-primary)" }}>
+              Agregar servicio {!isPro && <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 400 }}>(Free: 1 · PRO: ilimitados)</span>}
+            </h3>
+            <form action={createService} style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", alignItems: "flex-end" }}>
+              <div style={{ flex: "2 1 180px" }}>
+                <label style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Nombre</label>
+                <input name="name" required placeholder="Ej: Corte clásico" className="premium-input" style={{ width: "100%" }} />
+              </div>
+              <div style={{ flex: "1 1 100px" }}>
+                <label style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Precio (S/)</label>
+                <input name="price" type="number" min="0" step="0.5" required placeholder="0.00" className="premium-input" style={{ width: "100%" }} />
+              </div>
+              <button type="submit" className="premium-btn" style={{ flex: "0 0 auto" }}>Agregar</button>
+            </form>
           </div>
-          <div style={{ flex: "1 1 100px" }}>
-            <label style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Precio (S/)</label>
-            <input name="price" type="number" min="0" step="0.5" required placeholder="0.00" className="premium-input" style={{ width: "100%" }} />
-          </div>
-          <button type="submit" className="premium-btn" style={{ flex: "0 0 auto" }}>Agregar</button>
-        </form>
+        </ProLock>
       </div>
 
       {/* Lista */}

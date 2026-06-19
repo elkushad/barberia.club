@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { FLYER_TEMPLATES, getFlyerTemplate, type FlyerTemplateId } from "@/lib/flyer-templates";
+import ProLock from "@/components/ProLock";
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -18,14 +19,18 @@ export default function FlyerWithQR({
   slug,
   initialTemplate,
   onSaveTemplate,
+  isPro = true,
 }: {
   qrDataUrl: string;
   slug: string;
   initialTemplate: FlyerTemplateId;
   onSaveTemplate: (templateId: string) => Promise<void>;
+  isPro?: boolean;
 }) {
-  const [selected, setSelected] = useState<FlyerTemplateId>(initialTemplate);
-  const [saved, setSaved] = useState<FlyerTemplateId>(initialTemplate);
+  // Si el usuario es Free pero tenía guardada una plantilla PRO, arranca en una libre.
+  const safeInitial: FlyerTemplateId = getFlyerTemplate(initialTemplate).pro && !isPro ? "flyer" : initialTemplate;
+  const [selected, setSelected] = useState<FlyerTemplateId>(safeInitial);
+  const [saved, setSaved] = useState<FlyerTemplateId>(safeInitial);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
   const [isSaving, startSaving] = useTransition();
@@ -102,19 +107,16 @@ export default function FlyerWithQR({
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem" }}>
           {FLYER_TEMPLATES.map((t) => {
             const active = selected === t.id;
-            return (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setSelected(t.id)}
-                aria-pressed={active}
+            const locked = t.pro && !isPro;
+
+            const inner = (
+              <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   gap: "0.4rem",
                   padding: "0.4rem",
-                  cursor: "pointer",
                   background: "transparent",
                   border: active ? "2px solid var(--accent-primary)" : "2px solid var(--border-color)",
                   borderRadius: "10px",
@@ -140,6 +142,25 @@ export default function FlyerWithQR({
                 <span style={{ fontSize: "0.75rem", fontWeight: active ? 700 : 500, color: active ? "var(--accent-primary)" : "var(--text-secondary)" }}>
                   {t.label}
                 </span>
+              </div>
+            );
+
+            if (locked) {
+              return (
+                <ProLock key={t.id} locked slug={slug} radius={10}>
+                  {inner}
+                </ProLock>
+              );
+            }
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setSelected(t.id)}
+                aria-pressed={active}
+                style={{ padding: 0, border: "none", background: "transparent", cursor: "pointer", WebkitTapHighlightColor: "transparent", outline: "none" }}
+              >
+                {inner}
               </button>
             );
           })}

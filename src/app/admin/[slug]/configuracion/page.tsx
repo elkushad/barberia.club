@@ -65,24 +65,23 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     }
 
     const logoUrl = newLogoUrl || currentBarbershop.logo;
-    // Fondos del landing: solo plan Pro. Máximo 5 en total y máximo 2 videos.
+    // Fondos del landing — Free: 1 (foto o video). PRO: hasta 5 (máx 2 videos).
     const isProShop = hasProAccess(currentBarbershop);
-    let newBanners = currentBanners;
-    if (isProShop) {
-      const capped: string[] = [];
-      const seen = new Set<string>();
-      let vids = 0;
-      for (const u of [...currentBanners, ...newBannerUrls]) {
-        if (seen.has(u)) continue; // dedup: reenviar la misma URL no la duplica
-        if (capped.length >= 5) break;
-        const vid = isVideoUrl(u);
-        if (vid && vids >= 2) continue;
-        seen.add(u);
-        capped.push(u);
-        if (vid) vids++;
-      }
-      newBanners = capped;
+    const maxTotal = isProShop ? 5 : 1;
+    const maxVideos = isProShop ? 2 : 1;
+    const capped: string[] = [];
+    const seen = new Set<string>();
+    let vids = 0;
+    for (const u of [...currentBanners, ...newBannerUrls]) {
+      if (seen.has(u)) continue; // dedup: reenviar la misma URL no la duplica
+      if (capped.length >= maxTotal) break;
+      const vid = isVideoUrl(u);
+      if (vid && vids >= maxVideos) continue;
+      seen.add(u);
+      capped.push(u);
+      if (vid) vids++;
     }
+    const newBanners = capped;
 
     await prisma.barbershop.update({
       where: { id: currentBarbershop.id },
@@ -164,17 +163,20 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
         </div>
 
         <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Fondos del Landing</label>
-          {isPro ? (
-            <BannerUpload key={`${existingImages}-${existingVideos}`} name="banners" existingImages={existingImages} existingVideos={existingVideos} />
-          ) : (
-            <div style={{ padding: '1rem', borderRadius: '8px', border: '1px dashed var(--border-color)', backgroundColor: 'var(--bg-secondary)' }}>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>
-                Los fondos del landing están disponibles en el <strong style={{ color: 'var(--text-primary)' }}>plan Pro</strong>.{' '}
-                <a href={`/admin/${slug}/mi-plan`} style={{ color: 'var(--accent-primary)', textDecoration: 'underline' }}>Mejora tu plan</a>.
-              </p>
-            </div>
-          )}
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
+            Fondos del Landing{' '}
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+              {isPro ? '(PRO: hasta 5, máx 2 videos de 5s)' : '(Free: 1 foto o video de 5s · PRO: hasta 5)'}
+            </span>
+          </label>
+          <BannerUpload
+            key={`${existingImages}-${existingVideos}`}
+            name="banners"
+            existingImages={existingImages}
+            existingVideos={existingVideos}
+            maxTotal={isPro ? 5 : 1}
+            maxVideos={isPro ? 2 : 1}
+          />
         </div>
 
         <div>
