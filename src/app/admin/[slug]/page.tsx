@@ -292,11 +292,11 @@ export default async function OwnerDashboard({
 
         {/* QUICK ACTIONS */}
         <div className="dash-action-grid dash-animate" style={{ animationDelay: "120ms" }}>
-          <Link href={`/admin/${slug}/recompensas`} className="dash-action-btn" style={{ ...actionStyle(true) }}>
+          <Link href={`/admin/${slug}/servicios`} className="dash-action-btn" style={{ ...actionStyle(true) }}>
             <span aria-hidden style={{ color: RED }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </span>
-            Crear Recompensa
+            + Agregar servicio
           </Link>
           <Link href={`/admin/${slug}/qr`} className="dash-action-btn" style={actionStyle()}>
             <span aria-hidden style={{ color: "var(--text-secondary)" }}>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { assertBarbershopAccessBySlug } from "@/lib/guards";
 import { hasProAccess } from "@/lib/plans";
 import ProLock from "@/components/ProLock";
+import ServiceRow from "./ServiceRow";
 
 const FREE_SERVICE_LIMIT = 1;
 
@@ -125,34 +126,13 @@ export default async function ServiciosPage({ params }: { params: Promise<{ slug
           <p style={{ color: "var(--text-secondary)" }}>Aún no tienes servicios. Agrega el primero arriba.</p>
         )}
         {services.map((s) => (
-          <div key={s.id} className="premium-card" style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "flex-end", borderColor: s.isPrimary ? "var(--accent-primary)" : "var(--border-color)" }}>
-            <form action={updateService} style={{ display: "flex", gap: "0.75rem", flex: "1 1 280px", alignItems: "flex-end", flexWrap: "wrap" }}>
-              <input type="hidden" name="id" value={s.id} />
-              <div style={{ flex: "2 1 160px" }}>
-                <label style={{ fontSize: "0.7rem", color: "var(--text-secondary)" }}>
-                  Nombre {s.isPrimary && <span style={{ color: "var(--accent-primary)", fontWeight: 700 }}>· Principal ★</span>}
-                </label>
-                <input name="name" defaultValue={s.name} className="premium-input" style={{ width: "100%" }} />
-              </div>
-              <div style={{ flex: "1 1 90px" }}>
-                <label style={{ fontSize: "0.7rem", color: "var(--text-secondary)" }}>Precio (S/)</label>
-                <input name="price" type="number" min="0" step="0.5" defaultValue={s.price} className="premium-input" style={{ width: "100%" }} />
-              </div>
-              <button type="submit" className="premium-btn-secondary" style={{ padding: "8px 14px" }}>Guardar</button>
-            </form>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              {!s.isPrimary && (
-                <form action={setPrimary}>
-                  <input type="hidden" name="id" value={s.id} />
-                  <button type="submit" className="premium-btn-secondary" style={{ padding: "8px 12px", fontSize: "0.8rem" }}>★ Principal</button>
-                </form>
-              )}
-              <form action={deleteService}>
-                <input type="hidden" name="id" value={s.id} />
-                <button type="submit" className="premium-btn-secondary" style={{ padding: "8px 12px", fontSize: "0.8rem", color: "var(--accent-danger)" }}>Eliminar</button>
-              </form>
-            </div>
-          </div>
+          <ServiceRow
+            key={s.id}
+            service={s}
+            updateService={updateService}
+            deleteService={deleteService}
+            setPrimary={setPrimary}
+          />
         ))}
       </div>
     </div>

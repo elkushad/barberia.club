@@ -78,7 +78,7 @@ export default function VisitServicePill({
           style={{
             position: "absolute",
             top: "calc(100% + 6px)",
-            right: 0,
+            left: 0,
             zIndex: 50,
             minWidth: "180px",
             maxHeight: "240px",
