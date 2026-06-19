@@ -7,7 +7,7 @@ const CLIENT_ID =
   process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ||
   "AbTvDWLweaUSef81rwQiwwOm6dXBiGMk02iBwuYOnFcgx_B0z-qEeiRCkC9Ua5UnHQMooOrn9Azt1ScI";
 const PLAN_ID = process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID || "P-34R99602CN3659501NIXNLOI";
-// Plan con 20% de descuento el primer mes (primer ciclo $8, luego $10).
+// Plan con 30% de descuento el primer mes (primer ciclo $7, luego $10).
 // Si no está configurado, se usa el plan normal (sin descuento).
 const PLAN_ID_DISCOUNT = process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_DISCOUNT || "";
 

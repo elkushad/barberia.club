@@ -14,7 +14,7 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
   const isPro = barbershop.plan === "PRO";
   const onTrial = isOnTrial(barbershop);
 
-  // Descuento de bienvenida del invitado: 20% del primer mes.
+  // Descuento de bienvenida del invitado: 30% del primer mes.
   // Solo es cobrable de forma nativa en PayPal (USD). En Mercado Pago el gancho
   // del invitado son los 7 días gratis del plan.
   const hasWelcomeDiscount = barbershop.discountEligible && !barbershop.discountUsed && !isPro;
@@ -62,7 +62,7 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
               }}
             >
               🎁 Llegaste por una invitación. Tu beneficio de bienvenida:
-              <strong> 20% de descuento</strong> en tu primer mes con PayPal (${firstMonthUSD().toFixed(2)} el
+              <strong> 30% de descuento</strong> en tu primer mes con PayPal (${firstMonthUSD().toFixed(2)} el
               primer mes, luego ${PRO_PRICE_USD}/mes) o <strong>7 días gratis</strong> con Mercado Pago.
             </div>
           )}
@@ -82,7 +82,7 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
                 🌎 Otros países — PayPal{" "}
                 {hasWelcomeDiscount ? (
                   <strong style={{ color: "var(--accent-success, #22c55e)" }}>
-                    (primer mes ${firstMonthUSD().toFixed(2)}, 20% dcto · luego ${PRO_PRICE_USD})
+                    (primer mes ${firstMonthUSD().toFixed(2)}, 30% dcto · luego ${PRO_PRICE_USD})
                   </strong>
                 ) : (
                   <>(${PRO_PRICE_USD} USD)</>

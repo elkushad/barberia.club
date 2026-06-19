@@ -4,7 +4,9 @@ import { prisma } from "@/lib/prisma";
 // Centralizado aquí para permitir cambios futuros de monto sin tocar la lógica.
 export const REFERRAL_REWARD = 10; // S/10
 // Descuento para la barbería invitada en su primer mes Pro.
-export const REFERRAL_DISCOUNT_RATE = 0.2; // 20%
+export const REFERRAL_DISCOUNT_RATE = 0.3; // 30%
+// Porcentaje del descuento de bienvenida, para mostrar en la UI sin hardcodear.
+export const REFERRAL_DISCOUNT_PERCENT = Math.round(REFERRAL_DISCOUNT_RATE * 100); // 30
 // Días que la referida debe mantenerse Pro para liberar la recompensa.
 export const UNLOCK_DAYS = 30;
 // Saldo mínimo para poder solicitar un retiro a cuenta bancaria.
@@ -322,12 +324,12 @@ export async function getReferralRows(barbershopId: string) {
 /** Precio Pro en USD (PayPal). */
 export const PRO_PRICE_USD = 10;
 
-/** Monto del descuento de bienvenida del invitado (20% del primer mes en USD/PayPal). */
+/** Monto del descuento de bienvenida del invitado (30% del primer mes en USD/PayPal). */
 export function welcomeDiscountUSD(): number {
-  return Math.round(PRO_PRICE_USD * REFERRAL_DISCOUNT_RATE * 100) / 100; // 2.00
+  return Math.round(PRO_PRICE_USD * REFERRAL_DISCOUNT_RATE * 100) / 100; // 3.00
 }
 
-/** Precio del primer mes con el 20% de descuento (USD/PayPal). */
+/** Precio del primer mes con el 30% de descuento (USD/PayPal). */
 export function firstMonthUSD(): number {
-  return Math.round((PRO_PRICE_USD - welcomeDiscountUSD()) * 100) / 100; // 8.00
+  return Math.round((PRO_PRICE_USD - welcomeDiscountUSD()) * 100) / 100; // 7.00
 }

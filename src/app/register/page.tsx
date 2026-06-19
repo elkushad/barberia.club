@@ -98,7 +98,7 @@ export default function RegisterPage() {
             fontSize: '0.9rem',
             color: 'var(--accent-success, #22c55e)',
           }}>
-            🎁 Llegaste por una invitación. Obtienes <strong>20% de descuento</strong> en tu primer mes del Plan Pro.
+            🎁 Llegaste por una invitación. Obtienes <strong>30% de descuento</strong> en tu primer mes del Plan Pro.
           </div>
         )}
 

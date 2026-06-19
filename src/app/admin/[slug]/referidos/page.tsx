@@ -82,7 +82,7 @@ export default async function ReferidosPage({ params }: { params: Promise<{ slug
       <h2 style={{ marginBottom: "0.5rem" }}>Referidos</h2>
       <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
         Invita a otras barberías y gana <strong>{money(REFERRAL_REWARD)}</strong> por cada una que se
-        mantenga en el Plan Pro durante 30 días. Ellas obtienen <strong>20% de descuento</strong> en su
+        mantenga en el Plan Pro durante 30 días. Ellas obtienen <strong>30% de descuento</strong> en su
         primer mes.
       </p>
 
