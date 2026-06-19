@@ -5,6 +5,7 @@ import { getReferralSummary } from "@/lib/referrals";
 import DashboardActivityChart, { type ActivityPoint } from "./DashboardActivityChart";
 import MonthFilterPill from "./MonthFilterPill";
 import ShareLandingButton from "./ShareLandingButton";
+import DashboardPromos from "./DashboardPromos";
 
 function isVideoUrl(u: string) {
   return /\.(mp4|webm|mov|m4v|ogg)$/i.test(u) || u.startsWith("data:video/");
@@ -172,6 +173,8 @@ export default async function OwnerDashboard({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "640px", margin: "0 auto" }}>
+      <DashboardPromos isPro={isPro} slug={slug} />
+
       {/* HEADER */}
       <div
         style={{
