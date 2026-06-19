@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import RegisterLink from './RegisterLink';
 
 export default function PublicNavbar() {
   return (
@@ -35,9 +36,9 @@ export default function PublicNavbar() {
           <Link href="/login" className="saas-btn-outlined nav-btn-outline" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>
             Iniciar sesión
           </Link>
-          <Link href="/register" className="saas-btn-primary nav-btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>
+          <RegisterLink className="saas-btn-primary nav-btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>
             Empezar ahora
-          </Link>
+          </RegisterLink>
         </div>
         
       </div>

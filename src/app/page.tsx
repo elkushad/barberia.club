@@ -2,6 +2,7 @@ import PublicNavbar from '@/components/PublicNavbar';
 import PublicFooter from '@/components/PublicFooter';
 import ScrollAnimation from '@/components/ScrollAnimation';
 import Link from 'next/link';
+import RegisterLink from '@/components/RegisterLink';
 
 export default function SaaSLanding() {
   return (
@@ -29,9 +30,9 @@ export default function SaaSLanding() {
             
             <ScrollAnimation delay="delay-200">
               <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
-                <Link href="/register" className="saas-btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.05rem', width: '100%', maxWidth: '350px' }}>
+                <RegisterLink className="saas-btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.05rem', width: '100%', maxWidth: '350px' }}>
                   Registrar mi barbería gratis &rarr;
-                </Link>
+                </RegisterLink>
                 <Link href="/demo" className="saas-btn-outlined" style={{ padding: '1rem 2rem', fontSize: '1.05rem' }}>
                   Ver demo <span style={{ marginLeft: '8px' }}>&#9658;</span>
                 </Link>
@@ -215,9 +216,9 @@ export default function SaaSLanding() {
             </ScrollAnimation>
             <ScrollAnimation delay="delay-200">
               <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link href="/register" className="saas-btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}>
+                <RegisterLink className="saas-btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}>
                   Registrar mi barbería gratis &rarr;
-                </Link>
+                </RegisterLink>
                 <Link href="#como-funciona" className="saas-btn-outlined" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}>
                   Conocer más
                 </Link>
