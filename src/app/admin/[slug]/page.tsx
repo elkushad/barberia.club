@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { getSession } from "@/lib/auth";
 import { hasProAccess, isOnTrial, trialDaysLeft } from "@/lib/plans";
 import { getReferralSummary } from "@/lib/referrals";
 import DashboardActivityChart, { type ActivityPoint } from "./DashboardActivityChart";
@@ -97,6 +98,10 @@ export default async function OwnerDashboard({
   const onTrial = isOnTrial(barbershop);
   const daysLeft = trialDaysLeft(barbershop);
 
+  // Modo preview de popups para cuentas de prueba: alterna pro/ref en cada recarga.
+  const session = await getSession();
+  const promoPreview = (session?.user?.email ?? "").toLowerCase() === "barberia@dos.com";
+
   // --- Serie del gráfico: últimos 30 días, por día ---
   const dayKey = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}`;
   const buckets = new Map<string, ActivityPoint>();
@@ -173,7 +178,7 @@ export default async function OwnerDashboard({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "640px", margin: "0 auto" }}>
-      <DashboardPromos isPro={isPro} slug={slug} />
+      <DashboardPromos isPro={isPro} slug={slug} preview={promoPreview} />
 
       {/* HEADER */}
       <div

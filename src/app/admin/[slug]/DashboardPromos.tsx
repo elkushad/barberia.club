@@ -58,11 +58,21 @@ const CSS = `
 @keyframes bcpGlowRef{0%,100%{box-shadow:0 0 45px rgba(230,57,70,.2),inset 0 0 32px rgba(59,130,246,.06)}50%{box-shadow:0 0 62px rgba(230,57,70,.34),inset 0 0 32px rgba(59,130,246,.1)}}
 `;
 
-export default function DashboardPromos({ isPro, slug }: { isPro: boolean; slug: string }) {
+export default function DashboardPromos({ isPro, slug, preview = false }: { isPro: boolean; slug: string; preview?: boolean }) {
   const [active, setActive] = useState<PromoType | null>(null);
   const [closing, setClosing] = useState(false);
 
   useEffect(() => {
+    // Modo preview (cuentas de prueba): cada recarga alterna pro / ref, ignorando
+    // la cadencia normal y la preferencia "No volver a mostrar".
+    if (preview) {
+      const p = (parseInt(localStorage.getItem("bcPromoPreview") || "0", 10) || 0) + 1;
+      localStorage.setItem("bcPromoPreview", String(p));
+      const show: PromoType = p % 2 === 1 ? "pro" : "ref";
+      const t = setTimeout(() => setActive(show), 400);
+      return () => clearTimeout(t);
+    }
+
     if (localStorage.getItem(DISMISS_KEY) === "1") return;
     const n = (parseInt(localStorage.getItem(VISITS_KEY) || "0", 10) || 0) + 1;
     localStorage.setItem(VISITS_KEY, String(n));
@@ -78,7 +88,7 @@ export default function DashboardPromos({ isPro, slug }: { isPro: boolean; slug:
       const t = setTimeout(() => setActive(show), 650);
       return () => clearTimeout(t);
     }
-  }, [isPro]);
+  }, [isPro, preview]);
 
   function close() {
     setClosing(true);
