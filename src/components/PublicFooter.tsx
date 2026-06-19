@@ -9,7 +9,7 @@ export default function PublicFooter() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '3rem', marginBottom: '3rem' }}>
           
           <div>
-            <h3 style={{ color: 'white', fontSize: '1.2rem', marginBottom: '1rem', fontWeight: 600 }}>barberia.club</h3>
+            <h3 style={{ color: 'white', fontSize: '1.2rem', marginBottom: '1rem', fontWeight: 600 }}>barberia<span style={{ color: '#E63946' }}>.club</span></h3>
             <p style={{ fontSize: '0.9rem', lineHeight: 1.6 }}>
               La plataforma definitiva para gestionar tu barbería y premiar la lealtad de tus clientes.
             </p>
@@ -43,7 +43,7 @@ export default function PublicFooter() {
         </div>
         
         <div style={{ borderTop: '1px solid var(--saas-border)', paddingTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', fontSize: '0.85rem' }}>
-          <p>&copy; {currentYear} barberia.club. Todos los derechos reservados.</p>
+          <p>&copy; {currentYear} barberia<span style={{ color: '#E63946' }}>.club</span>. Todos los derechos reservados.</p>
           <div style={{ display: 'flex', gap: '1rem' }}>
             <Link href="#">X (Twitter)</Link>
             <Link href="#">Instagram</Link>

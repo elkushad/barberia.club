@@ -45,7 +45,7 @@ export default function PublicNavbar() {
 
       <style>{`
         .public-nav {
-          padding: 1rem 2rem;
+          padding: 1rem 2rem 1rem 0.75rem;
         }
         @media (max-width: 900px) {
           .hide-on-mobile {

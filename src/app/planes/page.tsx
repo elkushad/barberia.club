@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import PublicNavbar from "@/components/PublicNavbar";
 import PublicFooter from "@/components/PublicFooter";
 import { getSession } from "@/lib/auth";
@@ -111,7 +110,7 @@ export default async function PlanesPage() {
     ["Servicios con precio",  "1",                  "Ilimitados"],
     ["WhatsApp integrado",    <Dash key="wf"/>,      <SmallCheck key="wp" color={RED}/>],
     ["Programa de referidos", <Dash key="rf"/>,      <SmallCheck key="rp" color={RED}/>],
-    ["ChatBot inteligente",   <Pronto key="cbf"/>,   <Pronto key="cbp"/>],
+    ["ChatBot inteligente",   <Dash key="cbf"/>,      <Pronto key="cbp"/>],
   ];
 
   return (
@@ -198,7 +197,7 @@ export default async function PlanesPage() {
           {/* ══════════════════════════════
               CARD 2 — Pro
           ══════════════════════════════ */}
-          <div style={{ backgroundColor: "#11151c", borderRadius: "20px", border: `2px solid ${RED}`, padding: "2rem 1.75rem 1.75rem", marginBottom: "1.5rem", position: "relative", boxShadow: `0 0 32px rgba(230,57,70,0.1)` }}>
+          <div style={{ backgroundColor: "#11151c", borderRadius: "20px", border: `2px solid ${RED}`, padding: "2rem 1.75rem 1.75rem", marginBottom: "1.5rem", position: "relative", boxShadow: `0 0 40px rgba(230,57,70,0.28), 0 0 80px rgba(230,57,70,0.12)` }}>
             <div style={{ position: "absolute", top: "-14px", left: "50%", transform: "translateX(-50%)", backgroundColor: RED, color: "white", fontSize: "0.68rem", fontWeight: 800, padding: "5px 18px", borderRadius: "999px", letterSpacing: "0.1em", whiteSpace: "nowrap" }}>
               MÁS POPULAR
             </div>
@@ -221,10 +220,7 @@ export default async function PlanesPage() {
               {/* PRONTO único */}
               <li style={{ display: "flex", gap: "10px", alignItems: "center", fontSize: "0.9rem", color: "var(--saas-text-muted)" }}>
                 <Pronto />
-                <span style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                  ChatBot inteligente personalizado en tu landing y en tu panel
-                  <Image src="/icon.png" width={18} height={18} alt="" style={{ borderRadius: "3px", flexShrink: 0 }} />
-                </span>
+                ChatBot inteligente personalizado en tu landing y en tu panel
               </li>
             </ul>
 
@@ -279,7 +275,7 @@ export default async function PlanesPage() {
                 <p style={{ color: "var(--saas-text-muted)", fontSize: "0.875rem", margin: 0 }}>Planes personalizados para cadenas de barberías.</p>
               </div>
             </div>
-            <a href="mailto:contacto@barberia.club?subject=Consulta%20de%20ventas" style={{ border: "1px solid rgba(255,255,255,0.2)", backgroundColor: "transparent", color: "white", padding: "0.6rem 1.25rem", borderRadius: "8px", fontSize: "0.875rem", fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}>
+            <a href="mailto:barberia.club777@gmail.com?subject=Consulta%20de%20ventas" style={{ border: "1px solid rgba(255,255,255,0.2)", backgroundColor: "transparent", color: "white", padding: "0.6rem 1.25rem", borderRadius: "8px", fontSize: "0.875rem", fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}>
               Hablar con ventas
             </a>
           </div>
