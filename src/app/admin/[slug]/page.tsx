@@ -57,6 +57,7 @@ export default async function OwnerDashboard({
   const [
     customersThisMonth,
     visitsConfirmedTotal,
+    servicesCount,
     customersMonth,
     visitsMonth,
     referralsMonth,
@@ -65,12 +66,14 @@ export default async function OwnerDashboard({
     referral,
     recentVisits,
     recentCustomers,
-    recentRewards,
+    recentAppointments,
+    recentRedemptions,
     visitRows,
     customerRows,
   ] = await Promise.all([
     prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: { gte: currentMonthStart } } }),
     prisma.visit.count({ where: shopVisitWhere }),
+    prisma.service.count({ where: { barbershopId: barbershop.id } }),
     // --- Métricas del mes seleccionado (las 4 tarjetas) ---
     prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: monthRange } }),
     prisma.visit.count({ where: { ...shopVisitWhere, createdAt: monthRange } }),
@@ -78,9 +81,11 @@ export default async function OwnerDashboard({
     prisma.visit.aggregate({ where: { ...shopVisitWhere, createdAt: monthRange }, _sum: { servicePrice: true } }),
     prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: { gte: startOfWeek } } }),
     getReferralSummary(barbershop.id),
+    // --- Actividad reciente: visitas, clientes, citas y canjes ---
     prisma.visit.findMany({ where: shopVisitWhere, include: { customer: { select: { name: true } } }, orderBy: { createdAt: "desc" }, take: 5 }),
     prisma.customer.findMany({ where: { barbershopId: barbershop.id }, orderBy: { createdAt: "desc" }, take: 5 }),
-    prisma.reward.findMany({ where: { barbershopId: barbershop.id }, orderBy: { createdAt: "desc" }, take: 3 }),
+    prisma.appointment.findMany({ where: { barbershopId: barbershop.id }, include: { customer: { select: { name: true } } }, orderBy: { createdAt: "desc" }, take: 5 }),
+    prisma.redemption.findMany({ where: { customer: { barbershopId: barbershop.id } }, include: { customer: { select: { name: true } }, reward: { select: { name: true } } }, orderBy: { createdAt: "desc" }, take: 5 }),
     prisma.visit.findMany({ where: { ...shopVisitWhere, createdAt: { gte: last30 } }, select: { createdAt: true } }),
     prisma.customer.findMany({ where: { barbershopId: barbershop.id, createdAt: { gte: last30 } }, select: { createdAt: true } }),
   ]);
@@ -120,12 +125,12 @@ export default async function OwnerDashboard({
   const hasImage = banners.some((u) => !isVideoUrl(u));
 
   const checklist = [
-    { label: "Crear tu primera recompensa", done: barbershop._count.rewards > 0 },
-    { label: "Subir logo a tu landing", done: !!barbershop.logo },
-    { label: "Recibir tu primer cliente", done: customersTotal > 0 },
-    { label: "Registrar tu primera visita", done: visitsConfirmedTotal > 0 },
-    { label: "Subir 1 foto y video", done: hasImage && hasVideo },
-    { label: "Referir una barbería", done: referral.referralCount > 0 },
+    { label: "Crear tu primera recompensa", done: barbershop._count.rewards > 0, href: `/admin/${slug}/recompensas` },
+    { label: "Subir logo a tu landing", done: !!barbershop.logo, href: `/admin/${slug}/configuracion` },
+    { label: "Agrega un servicio a tu lista", done: servicesCount > 0, href: `/admin/${slug}/servicios` },
+    { label: "Registrar tu primera visita", done: visitsConfirmedTotal > 0, href: `/admin/${slug}/qr` },
+    { label: "Subir 1 foto y video", done: hasImage && hasVideo, href: `/admin/${slug}/configuracion` },
+    { label: "Referir una barbería", done: referral.referralCount > 0, href: `/admin/${slug}/referidos` },
   ];
   const completed = checklist.filter((c) => c.done).length;
   const progressPct = Math.round((completed / checklist.length) * 100);
@@ -135,7 +140,8 @@ export default async function OwnerDashboard({
   const activity: Activity[] = [
     ...recentVisits.map((v) => ({ text: `${v.customer?.name ?? "Un cliente"} registró una visita`, date: v.createdAt })),
     ...recentCustomers.map((c) => ({ text: `${c.name} se registró`, date: c.createdAt })),
-    ...recentRewards.map((r) => ({ text: `Nueva recompensa creada: ${r.name}`, date: r.createdAt })),
+    ...recentAppointments.map((a) => ({ text: `${a.customer?.name ?? "Un cliente"} agendó una cita`, date: a.createdAt })),
+    ...recentRedemptions.map((r) => ({ text: `${r.customer?.name ?? "Un cliente"} canjeó: ${r.reward?.name ?? "recompensa"}`, date: r.createdAt })),
   ]
     .sort((a, b) => b.date.getTime() - a.date.getTime())
     .slice(0, 5);
@@ -175,11 +181,18 @@ export default async function OwnerDashboard({
           padding: "1.5rem",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem" }}>
+        <div>
+          <h2 style={{ fontSize: "1.4rem", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Bienvenido, {barbershop.name}</h2>
+          <p style={{ color: "var(--text-secondary)", margin: "0.25rem 0 0", fontSize: "0.9rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            Aquí tienes el resumen de tu negocio.
+          </p>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "1rem", marginTop: "1.25rem" }}>
           <div>
-            <h2 style={{ fontSize: "1.5rem", margin: 0 }}>Bienvenido, {barbershop.name}</h2>
-            <p style={{ color: "var(--text-secondary)", margin: "0.25rem 0 0", fontSize: "0.9rem" }}>
-              Aquí tienes el resumen de tu negocio.
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.7rem", letterSpacing: "0.1em", margin: 0 }}>CLIENTES</p>
+            <p style={{ fontSize: "2.5rem", fontWeight: 800, margin: 0, lineHeight: 1 }}>
+              {customersTotal}
+              {customersThisMonth > 0 && <span style={{ fontSize: "1rem", color: "var(--accent-success)", marginLeft: "8px", fontWeight: 700 }}>+{customersThisMonth} este mes</span>}
             </p>
           </div>
           {(isPro || onTrial) && (
@@ -188,25 +201,18 @@ export default async function OwnerDashboard({
                 PRO
               </span>
               {onTrial && (
-                <span style={{ color: "rgba(255,255,255,0.75)", fontSize: "0.68rem" }}>
+                <span style={{ color: "rgba(255,255,255,0.75)", fontSize: "0.68rem", whiteSpace: "nowrap" }}>
                   Te {daysLeft === 1 ? "queda 1 día" : `quedan ${daysLeft} días`}
                 </span>
               )}
             </div>
           )}
         </div>
-        <div style={{ marginTop: "1.25rem" }}>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.7rem", letterSpacing: "0.1em", margin: 0 }}>CLIENTES</p>
-          <p style={{ fontSize: "2.5rem", fontWeight: 800, margin: 0, lineHeight: 1 }}>
-            {customersTotal}
-            {customersThisMonth > 0 && <span style={{ fontSize: "1rem", color: "var(--accent-success)", marginLeft: "8px", fontWeight: 700 }}>+{customersThisMonth} este mes</span>}
-          </p>
-        </div>
       </div>
 
       {/* FILTRO DE MES */}
       <div style={{ display: "flex", justifyContent: "flex-start" }}>
-        <MonthFilterPill selected={selectedMes} />
+        <MonthFilterPill selected={selectedMes} max={currentMonth} />
       </div>
 
       {/* STAT CARDS (del mes seleccionado) */}
@@ -243,10 +249,11 @@ export default async function OwnerDashboard({
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "0.6rem 1rem" }}>
             {checklist.map((c) => (
-              <div key={c.label} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem", color: c.done ? "var(--text-primary)" : "var(--text-secondary)" }}>
+              <Link key={c.label} href={c.href} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem", textDecoration: "none", color: c.done ? "var(--text-primary)" : "var(--text-secondary)" }}>
                 <span style={{ flexShrink: 0, width: "18px", height: "18px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", color: c.done ? "white" : "transparent", backgroundColor: c.done ? "var(--accent-success)" : "transparent", border: c.done ? "none" : "1.5px solid var(--border-color)" }}>✓</span>
-                {c.label}
-              </div>
+                <span style={{ borderBottom: c.done ? "none" : "1px dashed transparent" }}>{c.label}</span>
+                {!c.done && <span aria-hidden style={{ color: RED, fontSize: "0.7rem" }}>→</span>}
+              </Link>
             ))}
           </div>
         </div>

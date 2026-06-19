@@ -8,7 +8,7 @@ const MONTHS = [
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
 ];
 
-export default function MonthFilterPill({ selected }: { selected: number }) {
+export default function MonthFilterPill({ selected, max = 12 }: { selected: number; max?: number }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -69,7 +69,7 @@ export default function MonthFilterPill({ selected }: { selected: number }) {
             padding: "4px",
           }}
         >
-          {MONTHS.map((name, i) => {
+          {MONTHS.slice(0, max).map((name, i) => {
             const m = i + 1;
             const active = m === selected;
             return (
