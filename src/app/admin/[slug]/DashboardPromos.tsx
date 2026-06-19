@@ -11,7 +11,7 @@ type PromoType = "pro" | "ref";
 const PRO_FEATURES = [
   "Clientes ilimitados",
   "Personalización de página",
-  "Programa de referidos",
+  "Acceso al programa de referidos",
   "Hasta 10 recompensas",
   "Historial completo",
   "Mensajes automáticos por WhatsApp",
@@ -44,9 +44,13 @@ const CSS = `
 .bcp-check{color:#38bdf8;font-weight:900;flex-shrink:0}
 .bcp-price{font-size:1.15rem;font-weight:900;color:#fff;margin:.2rem 0 .15rem}
 .bcp-muted{color:#94a3b8;font-size:.72rem;margin:0}
-.bcp-cta{display:block;width:100%;margin-top:1.1rem;text-decoration:none;border-radius:14px;padding:2px;background:linear-gradient(90deg,#E63946,#3b82f6);box-shadow:0 0 22px rgba(230,57,70,.4);transition:box-shadow .3s,transform .15s}
-.bcp-cta:hover{box-shadow:0 0 36px rgba(59,130,246,.55);transform:translateY(-1px)}
+.bcp-cta{display:block;width:100%;margin-top:1.1rem;text-decoration:none;border-radius:14px;padding:2px;background:linear-gradient(90deg,#E63946,#3b82f6);transition:transform .15s}
+.bcp-cta:hover{transform:translateY(-1px)}
 .bcp-cta>span{display:block;background:#070a0e;border-radius:12px;padding:.9rem;color:#fff;font-weight:800;letter-spacing:.04em;font-size:.95rem}
+.bcp-card.pro .bcp-cta{animation:bcpBlinkCyan 1.4s ease-in-out infinite}
+.bcp-card.ref .bcp-cta{animation:bcpBlinkRed 1.4s ease-in-out infinite}
+@keyframes bcpBlinkCyan{0%,100%{box-shadow:0 0 12px rgba(56,189,248,.35)}50%{box-shadow:0 0 32px rgba(56,189,248,.9)}}
+@keyframes bcpBlinkRed{0%,100%{box-shadow:0 0 12px rgba(230,57,70,.4)}50%{box-shadow:0 0 32px rgba(230,57,70,.95)}}
 .bcp-gana{font-size:2.6rem;font-weight:900;color:#fff;line-height:1;margin:.2rem 0 .3rem}
 .bcp-gana b{color:#E63946;text-shadow:0 0 20px rgba(230,57,70,.75)}
 .bcp-dismiss{display:block;margin:.85rem auto 0;background:none;border:none;color:rgba(255,255,255,.42);font-size:.72rem;cursor:pointer;text-decoration:underline;-webkit-tap-highlight-color:transparent}
@@ -141,7 +145,7 @@ export default function DashboardPromos({ isPro, slug, preview = false }: { isPr
         </div>
         <p className="bcp-price">SOLO S/29.90 AL MES</p>
         <p className="bcp-muted">Pago seguro con Mercado Pago 💳</p>
-        <Link href={`/admin/${slug}/mi-plan`} className="bcp-cta" onClick={close}>
+        <Link href={`/admin/${slug}/mi-plan#sube-pro`} className="bcp-cta" onClick={close}>
           <span>PROBAR 7 DÍAS GRATIS</span>
         </Link>
       </div>
@@ -177,7 +181,7 @@ export default function DashboardPromos({ isPro, slug, preview = false }: { isPr
         ) : (
           <>
             <p className="bcp-muted" style={{ marginBottom: "0.4rem" }}>Activa Pro y desbloquea el programa de referidos</p>
-            <Link href={`/admin/${slug}/mi-plan`} className="bcp-cta" onClick={close}>
+            <Link href={`/admin/${slug}/mi-plan#sube-pro`} className="bcp-cta" onClick={close}>
               <span>DESBLOQUEAR REFERIDOS</span>
             </Link>
           </>

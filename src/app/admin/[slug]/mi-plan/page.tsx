@@ -4,6 +4,7 @@ import MercadoPagoButton from "@/components/MercadoPagoButton";
 import { welcomeDiscountUSD, firstMonthUSD, PRO_PRICE_USD } from "@/lib/referrals";
 import { isOnTrial } from "@/lib/plans";
 import TrialCountdown from "@/components/TrialCountdown";
+import ScrollGlow from "@/components/ScrollGlow";
 
 export default async function MiPlanPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -20,6 +21,7 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
 
   return (
     <div style={{ maxWidth: "640px" }}>
+      <ScrollGlow targetId="sube-pro" />
       <h2 style={{ marginBottom: "1.5rem" }}>Mi Plan</h2>
 
       <div className="premium-card" style={{ marginBottom: "2rem" }}>
@@ -38,7 +40,7 @@ export default async function MiPlanPage({ params }: { params: Promise<{ slug: s
       </div>
 
       {!isPro ? (
-        <div className="premium-card">
+        <div id="sube-pro" className="premium-card" style={{ scrollMarginTop: "90px" }}>
           <h3 style={{ marginBottom: "0.5rem" }}>Sube al plan Pro</h3>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "0.25rem" }}>
             Clientes ilimitados, hasta 10 recompensas, WhatsApp integrado y más.
