@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { hasProAccess } from "@/lib/plans";
 import {
   getReferralSummary,
   getReferralRows,
@@ -23,6 +25,48 @@ export default async function ReferidosPage({ params }: { params: Promise<{ slug
   const { slug } = await params;
   const barbershop = await prisma.barbershop.findUnique({ where: { slug } });
   if (!barbershop) return null;
+
+  // El programa de referidos es exclusivo del Plan Pro. Los usuarios Free solo
+  // ven una promoción; no acceden al enlace, saldo, historial ni condiciones.
+  if (!hasProAccess(barbershop)) {
+    return (
+      <div style={{ maxWidth: "640px" }}>
+        <h2 style={{ marginBottom: "0.5rem" }}>Referidos</h2>
+        <div
+          className="premium-card"
+          style={{ textAlign: "center", padding: "2.5rem 1.5rem", border: "1px solid var(--saas-red)", boxShadow: "0 0 24px rgba(230,57,70,0.12)" }}
+        >
+          <div style={{ fontSize: "2.5rem", marginBottom: "0.5rem" }}>🎁</div>
+          <h3 style={{ marginBottom: "0.5rem" }}>Gana dinero invitando barberías</h3>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", marginBottom: "1.25rem", lineHeight: 1.5 }}>
+            Con el <strong>Plan Pro</strong> obtienes tu enlace de referido y ganas{" "}
+            <strong>{money(REFERRAL_REWARD)}</strong> por cada barbería que invites. Retira tu saldo a tu
+            cuenta bancaria desde <strong>{money(MIN_WITHDRAWAL)}</strong>.
+          </p>
+          <span
+            style={{
+              display: "inline-block",
+              backgroundColor: "var(--saas-red)",
+              color: "white",
+              fontSize: "0.7rem",
+              fontWeight: 800,
+              padding: "4px 12px",
+              borderRadius: "999px",
+              letterSpacing: "0.05em",
+              marginBottom: "1.5rem",
+            }}
+          >
+            FUNCIÓN EXCLUSIVA DEL PLAN PRO
+          </span>
+          <div>
+            <Link href={`/admin/${slug}/mi-plan`} className="premium-btn" style={{ display: "inline-block", textDecoration: "none" }}>
+              Activar Plan Pro
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Reconciliación perezosa: libera/cancela recompensas vencidas al abrir el panel.
   await reconcileReferrals(barbershop.id);

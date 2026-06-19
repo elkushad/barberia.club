@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 
 // Recompensa fija para el referente por cada barbería referida válida.
-export const REFERRAL_REWARD = 5; // S/5
+// Centralizado aquí para permitir cambios futuros de monto sin tocar la lógica.
+export const REFERRAL_REWARD = 10; // S/10
 // Descuento para la barbería invitada en su primer mes Pro.
 export const REFERRAL_DISCOUNT_RATE = 0.2; // 20%
 // Días que la referida debe mantenerse Pro para liberar la recompensa.
