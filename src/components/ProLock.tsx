@@ -14,11 +14,13 @@ import { useRouter } from "next/navigation";
 export default function ProLock({
   locked,
   slug,
+  href,
   children,
   radius = 12,
 }: {
   locked: boolean;
-  slug: string;
+  slug?: string;
+  href?: string;
   children: React.ReactNode;
   radius?: number;
 }) {
@@ -70,7 +72,7 @@ export default function ProLock({
       {/* Popup dentro de la card (2s, sin cerrar) */}
       {show && (
         <div
-          onClick={() => router.push(`/admin/${slug}/mi-plan`)}
+          onClick={() => router.push(href ?? (slug ? `/admin/${slug}/mi-plan` : "/register"))}
           style={{
             position: "absolute",
             top: "50%",

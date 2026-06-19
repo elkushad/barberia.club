@@ -1,6 +1,7 @@
 import Link from "next/link";
 import PublicNavbar from "@/components/PublicNavbar";
 import PublicFooter from "@/components/PublicFooter";
+import ProLock from "@/components/ProLock";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
@@ -9,6 +10,27 @@ import ProPriceSelector from "@/components/ProPriceSelector";
 
 const GREEN = "#22c55e";
 const RED   = "#E63946";
+
+/* ── Beneficios definitivos ── */
+const PRO_BENEFITS = [
+  "Clientes ilimitados",
+  "Hasta 10 recompensas",
+  "Historial completo (últimas 50 visitas)",
+  "Landing: hasta 5 imágenes + 2 videos de fondo",
+  "WhatsApp integrado",
+  "Programa de referidos (gana S/10 por barbería)",
+  "Servicios con precios ilimitados",
+] as const;
+
+const FREE_BENEFITS = [
+  "Hasta 3 clientes",
+  "1 recompensa",
+  "Últimas 5 visitas en historial",
+  "QR personalizado",
+  "Landing básica: 1 foto o 1 video (máx. 5 seg)",
+  "Plantillas de flyer: oscura y clásica",
+  "1 servicio con precio configurado",
+] as const;
 
 function GreenCheck() {
   return (
@@ -130,7 +152,7 @@ export default async function PlanesPage() {
             <p style={{ color: "var(--saas-text-muted)", fontSize: "0.875rem", margin: "0 0 2px" }}>Prueba gratis</p>
             <h2 style={{ fontSize: "1.6rem", fontWeight: 700, margin: "0 0 0.75rem", color: "white" }}>7 días de prueba Pro</h2>
 
-            <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "0.75rem" }}>
+            <div style={{ marginBottom: "0.75rem" }}>
               <span style={{ fontSize: "3rem", fontWeight: 800, fontFamily: "var(--font-serif)", lineHeight: 1 }}>S/. 0</span>
             </div>
 
@@ -139,15 +161,9 @@ export default async function PlanesPage() {
               Después de la prueba, tu cuenta continúa gratis.
             </p>
 
-            {/* Trial benefits */}
+            {/* Beneficios durante la prueba (Pro, desbloqueados) */}
             <ul style={{ listStyle: "none", padding: 0, margin: "0 0 1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-              {[
-                "Clientes ilimitados durante la prueba",
-                "WhatsApp integrado",
-                "Landing completa",
-                "Hasta 10 recompensas",
-                "Historial completo desde el inicio",
-              ].map((item) => (
+              {PRO_BENEFITS.map((item) => (
                 <li key={item} style={{ display: "flex", gap: "10px", alignItems: "center", color: "white", fontSize: "0.9rem" }}>
                   <GreenCheck /> {item}
                 </li>
@@ -157,14 +173,29 @@ export default async function PlanesPage() {
             {/* Separator */}
             <div style={{ height: "1px", backgroundColor: "rgba(255,255,255,0.08)", margin: "0 0 1.25rem" }} />
 
-            {/* Post-trial free plan */}
-            <p style={{ fontSize: "0.8rem", color: "var(--saas-text-muted)", marginBottom: "0.6rem" }}>
+            {/* Plan Gratis después de la prueba */}
+            <p style={{ fontSize: "0.8rem", color: "var(--saas-text-muted)", marginBottom: "0.75rem" }}>
               Al finalizar la prueba, tu plan será Gratis:
             </p>
-            <ul style={{ listStyle: "none", padding: "0 0 0 4px", margin: "0 0 1.75rem", display: "flex", flexDirection: "column", gap: "5px" }}>
-              {["Hasta 3 clientes", "1 recompensa", "Landing básica", "Historial de las últimas 5 visitas"].map((item) => (
-                <li key={item} style={{ display: "flex", gap: "8px", alignItems: "center", color: "var(--saas-text-muted)", fontSize: "0.835rem" }}>
-                  <span style={{ fontSize: "1rem", lineHeight: 1 }}>•</span> {item}
+
+            {/* Beneficios gratis (desbloqueados) */}
+            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 0.5rem", display: "flex", flexDirection: "column", gap: "5px" }}>
+              {FREE_BENEFITS.map((item) => (
+                <li key={item} style={{ display: "flex", gap: "8px", alignItems: "center", color: "var(--saas-text-muted)", fontSize: "0.835rem", padding: "4px 8px" }}>
+                  <span style={{ fontSize: "1rem", lineHeight: 1, flexShrink: 0 }}>•</span> {item}
+                </li>
+              ))}
+            </ul>
+
+            {/* Beneficios PRO bloqueados */}
+            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 1.75rem", display: "flex", flexDirection: "column", gap: "5px" }}>
+              {PRO_BENEFITS.map((item) => (
+                <li key={item}>
+                  <ProLock locked={true} href={proHref} radius={6}>
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center", color: "var(--saas-text-muted)", fontSize: "0.835rem", padding: "4px 8px" }}>
+                      <span style={{ fontSize: "1rem", lineHeight: 1, flexShrink: 0 }}>•</span> {item}
+                    </div>
+                  </ProLock>
                 </li>
               ))}
             </ul>
@@ -175,7 +206,6 @@ export default async function PlanesPage() {
               backgroundColor: GREEN, color: "white",
               padding: "1rem", borderRadius: "10px",
               fontWeight: 700, fontSize: "1rem", textDecoration: "none",
-              transition: "filter 0.2s",
             }}>
               Empezar prueba gratis
             </Link>
@@ -212,25 +242,19 @@ export default async function PlanesPage() {
               Todo lo que necesitas para hacer crecer tu negocio.
             </p>
 
-            {/* Pro benefits */}
+            {/* Beneficios Pro (desbloqueados) */}
             <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", display: "flex", flexDirection: "column", gap: "0.75rem", color: "#e2e8f0" }}>
-              {[
-                <><strong>Clientes ilimitados</strong></>,
-                <>Hasta 5 imágenes + 2 videos en landing</>,
-                <>Hasta <strong>10 recompensas</strong></>,
-                <>WhatsApp integrado</>,
-                <><strong>Historial completo</strong> desde el inicio</>,
-              ].map((item, i) => (
-                <li key={i} style={{ display: "flex", gap: "10px", alignItems: "center", fontSize: "0.9rem" }}>
+              {PRO_BENEFITS.map((item) => (
+                <li key={item} style={{ display: "flex", gap: "10px", alignItems: "center", fontSize: "0.9rem" }}>
                   <RedCheck /> {item}
                 </li>
               ))}
-              {/* PRONTO items */}
-              {["Automatizaciones de fidelización", "Reportes avanzados"].map((item) => (
-                <li key={item} style={{ display: "flex", gap: "10px", alignItems: "center", fontSize: "0.9rem", color: "var(--saas-text-muted)" }}>
-                  <Pronto /> {item}
-                </li>
-              ))}
+              <li style={{ display: "flex", gap: "10px", alignItems: "center", fontSize: "0.9rem", color: "var(--saas-text-muted)" }}>
+                <Pronto /> Automatizaciones de fidelización
+              </li>
+              <li style={{ display: "flex", gap: "10px", alignItems: "center", fontSize: "0.9rem", color: "var(--saas-text-muted)" }}>
+                <Pronto /> Reportes avanzados
+              </li>
             </ul>
 
             <Link href={proHref} style={{
@@ -238,7 +262,6 @@ export default async function PlanesPage() {
               backgroundColor: RED, color: "white",
               padding: "1rem", borderRadius: "10px",
               fontWeight: 700, fontSize: "1rem", textDecoration: "none",
-              transition: "filter 0.2s",
             }}>
               Elegir Pro
             </Link>
@@ -272,7 +295,7 @@ export default async function PlanesPage() {
               border: `1px solid rgba(255,255,255,0.2)`, backgroundColor: "transparent",
               color: "white", padding: "0.6rem 1.25rem", borderRadius: "8px",
               fontSize: "0.875rem", fontWeight: 600, textDecoration: "none",
-              whiteSpace: "nowrap", transition: "border-color 0.2s",
+              whiteSpace: "nowrap",
             }}>
               Hablar con ventas
             </a>
