@@ -4,9 +4,27 @@ import ScrollAnimation from '@/components/ScrollAnimation';
 import Link from 'next/link';
 import RegisterLink from '@/components/RegisterLink';
 
+const APP_URL = "https://barberia.club";
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Barberia.club",
+  "url": APP_URL,
+  "description": "Convierte cada corte en una oportunidad para fidelizar. Sistema de recompensas, QR personalizado y herramientas diseñadas para barberías.",
+  "hasPart": [
+    { "@type": "WebPage", "name": "Empezar gratis",         "url": `${APP_URL}/register` },
+    { "@type": "WebPage", "name": "Programa de referidos",  "url": `${APP_URL}/referidos` },
+    { "@type": "WebPage", "name": "Planes",                 "url": `${APP_URL}/planes` },
+    { "@type": "WebPage", "name": "Entrar como barbero",    "url": `${APP_URL}/login` },
+    { "@type": "WebPage", "name": "Entrar como cliente",    "url": `${APP_URL}/c` },
+  ],
+};
+
 export default function SaaSLanding() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--saas-bg)', color: 'white' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <PublicNavbar />
       
       <main style={{ flexGrow: 1, paddingTop: '80px' }}>

@@ -7,6 +7,37 @@ import DeleteBarbershopButton from "./DeleteBarbershopButton";
 import FilterPill from "./FilterPill";
 import PlanPill from "./PlanPill";
 import type { Prisma } from "@prisma/client";
+import { detectCountryCode } from "@/lib/pricing";
+
+const CODE_COUNTRY: Record<string, { flag: string; name: string }> = {
+  "+51":  { flag: "🇵🇪", name: "Perú" },
+  "+1":   { flag: "🇺🇸", name: "EE.UU." },
+  "+57":  { flag: "🇨🇴", name: "Colombia" },
+  "+52":  { flag: "🇲🇽", name: "México" },
+  "+54":  { flag: "🇦🇷", name: "Argentina" },
+  "+56":  { flag: "🇨🇱", name: "Chile" },
+  "+593": { flag: "🇪🇨", name: "Ecuador" },
+  "+591": { flag: "🇧🇴", name: "Bolivia" },
+  "+598": { flag: "🇺🇾", name: "Uruguay" },
+  "+595": { flag: "🇵🇾", name: "Paraguay" },
+  "+502": { flag: "🇬🇹", name: "Guatemala" },
+  "+503": { flag: "🇸🇻", name: "El Salvador" },
+  "+504": { flag: "🇭🇳", name: "Honduras" },
+  "+505": { flag: "🇳🇮", name: "Nicaragua" },
+  "+506": { flag: "🇨🇷", name: "Costa Rica" },
+  "+507": { flag: "🇵🇦", name: "Panamá" },
+  "+58":  { flag: "🇻🇪", name: "Venezuela" },
+  "+55":  { flag: "🇧🇷", name: "Brasil" },
+  "+34":  { flag: "🇪🇸", name: "España" },
+  "+44":  { flag: "🇬🇧", name: "Reino Unido" },
+  "+49":  { flag: "🇩🇪", name: "Alemania" },
+};
+
+function countryFromPhone(phone: string | null | undefined) {
+  if (!phone) return null;
+  const code = detectCountryCode(phone);
+  return code ? (CODE_COUNTRY[code] ?? null) : null;
+}
 
 export default async function GodmodeBarberiasPage({
   searchParams,
@@ -125,6 +156,14 @@ export default async function GodmodeBarberiasPage({
                         <p style={{ fontSize: '0.75rem', color: expiringSoon ? '#eab308' : 'var(--text-secondary)' }}>
                           {b.slug}{expiringSoon ? ` · vence en ${daysLeft}d` : ''}
                         </p>
+                        {(() => {
+                          const country = countryFromPhone(b.whatsapp);
+                          return country ? (
+                            <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                              {country.flag} {country.name}
+                            </p>
+                          ) : null;
+                        })()}
                       </div>
                     </div>
                   </td>

@@ -14,11 +14,11 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://barberia.club";
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: {
-    default: "barberia.club — Fideliza a los clientes de tu barbería",
-    template: "%s · barberia.club",
+    default: "Barberia.club | Haz que cada corte cuente!",
+    template: "%s · Barberia.club",
   },
   description:
-    "Crea tu cuenta gratis, obtén tu flyer con código QR y premia la fidelidad de tus clientes con un sistema de recompensas pensado para barberías.",
+    "Convierte cada corte en una oportunidad para fidelizar. Sistema de recompensas, QR personalizado y herramientas diseñadas para barberías.",
   applicationName: "barberia.club",
   keywords: ["barbería", "fidelización", "recompensas", "código QR", "clientes", "barber"],
   alternates: { canonical: "/" },
@@ -27,15 +27,15 @@ export const metadata: Metadata = {
     locale: "es_ES",
     url: appUrl,
     siteName: "barberia.club",
-    title: "barberia.club — Fideliza a los clientes de tu barbería",
+    title: "Barberia.club | Haz que cada corte cuente!",
     description:
-      "Crea tu cuenta gratis, obtén tu flyer con código QR y premia la fidelidad de tus clientes.",
+      "Convierte cada corte en una oportunidad para fidelizar. Sistema de recompensas, QR personalizado y herramientas diseñadas para barberías.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "barberia.club",
+    title: "Barberia.club | Haz que cada corte cuente!",
     description:
-      "Fideliza a los clientes de tu barbería con recompensas y un flyer con código QR.",
+      "Convierte cada corte en una oportunidad para fidelizar. Sistema de recompensas, QR personalizado y herramientas diseñadas para barberías.",
   },
   robots: { index: true, follow: true },
   icons: {
