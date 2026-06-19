@@ -1,12 +1,44 @@
 import Link from "next/link";
 import PublicNavbar from "@/components/PublicNavbar";
 import PublicFooter from "@/components/PublicFooter";
-import ScrollAnimation from "@/components/ScrollAnimation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { detectCountryCode, currencyForCode, usdToLocal, defaultCurrency } from "@/lib/pricing";
 import ProPriceSelector from "@/components/ProPriceSelector";
+
+const GREEN = "#22c55e";
+const RED   = "#E63946";
+
+function GreenCheck() {
+  return (
+    <span style={{
+      width: "22px", height: "22px", borderRadius: "50%",
+      backgroundColor: GREEN, display: "flex", alignItems: "center",
+      justifyContent: "center", flexShrink: 0,
+    }}>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </span>
+  );
+}
+
+function RedCheck() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={RED} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: "1px" }}>
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  );
+}
+
+function Pronto() {
+  return (
+    <span style={{ backgroundColor: RED, color: "white", fontSize: "0.62rem", fontWeight: 800, padding: "2px 7px", borderRadius: "4px", letterSpacing: "0.06em", flexShrink: 0 }}>
+      PRONTO
+    </span>
+  );
+}
 
 export default async function PlanesPage() {
   const session = await getSession();
@@ -26,227 +58,226 @@ export default async function PlanesPage() {
   const cur = currencyForCode(countryCode);
   const localApprox = !peru && cur && cur.currency !== "USD" ? await usdToLocal(cur.currency) : null;
   const freeHref = session ? "/admin" : "/register";
-  const proHref = slug ? `/admin/${slug}/mi-plan` : "/register";
+  const proHref  = slug ? `/admin/${slug}/mi-plan` : "/register";
 
-  // Moneda por defecto del selector según región del visitante:
-  // LATAM (menos Brasil) → soles; Brasil y resto del mundo → dólares.
-  // Si el dueño está logueado se usa el país de su WhatsApp; si no, el geo-IP (header de Vercel).
-  const geoCountry = (await headers()).get("x-vercel-ip-country");
-  const defaultCur = defaultCurrency({ callingCode: countryCode, iso: geoCountry });
-  // Conversión aproximada del precio en USD a la moneda local del usuario extranjero.
+  const geoCountry  = (await headers()).get("x-vercel-ip-country");
+  const defaultCur  = defaultCurrency({ callingCode: countryCode, iso: geoCountry });
   const approxLabel =
     localApprox !== null && cur
       ? `≈ ${cur.symbol} ${localApprox.toLocaleString("es", { maximumFractionDigits: 0 })} en tu moneda (aprox.)`
       : null;
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--saas-bg)', color: 'white' }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: "var(--saas-bg)", color: "white" }}>
       <PublicNavbar />
-      
-      <main style={{ flexGrow: 1, paddingTop: '100px', paddingBottom: '6rem' }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 1.5rem' }}>
-          
-          <ScrollAnimation>
-            <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-              <p style={{ color: 'var(--saas-red)', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.15em', marginBottom: '1rem', textTransform: 'uppercase' }}>Planes</p>
-              <h1 style={{ fontSize: '3rem', fontFamily: 'var(--font-serif)', fontWeight: 700, marginBottom: '1rem' }}>Precios transparentes</h1>
-              <p style={{ color: 'var(--saas-text-muted)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto' }}>
-                Empieza gratis y mejora tu plan cuando tu barbería crezca. Sin contratos ni letras pequeñas.
+
+      <main style={{ flexGrow: 1, paddingTop: "88px", paddingBottom: "5rem" }}>
+        <div style={{ maxWidth: "520px", margin: "0 auto", padding: "0 1.25rem" }}>
+
+          {/* ── Banner 7 días gratis ── */}
+          <div style={{
+            backgroundColor: "rgba(34,197,94,0.07)",
+            border: "1px solid rgba(34,197,94,0.25)",
+            borderRadius: "14px",
+            padding: "1rem 1.25rem",
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "0.875rem",
+            marginBottom: "1.5rem",
+          }}>
+            <div style={{ width: "42px", height: "42px", borderRadius: "50%", backgroundColor: GREEN, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div>
+              <p style={{ fontWeight: 700, margin: "0 0 4px", fontSize: "0.95rem", color: "white", lineHeight: 1.4 }}>
+                Todos los nuevos usuarios reciben 7 días de Pro gratis.
+              </p>
+              <p style={{ fontSize: "0.8rem", color: "var(--saas-text-muted)", margin: 0 }}>
+                Sin tarjeta de crédito • Cancela cuando quieras
               </p>
             </div>
-          </ScrollAnimation>
-
-          <ScrollAnimation delay="delay-100">
-            <div style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              gap: '1rem',
-              border: '1px solid var(--saas-border)',
-              borderRadius: '12px',
-              padding: '1.25rem 1.5rem',
-              maxWidth: '500px',
-              margin: '0 auto 4rem auto',
-              backgroundColor: 'transparent'
-            }}>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.5rem' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <span style={{ fontSize: '0.95rem', color: '#e2e8f0', lineHeight: 1.3 }}>Sin contratos</span>
-              </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.5rem' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <span style={{ fontSize: '0.95rem', color: '#e2e8f0', lineHeight: 1.3 }}>Cancela cuando quieras</span>
-              </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.5rem' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <span style={{ fontSize: '0.95rem', color: '#e2e8f0', lineHeight: 1.3 }}>Soporte humano</span>
-              </div>
-            </div>
-          </ScrollAnimation>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', alignItems: 'flex-start' }}>
-            
-            {/* PLAN GRATIS */}
-            <ScrollAnimation delay="delay-100">
-              <div style={{ 
-                backgroundColor: '#0d1117', 
-                borderRadius: '16px', 
-                border: '1px solid var(--saas-border)',
-                padding: '2.5rem 2rem',
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%'
-              }}>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Gratis</h3>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '0.5rem' }}>
-                  <span style={{ fontSize: '3rem', fontWeight: 700, fontFamily: 'var(--font-serif)' }}>S/.0</span>
-                </div>
-                <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: '1.4' }}>
-                  Ideal para empezar<br/>sin riesgos.
-                </p>
-                
-                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2.5rem 0', display: 'flex', flexDirection: 'column', gap: '1rem', color: 'var(--saas-text-muted)' }}>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><polyline points="20 6 9 17 4 12"/></svg>
-                    <span>Hasta <strong>3 clientes</strong></span>
-                  </li>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><polyline points="20 6 9 17 4 12"/></svg>
-                    <span>QR personalizado</span>
-                  </li>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><polyline points="20 6 9 17 4 12"/></svg>
-                    <span>Landing page básica</span>
-                  </li>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><polyline points="20 6 9 17 4 12"/></svg>
-                    <span>Hasta <strong>1 recompensa</strong></span>
-                  </li>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><polyline points="20 6 9 17 4 12"/></svg>
-                    <span>Últimas 5 visitas en historial</span>
-                  </li>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>PRONTO</span>
-                    <span>Recordatorios de citas</span>
-                  </li>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>PRONTO</span>
-                    <span>Panel de estadísticas básico</span>
-                  </li>
-                </ul>
-
-                <Link href={freeHref} className="saas-btn-outlined" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center' }}>
-                  Elegir plan Gratis
-                </Link>
-              </div>
-            </ScrollAnimation>
-
-            {/* PLAN PRO */}
-            <ScrollAnimation delay="delay-200">
-              <div style={{ 
-                backgroundColor: '#11151c', 
-                borderRadius: '16px', 
-                border: '2px solid var(--saas-red)',
-                padding: '2.5rem 2rem',
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-                position: 'relative',
-                boxShadow: '0 0 30px rgba(230, 57, 70, 0.1)'
-              }}>
-                <div style={{ position: 'absolute', top: '-12px', right: '24px', backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.75rem', fontWeight: 700, padding: '4px 12px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Más popular
-                </div>
-                
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem', color: 'white' }}>Pro</h3>
-                <ProPriceSelector defaultCurrency={defaultCur} approxLabel={approxLabel} />
-                <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
-                  Se renueva automáticamente · cancela cuando quieras
-                </p>
-                <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: '1.4' }}>
-                  Todo lo que necesitas<br/>para hacer crecer tu negocio.
-                </p>
-                
-                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2.5rem 0', display: 'flex', flexDirection: 'column', gap: '1rem', color: '#e2e8f0' }}>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><polyline points="20 6 9 17 4 12"/></svg>
-                    <span><strong>Clientes ilimitados</strong></span>
-                  </li>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><polyline points="20 6 9 17 4 12"/></svg>
-                    <span>Hasta 5 imágenes + 2 videos en landing</span>
-                  </li>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><polyline points="20 6 9 17 4 12"/></svg>
-                    <span>Hasta <strong>10 recompensas</strong></span>
-                  </li>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><polyline points="20 6 9 17 4 12"/></svg>
-                    <span>WhatsApp integrado</span>
-                  </li>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><polyline points="20 6 9 17 4 12"/></svg>
-                    <span><strong>Historial completo</strong> desde el inicio</span>
-                  </li>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>PRONTO</span>
-                    <span>Automatizaciones de fidelización</span>
-                  </li>
-                  <li style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <span style={{ backgroundColor: 'var(--saas-red)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em', flexShrink: 0 }}>PRONTO</span>
-                    <span>Reportes avanzados</span>
-                  </li>
-                </ul>
-
-                <Link href={proHref} className="saas-btn-primary" style={{ width: '100%', marginTop: 'auto', padding: '1rem', textAlign: 'center', animation: 'none' }}>
-                  Empezar con Pro
-                </Link>
-              </div>
-            </ScrollAnimation>
-
           </div>
 
-          <ScrollAnimation delay="delay-300">
-            <div style={{ 
-              marginTop: '4rem',
-              backgroundColor: '#0d1117', 
-              borderRadius: '16px', 
-              border: '1px solid var(--saas-border)',
-              padding: '2rem',
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '2rem',
-              flexWrap: 'wrap'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                <div style={{ 
-                  width: '48px', 
-                  height: '48px', 
-                  borderRadius: '50%', 
-                  backgroundColor: 'transparent', 
-                  border: '1px solid var(--saas-red)',
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--saas-red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                  </svg>
-                </div>
-                <div>
-                  <h4 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'white', marginBottom: '0.25rem' }}>¿Necesitas algo más?</h4>
-                  <p style={{ color: 'var(--saas-text-muted)', fontSize: '0.95rem', margin: 0 }}>Planes personalizados para cadenas de barberías.</p>
-                </div>
+          {/* ── Tres pills ── */}
+          <div style={{ display: "flex", justifyContent: "center", gap: "0.75rem", flexWrap: "wrap", marginBottom: "2rem" }}>
+            {["Sin contratos", "Cancela cuando quieras", "Soporte humano"].map((label) => (
+              <div key={label} style={{ display: "flex", alignItems: "center", gap: "6px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "999px", padding: "5px 12px", fontSize: "0.82rem", color: "#e2e8f0" }}>
+                <span style={{ width: "16px", height: "16px", borderRadius: "50%", border: `2px solid ${RED}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={RED} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                {label}
               </div>
-              <a href="mailto:contacto@barberia.club?subject=Consulta%20de%20ventas" className="saas-btn-outlined" style={{ whiteSpace: 'nowrap' }}>
-                Hablar con ventas
-              </a>
+            ))}
+          </div>
+
+          {/* ══════════════════════════════════
+              CARD 1 — 7 días de prueba Pro
+          ══════════════════════════════════ */}
+          <div style={{
+            backgroundColor: "#0b1410",
+            borderRadius: "20px",
+            border: `2px solid ${GREEN}`,
+            padding: "2rem 1.75rem 1.75rem",
+            marginBottom: "1.5rem",
+            position: "relative",
+            boxShadow: "0 0 32px rgba(34,197,94,0.09)",
+          }}>
+            {/* Badge */}
+            <div style={{ position: "absolute", top: "-14px", left: "50%", transform: "translateX(-50%)", backgroundColor: GREEN, color: "white", fontSize: "0.68rem", fontWeight: 800, padding: "5px 18px", borderRadius: "999px", letterSpacing: "0.1em", whiteSpace: "nowrap" }}>
+              PRUÉBALO SIN RIESGO
             </div>
-          </ScrollAnimation>
+
+            <p style={{ color: "var(--saas-text-muted)", fontSize: "0.875rem", margin: "0 0 2px" }}>Prueba gratis</p>
+            <h2 style={{ fontSize: "1.6rem", fontWeight: 700, margin: "0 0 0.75rem", color: "white" }}>7 días de prueba Pro</h2>
+
+            <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "0.75rem" }}>
+              <span style={{ fontSize: "3rem", fontWeight: 800, fontFamily: "var(--font-serif)", lineHeight: 1 }}>S/. 0</span>
+            </div>
+
+            <p style={{ color: "var(--saas-text-muted)", fontSize: "0.875rem", marginBottom: "1.5rem", lineHeight: 1.55 }}>
+              Prueba todas las funciones de Pro durante 7 días.<br/>
+              Después de la prueba, tu cuenta continúa gratis.
+            </p>
+
+            {/* Trial benefits */}
+            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              {[
+                "Clientes ilimitados durante la prueba",
+                "WhatsApp integrado",
+                "Landing completa",
+                "Hasta 10 recompensas",
+                "Historial completo desde el inicio",
+              ].map((item) => (
+                <li key={item} style={{ display: "flex", gap: "10px", alignItems: "center", color: "white", fontSize: "0.9rem" }}>
+                  <GreenCheck /> {item}
+                </li>
+              ))}
+            </ul>
+
+            {/* Separator */}
+            <div style={{ height: "1px", backgroundColor: "rgba(255,255,255,0.08)", margin: "0 0 1.25rem" }} />
+
+            {/* Post-trial free plan */}
+            <p style={{ fontSize: "0.8rem", color: "var(--saas-text-muted)", marginBottom: "0.6rem" }}>
+              Al finalizar la prueba, tu plan será Gratis:
+            </p>
+            <ul style={{ listStyle: "none", padding: "0 0 0 4px", margin: "0 0 1.75rem", display: "flex", flexDirection: "column", gap: "5px" }}>
+              {["Hasta 3 clientes", "1 recompensa", "Landing básica", "Historial de las últimas 5 visitas"].map((item) => (
+                <li key={item} style={{ display: "flex", gap: "8px", alignItems: "center", color: "var(--saas-text-muted)", fontSize: "0.835rem" }}>
+                  <span style={{ fontSize: "1rem", lineHeight: 1 }}>•</span> {item}
+                </li>
+              ))}
+            </ul>
+
+            {/* CTA */}
+            <Link href={freeHref} style={{
+              display: "block", textAlign: "center", width: "100%",
+              backgroundColor: GREEN, color: "white",
+              padding: "1rem", borderRadius: "10px",
+              fontWeight: 700, fontSize: "1rem", textDecoration: "none",
+              transition: "filter 0.2s",
+            }}>
+              Empezar prueba gratis
+            </Link>
+            <p style={{ textAlign: "center", fontSize: "0.78rem", color: "var(--saas-text-muted)", marginTop: "0.75rem", marginBottom: 0 }}>
+              Sin tarjeta de crédito • Cancela cuando quieras
+            </p>
+          </div>
+
+          {/* ══════════════════════════════════
+              CARD 2 — Pro
+          ══════════════════════════════════ */}
+          <div style={{
+            backgroundColor: "#11151c",
+            borderRadius: "20px",
+            border: `2px solid ${RED}`,
+            padding: "2rem 1.75rem 1.75rem",
+            marginBottom: "1.5rem",
+            position: "relative",
+            boxShadow: `0 0 32px rgba(230,57,70,0.1)`,
+          }}>
+            {/* Badge */}
+            <div style={{ position: "absolute", top: "-14px", left: "50%", transform: "translateX(-50%)", backgroundColor: RED, color: "white", fontSize: "0.68rem", fontWeight: 800, padding: "5px 18px", borderRadius: "999px", letterSpacing: "0.1em", whiteSpace: "nowrap" }}>
+              MÁS POPULAR
+            </div>
+
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 700, margin: "0 0 0.75rem", color: "white" }}>Pro</h2>
+
+            <ProPriceSelector defaultCurrency={defaultCur} approxLabel={approxLabel} />
+
+            <p style={{ color: "var(--saas-text-muted)", fontSize: "0.8rem", margin: "0.5rem 0 0.25rem" }}>
+              Se renueva automáticamente • Cancela cuando quieras
+            </p>
+            <p style={{ color: "var(--saas-text-muted)", fontSize: "0.9rem", marginBottom: "1.5rem", lineHeight: 1.5 }}>
+              Todo lo que necesitas para hacer crecer tu negocio.
+            </p>
+
+            {/* Pro benefits */}
+            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", display: "flex", flexDirection: "column", gap: "0.75rem", color: "#e2e8f0" }}>
+              {[
+                <><strong>Clientes ilimitados</strong></>,
+                <>Hasta 5 imágenes + 2 videos en landing</>,
+                <>Hasta <strong>10 recompensas</strong></>,
+                <>WhatsApp integrado</>,
+                <><strong>Historial completo</strong> desde el inicio</>,
+              ].map((item, i) => (
+                <li key={i} style={{ display: "flex", gap: "10px", alignItems: "center", fontSize: "0.9rem" }}>
+                  <RedCheck /> {item}
+                </li>
+              ))}
+              {/* PRONTO items */}
+              {["Automatizaciones de fidelización", "Reportes avanzados"].map((item) => (
+                <li key={item} style={{ display: "flex", gap: "10px", alignItems: "center", fontSize: "0.9rem", color: "var(--saas-text-muted)" }}>
+                  <Pronto /> {item}
+                </li>
+              ))}
+            </ul>
+
+            <Link href={proHref} style={{
+              display: "block", textAlign: "center", width: "100%",
+              backgroundColor: RED, color: "white",
+              padding: "1rem", borderRadius: "10px",
+              fontWeight: 700, fontSize: "1rem", textDecoration: "none",
+              transition: "filter 0.2s",
+            }}>
+              Elegir Pro
+            </Link>
+          </div>
+
+          {/* ── ¿Necesitas algo más? ── */}
+          <div style={{
+            backgroundColor: "#0d1117",
+            borderRadius: "16px",
+            border: "1px solid var(--saas-border)",
+            padding: "1.5rem",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "1rem",
+            flexWrap: "wrap",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+              <div style={{ width: "44px", height: "44px", borderRadius: "50%", border: `1px solid ${RED}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={RED} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+              </div>
+              <div>
+                <h4 style={{ fontSize: "1.1rem", fontWeight: 600, color: "white", margin: "0 0 2px" }}>¿Necesitas algo más?</h4>
+                <p style={{ color: "var(--saas-text-muted)", fontSize: "0.875rem", margin: 0 }}>Planes personalizados para cadenas de barberías.</p>
+              </div>
+            </div>
+            <a href="mailto:contacto@barberia.club?subject=Consulta%20de%20ventas" style={{
+              border: `1px solid rgba(255,255,255,0.2)`, backgroundColor: "transparent",
+              color: "white", padding: "0.6rem 1.25rem", borderRadius: "8px",
+              fontSize: "0.875rem", fontWeight: 600, textDecoration: "none",
+              whiteSpace: "nowrap", transition: "border-color 0.2s",
+            }}>
+              Hablar con ventas
+            </a>
+          </div>
+
         </div>
       </main>
 
