@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { hasProAccess, isOnTrial } from "@/lib/plans";
+import { hasProAccess, isOnTrial, trialDaysLeft } from "@/lib/plans";
 import { getReferralSummary } from "@/lib/referrals";
 import DashboardActivityChart, { type ActivityPoint } from "./DashboardActivityChart";
+import MonthFilterPill from "./MonthFilterPill";
+import ShareLandingButton from "./ShareLandingButton";
 
 function isVideoUrl(u: string) {
   return /\.(mp4|webm|mov|m4v|ogg)$/i.test(u) || u.startsWith("data:video/");
@@ -20,8 +22,15 @@ function timeAgo(date: Date): string {
 
 const RED = "#E63946";
 
-export default async function OwnerDashboard({ params }: { params: Promise<{ slug: string }> }) {
+export default async function OwnerDashboard({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ mes?: string }>;
+}) {
   const { slug } = await params;
+  const { mes } = await searchParams;
 
   const barbershop = await prisma.barbershop.findUnique({
     where: { slug },
@@ -30,35 +39,45 @@ export default async function OwnerDashboard({ params }: { params: Promise<{ slu
   if (!barbershop) return null;
 
   const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const year = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  // Mes seleccionado por el pill (1-12); por defecto el mes actual.
+  const parsedMes = parseInt(mes ?? "", 10);
+  const selectedMes = parsedMes >= 1 && parsedMes <= 12 ? parsedMes : currentMonth;
+  const monthStart = new Date(year, selectedMes - 1, 1);
+  const monthEnd = new Date(year, selectedMes, 1);
+  const monthRange = { gte: monthStart, lt: monthEnd };
+
+  const currentMonthStart = new Date(year, now.getMonth(), 1);
   const startOfWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const last30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   const shopVisitWhere = { customer: { barbershopId: barbershop.id }, status: "CONFIRMED" as const };
 
   const [
     customersThisMonth,
-    visitsConfirmed,
-    visitsThisMonth,
-    referralsThisMonth,
+    visitsConfirmedTotal,
+    customersMonth,
+    visitsMonth,
+    referralsMonth,
+    earningsMonthAgg,
     newThisWeek,
     referral,
-    earningsTotalAgg,
-    earningsMonthAgg,
     recentVisits,
     recentCustomers,
     recentRewards,
     visitRows,
     customerRows,
   ] = await Promise.all([
-    prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: { gte: startOfMonth } } }),
+    prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: { gte: currentMonthStart } } }),
     prisma.visit.count({ where: shopVisitWhere }),
-    prisma.visit.count({ where: { ...shopVisitWhere, createdAt: { gte: startOfMonth } } }),
-    prisma.referral.count({ where: { referrerId: barbershop.id, createdAt: { gte: startOfMonth } } }),
+    // --- Métricas del mes seleccionado (las 4 tarjetas) ---
+    prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: monthRange } }),
+    prisma.visit.count({ where: { ...shopVisitWhere, createdAt: monthRange } }),
+    prisma.referral.count({ where: { referrerId: barbershop.id, createdAt: monthRange } }),
+    prisma.visit.aggregate({ where: { ...shopVisitWhere, createdAt: monthRange }, _sum: { servicePrice: true } }),
     prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: { gte: startOfWeek } } }),
     getReferralSummary(barbershop.id),
-    // Ganancias = suma del precio (snapshot) de las visitas confirmadas.
-    prisma.visit.aggregate({ where: shopVisitWhere, _sum: { servicePrice: true } }),
-    prisma.visit.aggregate({ where: { ...shopVisitWhere, createdAt: { gte: startOfMonth } }, _sum: { servicePrice: true } }),
     prisma.visit.findMany({ where: shopVisitWhere, include: { customer: { select: { name: true } } }, orderBy: { createdAt: "desc" }, take: 5 }),
     prisma.customer.findMany({ where: { barbershopId: barbershop.id }, orderBy: { createdAt: "desc" }, take: 5 }),
     prisma.reward.findMany({ where: { barbershopId: barbershop.id }, orderBy: { createdAt: "desc" }, take: 3 }),
@@ -66,12 +85,11 @@ export default async function OwnerDashboard({ params }: { params: Promise<{ slu
     prisma.customer.findMany({ where: { barbershopId: barbershop.id, createdAt: { gte: last30 } }, select: { createdAt: true } }),
   ]);
 
-  const earningsTotal = Math.round(earningsTotalAgg._sum.servicePrice ?? 0);
   const earningsMonth = Math.round(earningsMonthAgg._sum.servicePrice ?? 0);
-
   const customersTotal = barbershop._count.customers;
   const isPro = hasProAccess(barbershop);
   const onTrial = isOnTrial(barbershop);
+  const daysLeft = trialDaysLeft(barbershop);
 
   // --- Serie del gráfico: últimos 30 días, por día ---
   const dayKey = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}`;
@@ -105,7 +123,7 @@ export default async function OwnerDashboard({ params }: { params: Promise<{ slu
     { label: "Crear tu primera recompensa", done: barbershop._count.rewards > 0 },
     { label: "Subir logo a tu landing", done: !!barbershop.logo },
     { label: "Recibir tu primer cliente", done: customersTotal > 0 },
-    { label: "Registrar tu primera visita", done: visitsConfirmed > 0 },
+    { label: "Registrar tu primera visita", done: visitsConfirmedTotal > 0 },
     { label: "Subir 1 foto y video", done: hasImage && hasVideo },
     { label: "Referir una barbería", done: referral.referralCount > 0 },
   ];
@@ -122,19 +140,29 @@ export default async function OwnerDashboard({ params }: { params: Promise<{ slu
     .sort((a, b) => b.date.getTime() - a.date.getTime())
     .slice(0, 5);
 
-  const actions = [
-    { label: "Crear Recompensa", href: `/admin/${slug}/recompensas`, icon: "＋", primary: true },
-    { label: "Descargar QR", href: `/admin/${slug}/qr`, icon: "▢" },
-    { label: "Compartir Landing", href: `/${slug}`, icon: "🔗", external: true },
-    { label: "Ver clientes", href: `/admin/${slug}/clientes`, icon: "👥" },
-  ];
-
   const card: React.CSSProperties = {
     backgroundColor: "var(--bg-secondary)",
     border: "1px solid var(--border-color)",
     borderRadius: "16px",
     padding: "1.25rem",
   };
+
+  const actionStyle = (primary?: boolean): React.CSSProperties => ({
+    ...card,
+    padding: "0.9rem",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "0.5rem",
+    textDecoration: "none",
+    color: "var(--text-primary)",
+    fontSize: "0.85rem",
+    fontWeight: 600,
+    borderColor: primary ? RED : "var(--border-color)",
+    textAlign: "center",
+    WebkitTapHighlightColor: "transparent",
+    outline: "none",
+  });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "640px", margin: "0 auto" }}>
@@ -155,9 +183,16 @@ export default async function OwnerDashboard({ params }: { params: Promise<{ slu
             </p>
           </div>
           {(isPro || onTrial) && (
-            <span style={{ flexShrink: 0, backgroundColor: onTrial ? "rgba(46,204,113,0.15)" : `${RED}33`, color: onTrial ? "var(--accent-success)" : RED, border: `1px solid ${onTrial ? "var(--accent-success)" : RED}`, fontSize: "0.7rem", fontWeight: 800, padding: "4px 10px", borderRadius: "999px", letterSpacing: "0.05em" }}>
-              {onTrial ? "PRUEBA PRO" : "PLAN PRO"}
-            </span>
+            <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
+              <span style={{ backgroundColor: "rgba(46,204,113,0.15)", color: "var(--accent-success)", border: "1px solid var(--accent-success)", fontSize: "0.7rem", fontWeight: 800, padding: "4px 12px", borderRadius: "999px", letterSpacing: "0.05em" }}>
+                PRO
+              </span>
+              {onTrial && (
+                <span style={{ color: "rgba(255,255,255,0.75)", fontSize: "0.68rem" }}>
+                  Te {daysLeft === 1 ? "queda 1 día" : `quedan ${daysLeft} días`}
+                </span>
+              )}
+            </div>
           )}
         </div>
         <div style={{ marginTop: "1.25rem" }}>
@@ -169,60 +204,53 @@ export default async function OwnerDashboard({ params }: { params: Promise<{ slu
         </div>
       </div>
 
-      {/* STAT CARDS */}
+      {/* FILTRO DE MES */}
+      <div style={{ display: "flex", justifyContent: "flex-start" }}>
+        <MonthFilterPill selected={selectedMes} />
+      </div>
+
+      {/* STAT CARDS (del mes seleccionado) */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "0.75rem" }}>
-        <Stat label="CLIENTES" value={String(customersTotal)} delta={customersThisMonth > 0 ? `+${customersThisMonth}` : null} />
-        <Stat label="VISITAS REGISTRADAS" value={String(visitsConfirmed)} delta={visitsThisMonth > 0 ? `+${visitsThisMonth}` : null} />
-        <Stat label="GANANCIAS" value={`S/ ${earningsTotal}`} delta={earningsMonth > 0 ? `+S/ ${earningsMonth}` : null} />
-        <Stat label="REFERIDOS" value={String(referral.referralCount)} delta={referralsThisMonth > 0 ? `+${referralsThisMonth}` : null} />
+        <Stat label="CLIENTES" value={String(customersMonth)} />
+        <Stat label="VISITAS REGISTRADAS" value={String(visitsMonth)} />
+        <Stat label="GANANCIAS" value={`S/ ${earningsMonth}`} />
+        <Stat label="REFERIDOS" value={String(referralsMonth)} />
       </div>
 
       {/* QUICK ACTIONS */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "0.75rem" }}>
-        {actions.map((a) => (
-          <Link
-            key={a.label}
-            href={a.href}
-            target={a.external ? "_blank" : undefined}
-            style={{
-              ...card,
-              padding: "0.9rem",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.5rem",
-              textDecoration: "none",
-              color: "var(--text-primary)",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              borderColor: a.primary ? RED : "var(--border-color)",
-              textAlign: "center",
-            }}
-          >
-            <span aria-hidden style={{ color: a.primary ? RED : "var(--text-secondary)" }}>{a.icon}</span>
-            {a.label}
-          </Link>
-        ))}
+        <Link href={`/admin/${slug}/recompensas`} style={actionStyle(true)}>
+          <span aria-hidden style={{ color: RED }}>＋</span> Crear Recompensa
+        </Link>
+        <Link href={`/admin/${slug}/qr`} style={actionStyle()}>
+          <span aria-hidden style={{ color: "var(--text-secondary)" }}>▢</span> Descargar QR
+        </Link>
+        <ShareLandingButton slug={slug} shopName={barbershop.name} />
+        <Link href={`/admin/${slug}/clientes`} style={actionStyle()}>
+          <span aria-hidden style={{ color: "var(--text-secondary)" }}>👥</span> Ver clientes
+        </Link>
       </div>
 
-      {/* CHECKLIST */}
-      <div style={card}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-          <h3 style={{ margin: 0, fontSize: "1.05rem" }}>Estado de tu barbería</h3>
-          <span style={{ color: "var(--text-secondary)", fontSize: "0.8rem" }}>{progressPct}% completado</span>
+      {/* CHECKLIST — se oculta al llegar al 100% */}
+      {progressPct < 100 && (
+        <div style={card}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+            <h3 style={{ margin: 0, fontSize: "1.05rem" }}>Estado de tu barbería</h3>
+            <span style={{ color: "var(--text-secondary)", fontSize: "0.8rem" }}>{progressPct}% completado</span>
+          </div>
+          <div style={{ height: "8px", borderRadius: "999px", backgroundColor: "rgba(255,255,255,0.08)", overflow: "hidden", marginBottom: "1rem" }}>
+            <div style={{ height: "100%", width: `${progressPct}%`, backgroundColor: RED, borderRadius: "999px", transition: "width 0.5s ease" }} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "0.6rem 1rem" }}>
+            {checklist.map((c) => (
+              <div key={c.label} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem", color: c.done ? "var(--text-primary)" : "var(--text-secondary)" }}>
+                <span style={{ flexShrink: 0, width: "18px", height: "18px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", color: c.done ? "white" : "transparent", backgroundColor: c.done ? "var(--accent-success)" : "transparent", border: c.done ? "none" : "1.5px solid var(--border-color)" }}>✓</span>
+                {c.label}
+              </div>
+            ))}
+          </div>
         </div>
-        <div style={{ height: "8px", borderRadius: "999px", backgroundColor: "rgba(255,255,255,0.08)", overflow: "hidden", marginBottom: "1rem" }}>
-          <div style={{ height: "100%", width: `${progressPct}%`, backgroundColor: RED, borderRadius: "999px", transition: "width 0.5s ease" }} />
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "0.6rem 1rem" }}>
-          {checklist.map((c) => (
-            <div key={c.label} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem", color: c.done ? "var(--text-primary)" : "var(--text-secondary)" }}>
-              <span style={{ flexShrink: 0, width: "18px", height: "18px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", color: c.done ? "white" : "transparent", backgroundColor: c.done ? "var(--accent-success)" : "transparent", border: c.done ? "none" : "1.5px solid var(--border-color)" }}>✓</span>
-              {c.label}
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* CHART */}
       <div style={card}>
@@ -285,14 +313,11 @@ export default async function OwnerDashboard({ params }: { params: Promise<{ slu
   );
 }
 
-function Stat({ label, value, delta }: { label: string; value: string; delta: string | null }) {
+function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div style={{ backgroundColor: "var(--bg-secondary)", border: "1px solid var(--border-color)", borderRadius: "16px", padding: "1rem" }}>
       <p style={{ color: "var(--text-secondary)", fontSize: "0.68rem", letterSpacing: "0.08em", margin: 0 }}>{label}</p>
-      <p style={{ fontSize: "1.6rem", fontWeight: 800, margin: "0.25rem 0 0", lineHeight: 1 }}>
-        {value}
-        {delta && <span style={{ fontSize: "0.8rem", color: "var(--accent-success)", marginLeft: "6px", fontWeight: 700 }}>{delta}</span>}
-      </p>
+      <p style={{ fontSize: "1.6rem", fontWeight: 800, margin: "0.25rem 0 0", lineHeight: 1 }}>{value}</p>
     </div>
   );
 }
