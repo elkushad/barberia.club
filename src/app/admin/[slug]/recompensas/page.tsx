@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { assertBarbershopAccessBySlug, assertRewardAccess } from "@/lib/guards";
-import Link from "next/link";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
 import styles from "../../admin.module.css";
 import { hasProAccess } from "@/lib/plans";
+import ProLock from "@/components/ProLock";
 
 export default async function RecompensasPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -22,21 +22,22 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
 
   async function createReward(formData: FormData) {
     "use server";
-    await assertBarbershopAccessBySlug(slug);
+    const shop = await assertBarbershopAccessBySlug(slug);
     const name = formData.get("name") as string;
     const visitsRequired = parseInt(formData.get("visitsRequired") as string);
 
     if (!name || !visitsRequired) return;
 
+    // Defensa en servidor: Free solo puede tener 1 recompensa.
+    const count = await prisma.reward.count({ where: { barbershopId: shop.id } });
+    if (!hasProAccess(shop) && count >= 1) return;
+
     // La imagen se sube en el cliente a Vercel Blob; aquí llega la URL ya subida.
     const imageUrl = (formData.get("image") as string) || null;
 
-    const currentBarbershop = await prisma.barbershop.findUnique({ where: { slug }, select: { id: true } });
-    if (!currentBarbershop) return;
-
     await prisma.reward.create({
       data: {
-        barbershopId: currentBarbershop.id,
+        barbershopId: shop.id,
         name,
         visitsRequired,
         image: imageUrl
@@ -62,18 +63,13 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
       
       <div className={styles.recompensasGrid}>
         
-        {/* Nueva Recompensa */}
+        {/* Nueva Recompensa — en Free queda bloqueada tras la 1ra recompensa */}
         <div className="premium-card">
-          <h3 style={{ marginBottom: '1rem', color: 'var(--accent-primary)' }}>Crear Nueva Recompensa</h3>
-          
-          {limitReached ? (
-            <div style={{ padding: '1.5rem', backgroundColor: 'rgba(230,57,70,0.1)', border: '1px solid var(--saas-red)', borderRadius: '8px', textAlign: 'center' }}>
-              <p style={{ color: 'white', marginBottom: '1rem' }}>Has alcanzado el límite de 1 recompensa en el plan Gratis.</p>
-              <Link href="/planes" className="saas-btn-primary" style={{ padding: '0.75rem 1.5rem', display: 'inline-block', animation: 'none' }}>
-                Actualizar al plan PRO
-              </Link>
-            </div>
-          ) : (
+          <h3 style={{ marginBottom: '1rem', color: 'var(--accent-primary)' }}>
+            Crear Nueva Recompensa {isFreePlan && <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 400 }}>(Free: 1 · PRO: hasta 10)</span>}
+          </h3>
+
+          <ProLock locked={limitReached} slug={slug} radius={12}>
             <form action={createReward} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Nombre de Recompensa (ej: Corte Gratis)</label>
@@ -89,7 +85,7 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
               </div>
               <button type="submit" className="premium-btn" style={{ marginTop: '0.5rem' }}>Guardar Recompensa</button>
             </form>
-          )}
+          </ProLock>
         </div>
 
         {/* Lista de Recompensas */}

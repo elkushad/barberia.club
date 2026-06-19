@@ -4,6 +4,7 @@ import Link from "next/link";
 import { hasProAccess } from "@/lib/plans";
 import { assertBarbershopAccessBySlug } from "@/lib/guards";
 import VisitServicePill from "./VisitServicePill";
+import ProLock from "@/components/ProLock";
 
 export default async function VisitasPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -25,18 +26,19 @@ export default async function VisitasPage({ params }: { params: Promise<{ slug: 
     orderBy: { createdAt: 'desc' }
   });
 
-  const totalHistoryCount = await prisma.visit.count({
-    where: { customer: { barbershopId: barbershop.id }, status: "CONFIRMED" }
-  });
-
   const isFreePlan = !hasProAccess(barbershop);
+  const FREE_VISIBLE = 5;
 
   const historyVisits = await prisma.visit.findMany({
     where: { customer: { barbershopId: barbershop.id }, status: "CONFIRMED" },
     include: { customer: true },
     orderBy: { createdAt: 'desc' },
-    take: isFreePlan ? 5 : 50 // Limit to 5 for FREE, 50 for PRO MVP
+    take: 50
   });
+
+  // Free ve las últimas 5; el resto se MUESTRA pero bloqueado (no se borra).
+  const visibleVisits = isFreePlan ? historyVisits.slice(0, FREE_VISIBLE) : historyVisits;
+  const lockedVisits = isFreePlan ? historyVisits.slice(FREE_VISIBLE) : [];
 
   // Cambia el servicio asociado a una visita y actualiza el precio (snapshot).
   async function setVisitService(visitId: string, serviceId: string) {
@@ -67,6 +69,31 @@ export default async function VisitasPage({ params }: { params: Promise<{ slug: 
     await prisma.visit.delete({ where: { id } });
     revalidatePath(`/admin/${slug}/visitas`);
   }
+
+  const renderVisitRow = (visit: (typeof historyVisits)[number]) => (
+    <div key={visit.id} className="premium-card" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', padding: '1rem' }}>
+      <div>
+        <p style={{ fontWeight: 'bold' }}>{visit.customer.name}</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Tel: {visit.customer.phone}</p>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <VisitServicePill
+          visitId={visit.id}
+          services={services}
+          currentServiceId={visit.serviceId}
+          onSelect={setVisitService}
+        />
+        <div style={{ textAlign: 'right' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+            {new Date(visit.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
+          </p>
+          <span style={{ fontSize: '0.75rem', color: 'var(--accent-success)' }}>
+            Confirmada{visit.servicePrice != null ? ` · S/ ${visit.servicePrice}` : ''}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div>
@@ -121,41 +148,18 @@ export default async function VisitasPage({ params }: { params: Promise<{ slug: 
 
       <div>
         <h3 style={{ marginBottom: '1rem' }}>
-          Historial de Visitas {isFreePlan ? "(Últimas 5)" : "(Últimas 50)"}
+          Historial de Visitas {isFreePlan && <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 400 }}>(Free ve las últimas 5 · PRO el historial completo)</span>}
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {historyVisits.map(visit => (
-            <div key={visit.id} className="premium-card" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', padding: '1rem' }}>
-              <div>
-                <p style={{ fontWeight: 'bold' }}>{visit.customer.name}</p>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Tel: {visit.customer.phone}</p>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                <VisitServicePill
-                  visitId={visit.id}
-                  services={services}
-                  currentServiceId={visit.serviceId}
-                  onSelect={setVisitService}
-                />
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    {new Date(visit.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
-                  </p>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--accent-success)' }}>
-                    Confirmada{visit.servicePrice != null ? ` · S/ ${visit.servicePrice}` : ''}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
+          {visibleVisits.map(renderVisitRow)}
           {historyVisits.length === 0 && <p style={{ color: 'var(--text-secondary)' }}>No hay visitas registradas.</p>}
-          {isFreePlan && totalHistoryCount > 5 && (
-            <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: 'rgba(230,57,70,0.1)', border: '1px solid var(--saas-red)', borderRadius: '8px', textAlign: 'center' }}>
-              <p style={{ color: 'white', marginBottom: '0.5rem' }}>Tienes <strong>{totalHistoryCount - 5} visitas ocultas</strong> en tu historial.</p>
-              <Link href="/planes" className="saas-btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', display: 'inline-block', animation: 'none' }}>
-                Actualizar al plan PRO
-              </Link>
-            </div>
+
+          {lockedVisits.length > 0 && (
+            <ProLock locked slug={slug} radius={12}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {lockedVisits.map(renderVisitRow)}
+              </div>
+            </ProLock>
           )}
         </div>
       </div>
