@@ -5,6 +5,7 @@ import { hasProAccess, isOnTrial, trialDaysLeft } from "@/lib/plans";
 import { getReferralSummary } from "@/lib/referrals";
 import DashboardActivityChart, { type ActivityPoint } from "./DashboardActivityChart";
 import MonthFilterPill from "./MonthFilterPill";
+import DayFilterPill from "./DayFilterPill";
 import ShareLandingButton from "./ShareLandingButton";
 import DashboardPromos from "./DashboardPromos";
 
@@ -34,10 +35,10 @@ export default async function OwnerDashboard({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ mes?: string }>;
+  searchParams: Promise<{ mes?: string; dia?: string }>;
 }) {
   const { slug } = await params;
-  const { mes } = await searchParams;
+  const { mes, dia } = await searchParams;
 
   const barbershop = await prisma.barbershop.findUnique({
     where: { slug },
@@ -59,6 +60,17 @@ export default async function OwnerDashboard({
   const prevMonthNum = selectedMes === 1 ? 12 : selectedMes - 1;
   const prevYear = selectedMes === 1 ? year - 1 : year;
   const prevMonthRange = { gte: new Date(prevYear, prevMonthNum - 1, 1), lt: monthStart };
+
+  // Day filter — default: today (current month) or last day of selected month (past months)
+  const parsedDia = parseInt(dia ?? "", 10);
+  const selectedDay = !isNaN(parsedDia) && parsedDia >= 1 && parsedDia <= 31 ? parsedDia : null;
+  const defaultDay = selectedMes === currentMonth ? now.getDate() : new Date(year, selectedMes, 0).getDate();
+  const statsDay = selectedDay ?? defaultDay;
+  const prevStatsDay = statsDay > 1 ? statsDay - 1 : new Date(year, selectedMes - 1, 0).getDate();
+  const prevDayMes  = statsDay > 1 ? selectedMes : (selectedMes > 1 ? selectedMes - 1 : 12);
+  const prevDayYear = statsDay > 1 ? year : (selectedMes > 1 ? year : year - 1);
+  const statsRange     = { gte: new Date(year, selectedMes - 1, statsDay), lt: new Date(year, selectedMes - 1, statsDay + 1) };
+  const prevStatsRange = { gte: new Date(prevDayYear, prevDayMes - 1, prevStatsDay), lt: new Date(prevDayYear, prevDayMes - 1, prevStatsDay + 1) };
 
   const currentMonthStart = new Date(year, now.getMonth(), 1);
   const startOfWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -89,10 +101,10 @@ export default async function OwnerDashboard({
     prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: { gte: currentMonthStart } } }),
     prisma.visit.count({ where: shopVisitWhere }),
     prisma.service.count({ where: { barbershopId: barbershop.id } }),
-    prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: monthRange } }),
-    prisma.visit.count({ where: { ...shopVisitWhere, createdAt: monthRange } }),
-    prisma.referral.count({ where: { referrerId: barbershop.id, createdAt: monthRange } }),
-    prisma.visit.aggregate({ where: { ...shopVisitWhere, createdAt: monthRange }, _sum: { servicePrice: true } }),
+    prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: statsRange } }),
+    prisma.visit.count({ where: { ...shopVisitWhere, createdAt: statsRange } }),
+    prisma.referral.count({ where: { referrerId: barbershop.id, createdAt: statsRange } }),
+    prisma.visit.aggregate({ where: { ...shopVisitWhere, createdAt: statsRange }, _sum: { servicePrice: true } }),
     prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: { gte: startOfWeek } } }),
     getReferralSummary(barbershop.id),
     prisma.visit.findMany({ where: shopVisitWhere, include: { customer: { select: { name: true } } }, orderBy: { createdAt: "desc" }, take: 5 }),
@@ -101,11 +113,11 @@ export default async function OwnerDashboard({
     prisma.redemption.findMany({ where: { customer: { barbershopId: barbershop.id } }, include: { customer: { select: { name: true } }, reward: { select: { name: true } } }, orderBy: { createdAt: "desc" }, take: 5 }),
     prisma.visit.findMany({ where: { ...shopVisitWhere, createdAt: { gte: last30 } }, select: { createdAt: true } }),
     prisma.customer.findMany({ where: { barbershopId: barbershop.id, createdAt: { gte: last30 } }, select: { createdAt: true } }),
-    // Previous month
-    prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: prevMonthRange } }),
-    prisma.visit.count({ where: { ...shopVisitWhere, createdAt: prevMonthRange } }),
-    prisma.referral.count({ where: { referrerId: barbershop.id, createdAt: prevMonthRange } }),
-    prisma.visit.aggregate({ where: { ...shopVisitWhere, createdAt: prevMonthRange }, _sum: { servicePrice: true } }),
+    // Previous day for % change
+    prisma.customer.count({ where: { barbershopId: barbershop.id, createdAt: prevStatsRange } }),
+    prisma.visit.count({ where: { ...shopVisitWhere, createdAt: prevStatsRange } }),
+    prisma.referral.count({ where: { referrerId: barbershop.id, createdAt: prevStatsRange } }),
+    prisma.visit.aggregate({ where: { ...shopVisitWhere, createdAt: prevStatsRange }, _sum: { servicePrice: true } }),
   ]);
 
   const earningsMonth = Math.round(earningsMonthAgg._sum.servicePrice ?? 0);
@@ -257,9 +269,17 @@ export default async function OwnerDashboard({
           </div>
         </div>
 
-        {/* MES */}
-        <div style={{ display: "flex", justifyContent: "flex-start" }} className="dash-animate">
+        {/* MES + DÍA */}
+        <div style={{ display: "flex", justifyContent: "flex-start", gap: "0.5rem", position: "relative", zIndex: 20 }} className="dash-animate">
           <MonthFilterPill selected={selectedMes} max={currentMonth} />
+          <DayFilterPill
+            selectedDay={selectedDay}
+            statsDay={statsDay}
+            selectedMes={selectedMes}
+            selectedYear={year}
+            todayNum={now.getDate()}
+            isCurrentMonth={selectedMes === currentMonth}
+          />
         </div>
 
         {/* STAT CARDS */}
