@@ -38,6 +38,11 @@ export const metadata: Metadata = {
       "Fideliza a los clientes de tu barbería con recompensas y un flyer con código QR.",
   },
   robots: { index: true, follow: true },
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({
