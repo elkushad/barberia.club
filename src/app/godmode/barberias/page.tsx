@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { Eye, Power } from "lucide-react";
 import DeleteBarbershopButton from "./DeleteBarbershopButton";
 import FilterPill from "./FilterPill";
@@ -89,8 +90,41 @@ export default async function GodmodeBarberiasPage({
     "use server";
     await requireAdmin();
     const id = formData.get("id") as string;
-    await prisma.barbershop.delete({ where: { id } });
+
+    // Cascade manual: PostgreSQL no tiene onDelete:Cascade en este schema
+    const shopCustomers = await prisma.customer.findMany({
+      where: { barbershopId: id },
+      select: { id: true },
+    });
+    const customerIds = shopCustomers.map(c => c.id);
+
+    await prisma.$transaction([
+      // Desligar barberías que fueron referidas por esta
+      prisma.barbershop.updateMany({ where: { referredById: id }, data: { referredById: null } }),
+      // Eliminar referrals de/hacia esta barbería
+      prisma.referral.deleteMany({ where: { OR: [{ referrerId: id }, { referredId: id }] } }),
+      // Eliminar visitas de los clientes de esta barbería
+      prisma.visit.deleteMany({ where: { customerId: { in: customerIds } } }),
+      // Eliminar canjes de los clientes
+      prisma.redemption.deleteMany({ where: { customerId: { in: customerIds } } }),
+      // Eliminar citas
+      prisma.appointment.deleteMany({ where: { barbershopId: id } }),
+      // Eliminar clientes
+      prisma.customer.deleteMany({ where: { barbershopId: id } }),
+      // Eliminar servicios
+      prisma.service.deleteMany({ where: { barbershopId: id } }),
+      // Eliminar recompensas
+      prisma.reward.deleteMany({ where: { barbershopId: id } }),
+      // Eliminar movimientos de crédito
+      prisma.creditMovement.deleteMany({ where: { barbershopId: id } }),
+      // Eliminar pagos
+      prisma.payment.deleteMany({ where: { barbershopId: id } }),
+      // Eliminar la barbería
+      prisma.barbershop.delete({ where: { id } }),
+    ]);
+
     revalidatePath("/godmode/barberias");
+    redirect("/godmode/barberias");
   }
 
   async function changePlan(formData: FormData) {
