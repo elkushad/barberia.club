@@ -2,8 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
-import { hasProAccess } from "@/lib/plans";
-
 const RegisterCustomerSchema = z.object({
   phone: z.string().trim().min(3).max(30),
   name: z.string().trim().min(1).max(80),
@@ -35,18 +33,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Ya existe" }, { status: 400 });
     }
 
-    // Check limits
-    const barbershop = await prisma.barbershop.findUnique({
-      where: { id: barbershopId },
-      include: { _count: { select: { customers: true } } }
-    });
+    const barbershop = await prisma.barbershop.findUnique({ where: { id: barbershopId } });
 
     if (!barbershop) {
       return NextResponse.json({ error: "Barbería no encontrada" }, { status: 404 });
-    }
-
-    if (!hasProAccess(barbershop) && barbershop._count.customers >= 3) {
-      return NextResponse.json({ error: "La barbería no acepta más clientes en este momento." }, { status: 403 });
     }
 
     await prisma.customer.create({
