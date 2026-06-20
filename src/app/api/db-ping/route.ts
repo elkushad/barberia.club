@@ -65,12 +65,11 @@ export async function GET() {
   const ipv6Addr = dnsDirect.resolve6?.[0] ?? dnsDirect.lookup_all?.[0]?.address ?? null;
 
   const urls: Record<string, string> = {
-    pooler_tx: `postgresql://postgres.xjdoxxknyokeoqscevsc:${pw}@${poolerHost}:6543/postgres`,
-    pooler_sess: `postgresql://postgres.xjdoxxknyokeoqscevsc:${pw}@${poolerHost}:5432/postgres`,
+    pooler_tx_postgres: `postgresql://postgres.xjdoxxknyokeoqscevsc:${pw}@${poolerHost}:6543/postgres?pgbouncer=true`,
+    pooler_tx_prisma: `postgresql://prisma.xjdoxxknyokeoqscevsc:${pw}@${poolerHost}:6543/postgres?pgbouncer=true`,
+    pooler_sess_prisma: `postgresql://prisma.xjdoxxknyokeoqscevsc:${pw}@${poolerHost}:5432/postgres`,
+    env_db_url: process.env.DATABASE_URL ?? '',
   };
-  if (ipv6Addr) {
-    urls.direct_ipv6 = `postgresql://postgres:${pw}@[${ipv6Addr}]:5432/postgres`;
-  }
 
   const prismaResults: Record<string, string> = {};
   for (const [key, url] of Object.entries(urls)) {
