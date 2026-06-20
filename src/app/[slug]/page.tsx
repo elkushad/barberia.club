@@ -4,8 +4,15 @@ import Image from "next/image";
 import LandingForm from "./LandingForm";
 import CarouselBackground from "./CarouselBackground";
 
-export default async function PublicLandingPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PublicLandingPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ ref?: string }>;
+}) {
   const { slug } = await params;
+  const { ref } = await searchParams;
   const barbershop = await prisma.barbershop.findUnique({
     where: { slug },
   });
@@ -73,6 +80,7 @@ export default async function PublicLandingPage({ params }: { params: Promise<{ 
             barbershopInstagram={barbershop.instagram || ""}
             barbershopTiktok={barbershop.tiktok || ""}
             barbershopFacebook={barbershop.facebook || ""}
+            refCode={ref}
           />
         </div>
       </div>

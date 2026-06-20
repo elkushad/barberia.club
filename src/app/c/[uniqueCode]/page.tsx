@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getReferralProgress } from "@/lib/client-referrals";
+import ReferralProgressCard from "./ReferralProgressCard";
 
 export default async function CustomerDashboardPage({ params }: { params: Promise<{ uniqueCode: string }> }) {
   const { uniqueCode } = await params;
@@ -30,6 +32,10 @@ export default async function CustomerDashboardPage({ params }: { params: Promis
   const barbershop = customer.barbershop;
   const rewards = barbershop.rewards;
   const maxVisits = rewards.length > 0 ? rewards[rewards.length - 1].visitsRequired : 10;
+
+  const referralProgress = await getReferralProgress(customer.id, barbershop.id);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://barberia.club";
+  const referralUrl = `${appUrl}/${barbershop.slug}?ref=${customer.uniqueCode}`;
   
   let effectiveVisits = totalVisits % maxVisits;
   if (effectiveVisits === 0 && totalVisits > 0) {
@@ -153,7 +159,17 @@ export default async function CustomerDashboardPage({ params }: { params: Promis
           )}
         </div>
 
-        <div style={{ marginTop: '3rem', textAlign: 'center' }}>
+        {/* Tarjeta de referidos del cliente */}
+        {referralProgress && customer.uniqueCode && (
+          <div style={{ marginTop: '2rem' }}>
+            <ReferralProgressCard
+              progress={referralProgress}
+              referralUrl={referralUrl}
+            />
+          </div>
+        )}
+
+        <div style={{ marginTop: '2rem', textAlign: 'center' }}>
           <Link href={`/${barbershop.slug}`} className="premium-btn" style={{ width: '100%', maxWidth: '300px' }}>
             Volver al menú
           </Link>

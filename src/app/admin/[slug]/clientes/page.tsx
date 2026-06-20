@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { assertCustomerAccess, generateUniqueCode } from "@/lib/guards";
 import { hasProAccess } from "@/lib/plans";
+import { processCustomerApprovalReferral } from "@/lib/client-referrals";
 import ProLock from "@/components/ProLock";
 import PendingApproveButton from "./PendingApproveButton";
 import styles from "../../admin.module.css";
@@ -84,6 +85,8 @@ export default async function ClientesPage({
 
     if (result.count > 0) {
       await prisma.visit.create({ data: { customerId: id, status: "CONFIRMED" } });
+      // Si este cliente fue referido, marcar el referral como visita aprobada
+      await processCustomerApprovalReferral(id);
     }
 
     revalidatePath(`/admin/${slug}/clientes`);

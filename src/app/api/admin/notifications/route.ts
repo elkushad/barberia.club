@@ -32,7 +32,7 @@ export async function GET() {
       return NextResponse.json({ items: [], slug: null });
     }
 
-    const [customers, visits, appointments] = await Promise.all([
+    const [customers, visits, appointments, clientReferrals] = await Promise.all([
       prisma.customer.findMany({
         where: { barbershopId: barbershop.id },
         orderBy: { createdAt: "desc" },
@@ -55,6 +55,18 @@ export async function GET() {
           date: true,
           time: true,
           customer: { select: { name: true } },
+        },
+      }),
+      prisma.clientReferral.findMany({
+        where: { barbershopId: barbershop.id },
+        orderBy: { updatedAt: "desc" },
+        take: 10,
+        select: {
+          id: true,
+          status: true,
+          updatedAt: true,
+          referrer: { select: { name: true } },
+          referred: { select: { name: true } },
         },
       }),
     ]);
@@ -94,6 +106,18 @@ export async function GET() {
         subtitle: `${a.customer?.name ?? "Cliente"} · ${a.date} ${a.time}`,
         createdAt: a.createdAt.toISOString(),
         href: `${base}/citas`,
+      })),
+      ...clientReferrals.map((r) => ({
+        id: `cref-${r.id}`,
+        type: "customer" as const,
+        title: r.status === "VISITA_APROBADA"
+          ? `Referido válido: ${r.referrer.name}`
+          : `Nuevo referido: ${r.referrer.name}`,
+        subtitle: r.status === "VISITA_APROBADA"
+          ? `${r.referred.name} completó su primera visita`
+          : `${r.referred.name} se registró con su enlace`,
+        createdAt: r.updatedAt.toISOString(),
+        href: `${base}/recompensas`,
       })),
     ]
       .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))

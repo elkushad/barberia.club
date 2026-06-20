@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { hasProAccess } from "@/lib/plans";
 import { assertBarbershopAccessBySlug } from "@/lib/guards";
+import { processFirstVisitReferral } from "@/lib/client-referrals";
 import VisitServicePill from "./VisitServicePill";
 import ProLock from "@/components/ProLock";
 
@@ -56,10 +57,13 @@ export default async function VisitasPage({ params }: { params: Promise<{ slug: 
   async function approveVisit(formData: FormData) {
     "use server";
     const id = formData.get("id") as string;
-    await prisma.visit.update({
+    const visit = await prisma.visit.update({
       where: { id },
-      data: { status: "CONFIRMED" }
+      data: { status: "CONFIRMED" },
+      select: { customerId: true },
     });
+    // Actualizar referral si es la primera visita confirmada del cliente
+    await processFirstVisitReferral(visit.customerId);
     revalidatePath(`/admin/${slug}/visitas`);
   }
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function LandingForm({ barbershopId, brandColor, barbershopName, barbershopWhatsapp, barbershopInstagram, barbershopTiktok, barbershopFacebook }: { barbershopId: string, brandColor: string, barbershopName?: string, barbershopWhatsapp?: string, barbershopInstagram?: string, barbershopTiktok?: string, barbershopFacebook?: string }) {
+export default function LandingForm({ barbershopId, brandColor, barbershopName, barbershopWhatsapp, barbershopInstagram, barbershopTiktok, barbershopFacebook, refCode }: { barbershopId: string, brandColor: string, barbershopName?: string, barbershopWhatsapp?: string, barbershopInstagram?: string, barbershopTiktok?: string, barbershopFacebook?: string, refCode?: string }) {
   const [step, setStep] = useState(1);
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
@@ -94,7 +94,7 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
         const regRes = await fetch(`/api/customer/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, name, barbershopId })
+          body: JSON.stringify({ phone, name, barbershopId, refCode })
         });
         
         if (!regRes.ok) {
@@ -176,6 +176,21 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
 
   return (
     <div style={{ width: '100%', padding: '0 10px' }}>
+      {/* Banner: llegó invitado por alguien */}
+      {refCode && step === 1 && (
+        <div style={{
+          backgroundColor: 'rgba(34,197,94,0.1)',
+          border: '1px solid rgba(34,197,94,0.3)',
+          borderRadius: '10px',
+          padding: '0.6rem 0.9rem',
+          marginBottom: '0.85rem',
+          textAlign: 'center',
+          fontSize: '0.82rem',
+          color: 'var(--accent-success)',
+        }}>
+          🎉 Un amigo te invitó — regístrate y confirma tu primera visita para que gane su recompensa
+        </div>
+      )}
       {error && <div style={{ color: 'var(--accent-danger)', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
       
       {step === 1 && (

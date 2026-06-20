@@ -48,6 +48,8 @@ model Barbershop {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   payments    Payment[]
+  clientReferralRewards ClientReferralReward[]
+  clientReferrals       ClientReferral[]
 
   // --- Referidos ---
   referralCode       String?      @unique // código único de referido (ej "ABC123")
@@ -108,6 +110,8 @@ model Customer {
   visits       Visit[]
   redemptions  Redemption[]
   appointments Appointment[]
+  referralsMade    ClientReferral[] @relation("ClientReferrer")
+  referralReceived ClientReferral?  @relation("ClientReferred")
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
@@ -183,4 +187,39 @@ model Payment {
   barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+}
+
+// Recompensa por referidos que configura cada barbería para sus clientes.
+// "Invita X amigos → gana Y"
+model ClientReferralReward {
+  id                String           @id @default(cuid())
+  barbershopId      String
+  barbershop        Barbershop       @relation(fields: [barbershopId], references: [id])
+  name              String           // "Corte gratis por referidos"
+  rewardType        String           @default("TEXT") // CORTE_GRATIS | DESCUENTO | PRODUCTO | TEXT
+  description       String?
+  referralsRequired Int              @default(2)
+  isActive          Boolean          @default(true)
+  isPrimary         Boolean          @default(false) // Solo 1 puede ser principal (destacada al cliente)
+  referrals         ClientReferral[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+}
+
+// Registro de quién invitó a quién dentro de una barbería.
+// Un cliente solo puede ser referido una vez por barbería (unique referredId).
+model ClientReferral {
+  id           String                @id @default(cuid())
+  barbershopId String
+  barbershop   Barbershop            @relation(fields: [barbershopId], references: [id])
+  rewardId     String?
+  reward       ClientReferralReward? @relation(fields: [rewardId], references: [id])
+  referrerId   String
+  referrer     Customer              @relation("ClientReferrer", fields: [referrerId], references: [id])
+  referredId   String                @unique
+  referred     Customer              @relation("ClientReferred", fields: [referredId], references: [id])
+  // REGISTRADO → VISITA_APROBADA
+  status       String                @default("REGISTRADO")
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
 }

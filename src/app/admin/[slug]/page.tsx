@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { hasProAccess, isOnTrial, trialDaysLeft } from "@/lib/plans";
 import { getReferralSummary } from "@/lib/referrals";
+import { getReferralMetrics } from "@/lib/client-referrals";
 import { detectCountryCode } from "@/lib/pricing";
 import DashboardActivityChart, { type ActivityPoint } from "./DashboardActivityChart";
 import MonthFilterPill from "./MonthFilterPill";
@@ -133,6 +134,8 @@ export default async function OwnerDashboard({
   const visitsPct    = calcPct(visitsMonth, prevVisitsMonth);
   const earningsPct  = calcPct(earningsMonth, prevEarnings);
   const referralsPct = calcPct(referralsMonth, prevReferralsMonth);
+
+  const clientReferralMetrics = await getReferralMetrics(barbershop.id);
 
   const session = await getSession();
   const promoPreview = (session?.user?.email ?? "").toLowerCase() === "barberia@dos.com";
@@ -395,6 +398,41 @@ export default async function OwnerDashboard({
             </div>
           )}
         </div>
+
+        {/* REFERIDOS DE CLIENTES */}
+        {(clientReferralMetrics.total > 0) && (
+          <div style={{ ...card }} className="dash-animate">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+              <h3 style={{ margin: 0, fontSize: "1rem" }}>Referidos de clientes</h3>
+              <Link href={`/admin/${slug}/recompensas`} style={{ fontSize: "0.78rem", color: "var(--text-secondary)", textDecoration: "none" }}>
+                Configurar →
+              </Link>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem", marginBottom: "1rem" }}>
+              {[
+                { label: "Registrados", value: clientReferralMetrics.total },
+                { label: "Válidos", value: clientReferralMetrics.valid },
+                { label: "Recompensas", value: clientReferralMetrics.unlockedCount },
+              ].map((s) => (
+                <div key={s.label} style={{ textAlign: "center", backgroundColor: "var(--bg-primary)", borderRadius: "10px", padding: "0.75rem 0.5rem" }}>
+                  <p style={{ fontSize: "1.5rem", fontWeight: 800, margin: "0 0 0.1rem" }}>{s.value}</p>
+                  <p style={{ fontSize: "0.7rem", color: "var(--text-secondary)", margin: 0 }}>{s.label}</p>
+                </div>
+              ))}
+            </div>
+            {clientReferralMetrics.top.length > 0 && (
+              <div>
+                <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginBottom: "0.5rem", fontWeight: 600 }}>TOP REFERIDORES</p>
+                {clientReferralMetrics.top.map((t, i) => (
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", padding: "0.3rem 0", borderTop: i > 0 ? "1px solid var(--border-color)" : undefined }}>
+                    <span>{t.name}</span>
+                    <span style={{ color: "var(--accent-success)", fontWeight: 700 }}>{t.count} referido{t.count !== 1 ? "s" : ""}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* RECOMENDACIÓN */}
         <div style={{ ...card, border: `1px solid ${RED}55`, boxShadow: `0 0 24px ${RED}0d` }}>
