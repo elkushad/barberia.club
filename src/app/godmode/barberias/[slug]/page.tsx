@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { ArrowLeft, Store, Users, CalendarCheck, CircleDollarSign } from "lucide-react";
 
 export default async function GodmodeBarbershopDetail({ params }: { params: Promise<{ slug: string }> }) {
@@ -36,10 +36,10 @@ export default async function GodmodeBarbershopDetail({ params }: { params: Prom
     await requireAdmin();
     const newPlan = formData.get("plan") as string;
     await prisma.barbershop.update({
-      where: { id: barbershop?.id },
-      data: { plan: newPlan }
+      where: { id: barbershop!.id },
+      data: { plan: newPlan },
     });
-    revalidatePath(`/godmode/barberias/${slug}`);
+    redirect(`/godmode/barberias/${slug}`);
   }
 
   return (

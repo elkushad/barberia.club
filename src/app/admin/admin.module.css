@@ -122,6 +122,11 @@
 }
 .sidebarLandingLink:hover { opacity: 0.75; background: rgba(250,204,21,0.06); }
 
+.sidebarLogout {
+  margin-top: 0.25rem;
+  padding: 0 0.1rem;
+}
+
 /* =============================================
    MAIN WRAPPER
    ============================================= */

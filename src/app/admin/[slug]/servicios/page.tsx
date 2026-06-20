@@ -23,6 +23,9 @@ export default async function ServiciosPage({ params }: { params: Promise<{ slug
   // Free: 1 servicio. PRO: ilimitados.
   const atFreeLimit = !isPro && services.length >= FREE_SERVICE_LIMIT;
 
+  const visibleServices = isPro ? services : services.slice(0, FREE_SERVICE_LIMIT);
+  const lockedServices  = isPro ? []       : services.slice(FREE_SERVICE_LIMIT);
+
   async function createService(formData: FormData) {
     "use server";
     const shop = await assertBarbershopAccessBySlug(slug);
@@ -125,7 +128,7 @@ export default async function ServiciosPage({ params }: { params: Promise<{ slug
         {services.length === 0 && (
           <p style={{ color: "var(--text-secondary)" }}>Aún no tienes servicios. Agrega el primero arriba.</p>
         )}
-        {services.map((s) => (
+        {visibleServices.map((s) => (
           <ServiceRow
             key={s.id}
             service={s}
@@ -134,6 +137,21 @@ export default async function ServiciosPage({ params }: { params: Promise<{ slug
             setPrimary={setPrimary}
           />
         ))}
+        {lockedServices.length > 0 && (
+          <ProLock locked slug={slug} radius={12}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              {lockedServices.map((s) => (
+                <ServiceRow
+                  key={s.id}
+                  service={s}
+                  updateService={updateService}
+                  deleteService={deleteService}
+                  setPrimary={setPrimary}
+                />
+              ))}
+            </div>
+          </ProLock>
+        )}
       </div>
     </div>
   );

@@ -3,11 +3,13 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { hasProAccess, isOnTrial, trialDaysLeft } from "@/lib/plans";
 import { getReferralSummary } from "@/lib/referrals";
+import { detectCountryCode } from "@/lib/pricing";
 import DashboardActivityChart, { type ActivityPoint } from "./DashboardActivityChart";
 import MonthFilterPill from "./MonthFilterPill";
 import DayFilterPill from "./DayFilterPill";
 import ShareLandingButton from "./ShareLandingButton";
 import DashboardPromos from "./DashboardPromos";
+import ReferralChecklistItem from "./ReferralChecklistItem";
 
 function isVideoUrl(u: string) {
   return /\.(mp4|webm|mov|m4v|ogg)$/i.test(u) || u.startsWith("data:video/");
@@ -135,6 +137,12 @@ export default async function OwnerDashboard({
   const session = await getSession();
   const promoPreview = (session?.user?.email ?? "").toLowerCase() === "barberia@dos.com";
 
+  // Reward text for referral checklist item based on country
+  const countryCode = detectCountryCode(barbershop.whatsapp);
+  const referralRewardText = countryCode === "+51"
+    ? "Gana S/.10 por cada referido"
+    : "Gana $3 por cada referido";
+
   // Chart data — últimos 30 días
   const MONTHS_SHORT = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
   const dayKey = (d: Date) => `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
@@ -162,10 +170,12 @@ export default async function OwnerDashboard({
     { label: "Agrega un servicio a tu lista", done: servicesCount > 0,               href: `/admin/${slug}/servicios` },
     { label: "Registrar tu primera visita",   done: visitsConfirmedTotal > 0,        href: `/admin/${slug}/qr` },
     { label: "Subir 1 foto y video",          done: hasImage && hasVideo,            href: `/admin/${slug}/configuracion` },
-    { label: "Referir una barbería",          done: referral.referralCount > 0,      href: `/admin/${slug}/referidos` },
   ];
-  const completed = checklist.filter((c) => c.done).length;
-  const progressPct = Math.round((completed / checklist.length) * 100);
+  const referralDone = referral.referralCount > 0;
+  const referralHref = `/admin/${slug}/referidos`;
+  const allItems = checklist.length + 1; // +1 for referral item
+  const completed = checklist.filter((c) => c.done).length + (referralDone ? 1 : 0);
+  const progressPct = Math.round((completed / allItems) * 100);
 
   type Activity = { text: string; date: Date };
   const activity: Activity[] = [
@@ -284,10 +294,10 @@ export default async function OwnerDashboard({
 
         {/* STAT CARDS */}
         <div className="dash-stat-grid dash-animate" style={{ animationDelay: "80ms" }}>
-          <Stat label="CLIENTES"           value={String(customersMonth)}          change={customersPct} />
-          <Stat label="VISITAS REGISTRADAS" value={String(visitsMonth)}            change={visitsPct} />
+          <Stat label="CLIENTES"            value={String(customersMonth)}          change={customersPct}  href={`/admin/${slug}/clientes`} />
+          <Stat label="VISITAS REGISTRADAS" value={String(visitsMonth)}             change={visitsPct}     href={`/admin/${slug}/visitas`} />
           <Stat label="GANANCIAS"           value={`S/ ${earningsMonth.toLocaleString("es")}`} change={earningsPct} />
-          <Stat label="REFERIDOS"           value={String(referralsMonth)}         change={referralsPct} />
+          <Stat label="REFERIDOS"           value={String(referralsMonth)}          change={referralsPct} />
         </div>
 
         {/* QUICK ACTIONS */}
@@ -331,6 +341,7 @@ export default async function OwnerDashboard({
                   {!c.done && <span aria-hidden style={{ color: RED, fontSize: "0.7rem", marginLeft: "auto" }}>→</span>}
                 </Link>
               ))}
+              <ReferralChecklistItem href={referralHref} done={referralDone} rewardText={referralRewardText} />
             </div>
           </div>
         )}
@@ -417,8 +428,8 @@ export default async function OwnerDashboard({
 }
 
 /* ── Stat card (mes seleccionado) ──────────────────────────────────────── */
-function Stat({ label, value, change }: { label: string; value: string; change?: number | null }) {
-  return (
+function Stat({ label, value, change, href }: { label: string; value: string; change?: number | null; href?: string }) {
+  const inner = (
     <div
       className="dash-stat-card"
       style={{
@@ -427,6 +438,7 @@ function Stat({ label, value, change }: { label: string; value: string; change?:
         borderRadius: "16px",
         padding: "1.1rem 1.25rem",
         transition: "border-color 0.2s, box-shadow 0.2s",
+        cursor: href ? "pointer" : "default",
       }}
     >
       <p style={{ color: "var(--text-secondary)", fontSize: "0.65rem", letterSpacing: "0.1em", margin: 0, fontWeight: 600 }}>{label}</p>
@@ -445,6 +457,10 @@ function Stat({ label, value, change }: { label: string; value: string; change?:
       </div>
     </div>
   );
+  if (href) {
+    return <Link href={href} style={{ textDecoration: "none", display: "block" }}>{inner}</Link>;
+  }
+  return inner;
 }
 
 /* ── Side stat (junto al chart) ────────────────────────────────────────── */

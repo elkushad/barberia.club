@@ -84,6 +84,16 @@ export default function NotificationBell({ slug }: { slug?: string }) {
 
   return (
     <div ref={wrapRef} style={{ position: "relative", display: "flex", alignItems: "center" }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .notif-panel {
+            position: fixed !important;
+            top: 56px !important;
+            right: 1rem !important;
+            left: auto !important;
+          }
+        }
+      `}</style>
       <button
         onClick={toggle}
         aria-label="Notificaciones"
@@ -129,6 +139,7 @@ export default function NotificationBell({ slug }: { slug?: string }) {
 
       {open && (
         <div
+          className="notif-panel"
           style={{
             position: "absolute",
             top: "calc(100% + 10px)",

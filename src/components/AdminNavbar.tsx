@@ -131,6 +131,9 @@ export default function AdminNavbar({ userName, shopLogo, shopName, shopSlug, na
                 <line x1="10" y1="14" x2="21" y2="3"/>
               </svg>
             </Link>
+            <div className={styles.sidebarLogout}>
+              <LogoutButton />
+            </div>
           </div>
         )}
       </aside>

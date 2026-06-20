@@ -9,6 +9,7 @@ import {
   REFERRAL_REWARD,
   MIN_WITHDRAWAL,
 } from "@/lib/referrals";
+import ProLock from "@/components/ProLock";
 import CopyReferralLink from "./CopyReferralLink";
 
 const STATUS_STYLES: Record<string, { color: string; bg: string; label: string }> = {
@@ -26,60 +27,37 @@ export default async function ReferidosPage({ params }: { params: Promise<{ slug
   const barbershop = await prisma.barbershop.findUnique({ where: { slug } });
   if (!barbershop) return null;
 
-  // El programa de referidos es exclusivo del Plan Pro. Los usuarios Free solo
-  // ven una promoción; no acceden al enlace, saldo, historial ni condiciones.
-  if (!hasProAccess(barbershop)) {
-    return (
-      <div style={{ maxWidth: "640px" }}>
-        <h2 style={{ marginBottom: "0.5rem" }}>Referidos</h2>
-        <div
-          className="premium-card"
-          style={{ textAlign: "center", padding: "2.5rem 1.5rem", border: "1px solid var(--saas-red)", boxShadow: "0 0 24px rgba(230,57,70,0.12)" }}
-        >
-          <div style={{ fontSize: "2.5rem", marginBottom: "0.5rem" }}>🎁</div>
-          <h3 style={{ marginBottom: "0.5rem" }}>Gana dinero invitando barberías</h3>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", marginBottom: "1.25rem", lineHeight: 1.5 }}>
-            Con el <strong>Plan Pro</strong> obtienes tu enlace de referido y ganas{" "}
-            <strong>{money(REFERRAL_REWARD)}</strong> por cada barbería que invites. Retira tu saldo a tu
-            cuenta bancaria desde <strong>{money(MIN_WITHDRAWAL)}</strong>.
-          </p>
-          <span
-            style={{
-              display: "inline-block",
-              backgroundColor: "var(--saas-red)",
-              color: "white",
-              fontSize: "0.7rem",
-              fontWeight: 800,
-              padding: "4px 12px",
-              borderRadius: "999px",
-              letterSpacing: "0.05em",
-              marginBottom: "1.5rem",
-            }}
-          >
-            FUNCIÓN EXCLUSIVA DEL PLAN PRO
-          </span>
-          <div>
-            <Link href={`/admin/${slug}/mi-plan`} className="premium-btn" style={{ display: "inline-block", textDecoration: "none" }}>
-              Activar Plan Pro
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+  const isPro = hasProAccess(barbershop);
+
+  // Solo reconciliar para usuarios PRO activos
+  if (isPro) {
+    await reconcileReferrals(barbershop.id);
   }
 
-  // Reconciliación perezosa: libera/cancela recompensas vencidas al abrir el panel.
-  await reconcileReferrals(barbershop.id);
+  // Cargar datos solo si es PRO o ya tiene código de referido (fue PRO antes)
+  const hasCode = isPro || !!barbershop.referralCode;
+  const [summary, rows] = hasCode
+    ? await Promise.all([
+        getReferralSummary(barbershop.id),
+        getReferralRows(barbershop.id),
+      ])
+    : [
+        {
+          availableBalance: 0,
+          pendingBalance: 0,
+          totalEarned: 0,
+          referralCount: 0,
+          code: "------",
+          link: "",
+        },
+        [],
+      ];
 
-  const summary = await getReferralSummary(barbershop.id);
-  const rows = await getReferralRows(barbershop.id);
+  const canWithdraw = isPro && summary.availableBalance >= MIN_WITHDRAWAL;
+  const waLink = isPro ? withdrawalWhatsAppLink(barbershop.name, summary.availableBalance) : null;
 
-  const canWithdraw = summary.availableBalance >= MIN_WITHDRAWAL;
-  const waLink = withdrawalWhatsAppLink(barbershop.name, summary.availableBalance);
-
-  return (
-    <div style={{ maxWidth: "880px" }}>
-      <h2 style={{ marginBottom: "0.5rem" }}>Referidos</h2>
+  const content = (
+    <div>
       <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
         Invita a otras barberías y gana <strong>{money(REFERRAL_REWARD)}</strong> por cada una que se
         mantenga en el Plan Pro durante 30 días. Ellas obtienen <strong>30% de descuento</strong> en su
@@ -154,7 +132,13 @@ export default async function ReferidosPage({ params }: { params: Promise<{ slug
         <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginBottom: "0.75rem" }}>
           Compártelo con otras barberías. Tu código es <strong>{summary.code}</strong>.
         </p>
-        <CopyReferralLink link={summary.link} />
+        {summary.link ? (
+          <CopyReferralLink link={summary.link} />
+        ) : (
+          <div style={{ padding: "0.6rem 1rem", backgroundColor: "var(--bg-tertiary)", borderRadius: "8px", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+            Activa PRO para obtener tu enlace
+          </div>
+        )}
       </div>
 
       {/* Tabla de referidos */}
@@ -218,6 +202,29 @@ export default async function ReferidosPage({ params }: { params: Promise<{ slug
           </div>
         )}
       </div>
+    </div>
+  );
+
+  return (
+    <div style={{ maxWidth: "880px" }}>
+      <h2 style={{ marginBottom: "0.5rem" }}>Referidos</h2>
+
+      {isPro ? (
+        content
+      ) : (
+        <>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", marginBottom: "1rem" }}>
+            El programa de referidos es exclusivo del{" "}
+            <Link href={`/admin/${slug}/mi-plan`} style={{ color: "var(--accent-primary)", textDecoration: "none", fontWeight: 600 }}>
+              Plan PRO
+            </Link>
+            . Sube para ganar {money(REFERRAL_REWARD)} por cada barbería que invites.
+          </p>
+          <ProLock locked slug={slug} radius={14}>
+            {content}
+          </ProLock>
+        </>
+      )}
     </div>
   );
 }

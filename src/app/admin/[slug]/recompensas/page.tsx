@@ -57,6 +57,9 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
   const isFreePlan = !hasProAccess(barbershop);
   const limitReached = isFreePlan && rewards.length >= 1;
 
+  const visibleRewards = isFreePlan ? rewards.slice(0, 1) : rewards;
+  const lockedRewards  = isFreePlan ? rewards.slice(1)    : [];
+
   return (
     <div>
       <h2 style={{ marginBottom: '1.5rem' }}>Sistema de Recompensas</h2>
@@ -92,7 +95,7 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
         <div>
           <h3 style={{ marginBottom: '1rem' }}>Recompensas Activas</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {rewards.map(reward => (
+            {visibleRewards.map(reward => (
               <div key={reward.id} className="premium-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   {reward.image ? (
@@ -113,6 +116,31 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
                 </form>
               </div>
             ))}
+
+            {lockedRewards.length > 0 && (
+              <ProLock locked slug={slug} radius={12}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {lockedRewards.map(reward => (
+                    <div key={reward.id} className="premium-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        {reward.image ? (
+                          <Image src={reward.image} alt={reward.name} width={60} height={60} style={{ borderRadius: '8px', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ width: '60px', height: '60px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <span style={{ fontSize: '1.5rem' }}>🎁</span>
+                          </div>
+                        )}
+                        <div>
+                          <h4 style={{ fontSize: '1.1rem', marginBottom: '0.25rem' }}>{reward.name}</h4>
+                          <p style={{ color: 'var(--accent-primary)', fontWeight: 'bold' }}>{reward.visitsRequired} visitas requeridas</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ProLock>
+            )}
+
             {rewards.length === 0 && (
               <p style={{ color: 'var(--text-secondary)', padding: '2rem', textAlign: 'center', border: '1px dashed var(--border-color)', borderRadius: '8px' }}>
                 Aún no has configurado recompensas.
