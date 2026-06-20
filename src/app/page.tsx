@@ -3,6 +3,7 @@ import PublicFooter from '@/components/PublicFooter';
 import ScrollAnimation from '@/components/ScrollAnimation';
 import Link from 'next/link';
 import RegisterLink from '@/components/RegisterLink';
+import HeroCarousel from '@/components/HeroCarousel';
 
 const APP_URL = "https://barberia.club";
 
@@ -31,61 +32,7 @@ export default function SaaSLanding() {
         {/* HERO SECTION */}
         <section id="inicio" style={{ padding: '4rem 1.5rem', maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '4rem', flexWrap: 'wrap' }}>
           
-          <div style={{ flex: '1 1 500px' }}>
-            <ScrollAnimation>
-              <h1 style={{ fontSize: '3.8rem', lineHeight: 1.1, marginBottom: '1.5rem', fontFamily: 'var(--font-serif)', fontWeight: 700, letterSpacing: '-0.02em' }}>
-                Tu barbería.<br/>
-                Tus clientes.<br/>
-                <i style={{ color: 'var(--saas-red)', fontStyle: 'italic' }}>Su lealtad.</i>
-              </h1>
-            </ScrollAnimation>
-            
-            <ScrollAnimation delay="delay-100">
-              <p style={{ fontSize: '1.1rem', color: 'var(--saas-text-muted)', marginBottom: '2.5rem', maxWidth: '500px', lineHeight: 1.6 }}>
-                Crea tu cuenta gratis, obtén tu flyer con código QR listo para imprimir y comienza a premiar la fidelidad de tus clientes.
-              </p>
-            </ScrollAnimation>
-            
-            <ScrollAnimation delay="delay-200">
-              <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
-                <RegisterLink className="saas-btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.05rem', width: '100%', maxWidth: '350px' }}>
-                  Registrar mi barbería gratis &rarr;
-                </RegisterLink>
-                <Link href="/demo" className="saas-btn-outlined" style={{ padding: '1rem 2rem', fontSize: '1.05rem' }}>
-                  Ver demo <span style={{ marginLeft: '8px' }}>&#9658;</span>
-                </Link>
-              </div>
-            </ScrollAnimation>
-            
-            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: '1rem', fontSize: '0.85rem', color: 'var(--saas-text-muted)', flexWrap: 'nowrap' }}>
-              <ScrollAnimation delay="delay-300" style={{ flex: 1 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.75rem', padding: '1rem 0.5rem', borderRadius: '12px', transition: 'background-color 0.3s ease, transform 0.3s ease' }} className="feature-item-hover">
-                  <div style={{ padding: '12px', background: 'linear-gradient(135deg, rgba(255,51,102,0.1) 0%, rgba(255,51,102,0.05) 100%)', borderRadius: '50%', color: 'var(--saas-red)', display: 'flex', boxShadow: '0 4px 12px rgba(255,51,102,0.1)' }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3h6v6H3z"/><path d="M15 3h6v6h-6z"/><path d="M3 15h6v6H3z"/><path d="M15 15h6v6h-6z"/></svg>
-                  </div>
-                  <span style={{ lineHeight: 1.4, fontWeight: 500, color: '#e2e8f0' }}>Flyer con QR<br/>listo para imprimir</span>
-                </div>
-              </ScrollAnimation>
-
-              <ScrollAnimation delay="delay-400" style={{ flex: 1 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.75rem', padding: '1rem 0.5rem', borderRadius: '12px', transition: 'background-color 0.3s ease, transform 0.3s ease' }} className="feature-item-hover">
-                  <div style={{ padding: '12px', background: 'linear-gradient(135deg, rgba(255,51,102,0.1) 0%, rgba(255,51,102,0.05) 100%)', borderRadius: '50%', color: 'var(--saas-red)', display: 'flex', boxShadow: '0 4px 12px rgba(255,51,102,0.1)' }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-                  </div>
-                  <span style={{ lineHeight: 1.4, fontWeight: 500, color: '#e2e8f0' }}>Sistema de recompensas<br/>por fidelización</span>
-                </div>
-              </ScrollAnimation>
-
-              <ScrollAnimation delay="delay-500" style={{ flex: 1 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.75rem', padding: '1rem 0.5rem', borderRadius: '12px', transition: 'background-color 0.3s ease, transform 0.3s ease' }} className="feature-item-hover">
-                  <div style={{ padding: '12px', background: 'linear-gradient(135deg, rgba(255,51,102,0.1) 0%, rgba(255,51,102,0.05) 100%)', borderRadius: '50%', color: 'var(--saas-red)', display: 'flex', boxShadow: '0 4px 12px rgba(255,51,102,0.1)' }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  </div>
-                  <span style={{ lineHeight: 1.4, fontWeight: 500, color: '#e2e8f0' }}>Registro de clientes<br/>y contactos</span>
-                </div>
-              </ScrollAnimation>
-            </div>
-          </div>
+          <HeroCarousel />
           
           <ScrollAnimation delay="delay-200" style={{ flex: '1 1 500px', display: 'flex', justifyContent: 'center' }}>
             <img src="/hero.png" alt="Barberia Club App" style={{ width: '100%', maxWidth: '650px', height: 'auto', objectFit: 'contain' }} />
