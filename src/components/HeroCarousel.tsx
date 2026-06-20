@@ -1,37 +1,67 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
-const slides = [
+interface SlidePart {
+  text: string;
+  accent: boolean;
+}
+
+interface Slide {
+  headingParts: SlidePart[];
+  subtext: string;
+  cta: string;
+  href: string;
+}
+
+const slides: Slide[] = [
   {
-    heading: "Haz que tus clientes regresen más seguido",
+    headingParts: [
+      { text: "Haz que tus clientes ", accent: false },
+      { text: "regresen más seguido", accent: true },
+    ],
     subtext: "Recompensa cada visita y convierte clientes ocasionales en clientes frecuentes.",
     cta: "Registrar mi barbería gratis →",
+    href: "/register",
   },
   {
-    heading: "Personaliza tus recompensas",
-    subtext: "Tú decides qué regalar, cuántas visitas necesitan y cómo premiar a tus mejores clientes.",
+    headingParts: [
+      { text: "Tú decides ", accent: false },
+      { text: "cuándo y cómo", accent: true },
+    ],
+    subtext: "Personaliza tus recompensas, cuántas visitas o invitados necesitan para ganar.",
     cta: "Crear recompensas →",
+    href: "/recompensas",
   },
   {
-    heading: "Elige el estilo de tu flyer y empieza hoy mismo",
+    headingParts: [
+      { text: "Elige el estilo de tu ", accent: false },
+      { text: "flyer", accent: true },
+      { text: " y empieza hoy mismo", accent: false },
+    ],
     subtext: "Obtén un QR único para tu barbería y comienza a fidelizar clientes desde el primer día.",
     cta: "Generar mi QR →",
+    href: "/qr",
   },
 ];
 
 export default function HeroCarousel() {
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
+  const router = useRouter();
 
-  const goTo = useCallback((index: number) => {
-    if (animating || index === current) return;
-    setAnimating(true);
-    setTimeout(() => {
-      setCurrent(index);
-      setAnimating(false);
-    }, 220);
-  }, [animating, current]);
+  const goTo = useCallback(
+    (index: number) => {
+      if (animating || index === current) return;
+      setAnimating(true);
+      setTimeout(() => {
+        setCurrent(index);
+        setAnimating(false);
+      }, 220);
+    },
+    [animating, current]
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -62,21 +92,14 @@ export default function HeroCarousel() {
             minHeight: "8rem",
           }}
         >
-          {slide.heading.includes("flyer") ? (
-            <>
-              {slide.heading.split("flyer")[0]}
-              <i style={{ color: "var(--saas-red)", fontStyle: "italic" }}>flyer</i>
-              {slide.heading.split("flyer")[1]}
-            </>
-          ) : slide.heading.includes("regresen") ? (
-            <>
-              Haz que tus clientes{" "}
-              <i style={{ color: "var(--saas-red)", fontStyle: "italic" }}>regresen más seguido</i>
-            </>
-          ) : (
-            <>
-              <i style={{ color: "var(--saas-red)", fontStyle: "italic" }}>Personaliza</i> tus recompensas
-            </>
+          {slide.headingParts.map((part, i) =>
+            part.accent ? (
+              <i key={i} style={{ color: "var(--saas-red)", fontStyle: "italic" }}>
+                {part.text}
+              </i>
+            ) : (
+              <span key={i}>{part.text}</span>
+            )
           )}
         </h1>
 
@@ -95,9 +118,16 @@ export default function HeroCarousel() {
 
         <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem", flexWrap: "wrap" }}>
           <button
-            onClick={() => {}}
+            onClick={() => router.push(slide.href)}
             className="saas-btn-primary"
-            style={{ padding: "1rem 2rem", fontSize: "1.05rem", width: "100%", maxWidth: "350px", cursor: "pointer", border: "none" }}
+            style={{
+              padding: "1rem 2rem",
+              fontSize: "1.05rem",
+              width: "100%",
+              maxWidth: "350px",
+              cursor: "pointer",
+              border: "none",
+            }}
           >
             {slide.cta}
           </button>
