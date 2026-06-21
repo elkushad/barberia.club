@@ -104,9 +104,11 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
 
       <div
         style={{
-          position: 'relative',
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: '0.75rem',
           marginBottom: '1.5rem',
-          padding: '0.6rem 0.9rem 1.3rem',
+          padding: '0.6rem 0.9rem',
           borderRadius: '10px',
           border: '1px solid rgba(212, 175, 55, 0.35)',
           backgroundColor: 'rgba(212, 175, 55, 0.08)',
@@ -115,17 +117,18 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
           lineHeight: 1.35,
         }}
       >
-        💡 Tus recompensas son visibles para otros clientes. Considera ofrecer beneficios atractivos
+        <span style={{ flex: 1 }}>
+          💡 Tus recompensas son visibles para otros clientes. Considera ofrecer beneficios atractivos
+        </span>
         <Link
           href="/descubrir"
           style={{
-            position: 'absolute',
-            right: '0.7rem',
-            bottom: '0.35rem',
-            fontSize: '0.72rem',
+            flexShrink: 0,
+            fontSize: '0.62rem',
             color: 'var(--accent-primary)',
             textDecoration: 'underline',
             textUnderlineOffset: '2px',
+            whiteSpace: 'nowrap',
           }}
         >
           Ver barberías
