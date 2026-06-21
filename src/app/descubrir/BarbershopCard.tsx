@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CarouselBackground from "../[slug]/CarouselBackground";
 
 type Reward = { id: string; name: string; visitsRequired: number };
 
@@ -12,22 +13,18 @@ type Shop = {
   rewards: Reward[];
 };
 
-export default function BarbershopCard({
-  shop,
-  backgroundUrl,
-}: {
-  shop: Shop;
-  backgroundUrl?: string | null;
-}) {
+export default function BarbershopCard({ shop, media }: { shop: Shop; media: string[] }) {
   const accent = shop.brandColor && shop.brandColor !== "#000000" ? shop.brandColor : "var(--accent-primary)";
   const rewards = shop.rewards;
   // Posición horizontal del centro del primer/último hito (cells de ancho igual).
   const edge = rewards.length > 0 ? 50 / rewards.length : 50;
-  const isVideo = !!backgroundUrl && (/\.(mp4|webm)$/i.test(backgroundUrl) || backgroundUrl.startsWith("data:video/"));
 
   return (
-    <article
+    <Link
+      href={`/${shop.slug}`}
+      aria-label={`Ver ${shop.name}`}
       style={{
+        display: "block",
         position: "relative",
         borderRadius: "20px",
         border: "1px solid var(--border-color)",
@@ -35,35 +32,22 @@ export default function BarbershopCard({
         padding: "1.25rem 1.25rem 1.5rem",
         boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
         overflow: "hidden",
+        textDecoration: "none",
+        color: "inherit",
       }}
     >
-      {/* Fondo: el mismo banner que se muestra en la landing de la barbería */}
-      {backgroundUrl && (
+      {/* Fondo: mismo carrusel de banners que la landing (transición + paneo lento) */}
+      {media.length > 0 && (
         <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }}>
-          {isVideo ? (
-            <video
-              src={backgroundUrl}
-              autoPlay
-              muted
-              loop
-              playsInline
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          ) : (
-            <img
-              src={backgroundUrl}
-              alt=""
-              aria-hidden="true"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          )}
-          {/* Overlay oscuro para legibilidad (igual que en la landing) */}
+          <CarouselBackground mediaUrls={media} />
+          {/* Overlay extra para legibilidad del contenido sobre el carrusel */}
           <div
             style={{
               position: "absolute",
               inset: 0,
+              zIndex: 2,
               background:
-                "linear-gradient(180deg, rgba(5,5,5,0.72) 0%, rgba(5,5,5,0.82) 55%, rgba(5,5,5,0.94) 100%)",
+                "linear-gradient(180deg, rgba(5,5,5,0.62) 0%, rgba(5,5,5,0.78) 55%, rgba(5,5,5,0.92) 100%)",
             }}
           />
         </div>
@@ -86,8 +70,8 @@ export default function BarbershopCard({
         }}
       />
 
-      {/* Encabezado: logo + nombre + ubicación + acceso */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "0.85rem", position: "relative", zIndex: 2 }}>
+      {/* Encabezado: logo + nombre + ubicación */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "0.85rem", position: "relative", zIndex: 3 }}>
         {shop.logo ? (
           <img
             src={shop.logo}
@@ -127,10 +111,8 @@ export default function BarbershopCard({
               fontSize: "1.2rem",
               fontFamily: "var(--font-heading)",
               color: "var(--text-primary)",
-              lineHeight: 1.15,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
+              lineHeight: 1.2,
+              wordBreak: "break-word",
             }}
           >
             {shop.name}
@@ -138,41 +120,20 @@ export default function BarbershopCard({
           {shop.address && (
             <p
               style={{
-                margin: "0.2rem 0 0",
+                margin: "0.25rem 0 0",
                 fontSize: "0.82rem",
                 color: "var(--text-secondary)",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
               }}
             >
               📍 {shop.address}
             </p>
           )}
         </div>
-
-        <Link
-          href={`/${shop.slug}`}
-          style={{
-            flexShrink: 0,
-            fontSize: "0.78rem",
-            fontWeight: 600,
-            color: "var(--text-primary)",
-            textDecoration: "none",
-            padding: "0.4rem 0.7rem",
-            borderRadius: "9999px",
-            border: "1px solid var(--border-color)",
-            backgroundColor: "rgba(255,255,255,0.04)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Ver barbería →
-        </Link>
       </div>
 
       {/* Mapa de recompensas (hitos) */}
       {rewards.length > 0 ? (
-        <div style={{ position: "relative", marginTop: "1.75rem", zIndex: 2 }}>
+        <div style={{ position: "relative", marginTop: "1.75rem", zIndex: 3 }}>
           {/* Etiquetas de recompensa sobre cada hito */}
           <div style={{ display: "flex", alignItems: "flex-end" }}>
             {rewards.map((r) => (
@@ -248,10 +209,10 @@ export default function BarbershopCard({
           </div>
         </div>
       ) : (
-        <p style={{ position: "relative", zIndex: 2, marginTop: "1.25rem", fontSize: "0.82rem", color: "var(--text-secondary)", textAlign: "center" }}>
+        <p style={{ position: "relative", zIndex: 3, marginTop: "1.25rem", fontSize: "0.82rem", color: "var(--text-secondary)", textAlign: "center" }}>
           Programa de recompensas próximamente.
         </p>
       )}
-    </article>
+    </Link>
   );
 }

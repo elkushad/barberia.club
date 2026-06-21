@@ -88,7 +88,7 @@ export default async function PublicLandingPage({
       
       {/* Acceso discreto: Descubrir barberías (esquina inferior derecha) */}
       <Link
-        href="/descubrir"
+        href={`/descubrir?from=${barbershop.slug}`}
         style={{
           position: 'absolute',
           bottom: '0.6rem',
