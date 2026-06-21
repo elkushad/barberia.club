@@ -42,6 +42,7 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const brandColor = formData.get("brandColor") as string;
+    const address = (formData.get("address") as string)?.trim() || null;
     const whatsapp = formData.get("whatsapp") as string;
     const instagram = formData.get("instagram") as string;
     const tiktok = formData.get("tiktok") as string;
@@ -85,11 +86,12 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
 
     await prisma.barbershop.update({
       where: { id: currentBarbershop.id },
-      data: { name, description, brandColor, whatsapp, instagram, tiktok, facebook, logo: logoUrl, banner: JSON.stringify(newBanners) }
+      data: { name, description, brandColor, address, whatsapp, instagram, tiktok, facebook, logo: logoUrl, banner: JSON.stringify(newBanners) }
     });
     
     revalidatePath(`/admin/${slug}/configuracion`);
     revalidatePath(`/${slug}`);
+    revalidatePath("/descubrir");
   }
 
   async function deleteBanner(formData: FormData) {
@@ -129,6 +131,14 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
         <div>
           <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Nombre Público</label>
           <input type="text" name="name" defaultValue={barbershop.name} className="premium-input" required />
+        </div>
+
+        <div>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Dirección del negocio</label>
+          <input type="text" name="address" defaultValue={barbershop.address || ""} className="premium-input" placeholder="ej: Av. Primavera 123, Surco, Lima" />
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.35rem' }}>
+            Se mostrará en &quot;Descubrir barberías&quot; y abrirá tu ubicación en mapas al tocarla.
+          </p>
         </div>
 
         <div>

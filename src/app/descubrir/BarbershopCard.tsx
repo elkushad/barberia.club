@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CarouselBackground from "../[slug]/CarouselBackground";
+import AddressMapLink from "./AddressMapLink";
 
 type Reward = { id: string; name: string; visitsRequired: number };
 
@@ -117,17 +118,7 @@ export default function BarbershopCard({ shop, media }: { shop: Shop; media: str
           >
             {shop.name}
           </h2>
-          {shop.address && (
-            <p
-              style={{
-                margin: "0.25rem 0 0",
-                fontSize: "0.82rem",
-                color: "var(--text-secondary)",
-              }}
-            >
-              📍 {shop.address}
-            </p>
-          )}
+          {shop.address && <AddressMapLink address={shop.address} />}
         </div>
       </div>
 
