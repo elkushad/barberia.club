@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getReferralProgress } from "@/lib/client-referrals";
 import ReferralProgressCard from "./ReferralProgressCard";
+import ReferralProgressBar from "@/components/ReferralProgressBar";
 
 export default async function CustomerDashboardPage({ params }: { params: Promise<{ uniqueCode: string }> }) {
   const { uniqueCode } = await params;
@@ -157,6 +158,16 @@ export default async function CustomerDashboardPage({ params }: { params: Promis
           {barbershop.rewards.length === 0 && (
             <p style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>Pronto habrán recompensas disponibles.</p>
           )}
+
+          {/* Barra celeste: progreso de la recompensa por referidos (solo si ya invitó a alguien) */}
+          {referralProgress?.reward &&
+            referralProgress.validCount + referralProgress.pendingCount >= 1 && (
+              <ReferralProgressBar
+                rewardName={referralProgress.reward.name}
+                required={referralProgress.required}
+                validCount={referralProgress.validCount}
+              />
+            )}
         </div>
 
         {/* Tarjeta de referidos del cliente */}

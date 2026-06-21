@@ -4,6 +4,7 @@ import { assertCustomerAccess, generateUniqueCode } from "@/lib/guards";
 import { hasProAccess } from "@/lib/plans";
 import { processCustomerApprovalReferral } from "@/lib/client-referrals";
 import ProLock from "@/components/ProLock";
+import ReferralProgressBar from "@/components/ReferralProgressBar";
 import PendingApproveButton from "./PendingApproveButton";
 import styles from "../../admin.module.css";
 import FilterDropdown from "./FilterDropdown";
@@ -54,6 +55,28 @@ export default async function ClientesPage({
       },
     },
   });
+
+  // Recompensa por referidos activa de la barbería (para la barra celeste).
+  const referralReward = await prisma.clientReferralReward.findFirst({
+    where: { barbershopId: barbershop.id, isActive: true },
+    orderBy: { createdAt: "asc" },
+    select: { name: true, referralsRequired: true },
+  });
+
+  // Conteo de referidos por cliente (invitador): total y con visita aprobada.
+  const allReferrals = referralReward
+    ? await prisma.clientReferral.findMany({
+        where: { barbershopId: barbershop.id },
+        select: { referrerId: true, status: true },
+      })
+    : [];
+  const referralByReferrer = new Map<string, { valid: number; total: number }>();
+  for (const r of allReferrals) {
+    const e = referralByReferrer.get(r.referrerId) ?? { valid: 0, total: 0 };
+    e.total++;
+    if (r.status === "VISITA_APROBADA") e.valid++;
+    referralByReferrer.set(r.referrerId, e);
+  }
 
   if (search) {
     activeCustomers = activeCustomers.filter(
@@ -172,6 +195,15 @@ export default async function ClientesPage({
           </div>
           {shop.rewards.length === 0 && (
             <p style={{ color: "var(--text-secondary)", textAlign: "center", marginTop: "1rem" }}>No hay recompensas configuradas.</p>
+          )}
+
+          {/* Barra celeste: progreso de la recompensa por referidos (solo si ya invitó a alguien) */}
+          {referralReward && (referralByReferrer.get(customer.id)?.total ?? 0) >= 1 && (
+            <ReferralProgressBar
+              rewardName={referralReward.name}
+              required={referralReward.referralsRequired}
+              validCount={referralByReferrer.get(customer.id)?.valid ?? 0}
+            />
           )}
         </div>
 
