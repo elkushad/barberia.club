@@ -1,18 +1,21 @@
 import { NextResponse } from "next/server";
 import { put, list, del } from "@vercel/blob";
+import { createCipheriv, randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 
-// Backup diario de la base de datos a Vercel Blob (privado).
-// Vuelca todas las tablas a un JSON con timestamp y conserva los últimos KEEP.
-// Protección: Vercel Cron envía `Authorization: Bearer <CRON_SECRET>`.
+// Backup diario de la base de datos a Vercel Blob.
+// El JSON con todos los datos se CIFRA con AES-256-GCM (clave en BACKUP_ENCRYPTION_KEY)
+// antes de subirse, así que aunque el blob sea de un store público y alguien
+// adivinara la URL, el contenido es ilegible sin la clave. Conserva los últimos KEEP.
+// Protección del endpoint: Vercel Cron envía `Authorization: Bearer <CRON_SECRET>`.
 //
-// Restaurar: descarga el JSON desde el dashboard de Blob y reinserta con un
-// script (mismo formato que usó la migración Neon→Supabase).
+// Formato del archivo .enc: [iv(12 bytes)][authTag(16 bytes)][ciphertext].
+// Restaurar: descargar el .enc, separar iv/tag/ciphertext y descifrar con la clave.
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-const KEEP = 30; // cuántos backups conservar (≈1 mes con cron diario)
+const KEEP = 30; // backups a conservar (≈1 mes con cron diario)
 
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
@@ -21,6 +24,14 @@ export async function GET(req: Request) {
     if (auth !== `Bearer ${secret}`) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
+  }
+
+  const keyHex = process.env.BACKUP_ENCRYPTION_KEY;
+  if (!keyHex || keyHex.length !== 64) {
+    return NextResponse.json(
+      { ok: false, error: "BACKUP_ENCRYPTION_KEY no configurada (debe ser 64 hex / 32 bytes)" },
+      { status: 500 }
+    );
   }
 
   try {
@@ -52,14 +63,23 @@ export async function GET(req: Request) {
       ClientReferral, ClientReferralReward,
     };
 
+    // Cifrado AES-256-GCM
+    const key = Buffer.from(keyHex, "hex");
+    const iv = randomBytes(12);
+    const cipher = createCipheriv("aes-256-gcm", key, iv);
+    const plaintext = Buffer.from(JSON.stringify(dump), "utf8");
+    const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
+    const authTag = cipher.getAuthTag();
+    const payload = Buffer.concat([iv, authTag, ciphertext]);
+
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const blob = await put(`backups/db-${stamp}.json`, JSON.stringify(dump), {
-      access: "private",
-      contentType: "application/json",
-      addRandomSuffix: false,
+    const blob = await put(`backups/db-${stamp}.enc`, payload, {
+      access: "public",
+      contentType: "application/octet-stream",
+      addRandomSuffix: true, // URL impredecible; además el contenido va cifrado
     });
 
-    // Retención: conserva los KEEP más recientes (nombre con timestamp ISO → orden lexicográfico = cronológico).
+    // Retención: conserva los KEEP más recientes (timestamp en el nombre).
     let deletedOld = 0;
     try {
       const { blobs } = await list({ prefix: "backups/" });
@@ -79,7 +99,7 @@ export async function GET(req: Request) {
         .map(([k, v]) => [k, (v as unknown[]).length])
     );
 
-    return NextResponse.json({ ok: true, file: blob.pathname, counts, deletedOld });
+    return NextResponse.json({ ok: true, file: blob.pathname, bytes: payload.length, counts, deletedOld });
   } catch (e) {
     console.error("Cron backup error:", e);
     return NextResponse.json({ ok: false, error: (e as Error).message }, { status: 500 });
