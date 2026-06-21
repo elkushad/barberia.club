@@ -171,9 +171,9 @@ export default async function CustomerDashboardPage({ params }: { params: Promis
         </div>
 
         {/* Tarjeta de referidos del cliente */}
-        {referralProgress && customer.uniqueCode && (
+        {referralProgress?.reward && customer.uniqueCode && (
           <div style={{ marginTop: '2rem' }}>
-            <ReferralProgressCard referralUrl={referralUrl} />
+            <ReferralProgressCard reward={referralProgress.reward} referralUrl={referralUrl} />
           </div>
         )}
 
