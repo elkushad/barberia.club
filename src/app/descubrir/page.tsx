@@ -10,6 +10,19 @@ export const metadata = {
   description: "Explora las barberías registradas en Barbería Club y sus programas de recompensas.",
 };
 
+// Mismo parseo del banner que la landing pública: el campo guarda un JSON array
+// de URLs de medios (o una sola URL en formato legacy). Devolvemos el primer medio.
+function firstMedia(banner: string | null): string | null {
+  if (!banner) return null;
+  try {
+    const parsed = JSON.parse(banner);
+    if (Array.isArray(parsed)) return parsed[0] ?? null;
+  } catch {
+    /* legacy: una sola URL en texto plano */
+  }
+  return banner || null;
+}
+
 export default async function DescubrirPage() {
   // Estructura pensada para crecer (búsqueda, orden por distancia/recompensas).
   // Por ahora: todas las barberías activas con sus recompensas (hitos).
@@ -21,6 +34,7 @@ export default async function DescubrirPage() {
       name: true,
       slug: true,
       logo: true,
+      banner: true,
       address: true,
       brandColor: true,
       rewards: {
@@ -133,7 +147,9 @@ export default async function DescubrirPage() {
             Aún no hay barberías para mostrar.
           </p>
         ) : (
-          barbershops.map((shop) => <BarbershopCard key={shop.id} shop={shop} />)
+          barbershops.map((shop) => (
+            <BarbershopCard key={shop.id} shop={shop} backgroundUrl={firstMedia(shop.banner)} />
+          ))
         )}
       </main>
 

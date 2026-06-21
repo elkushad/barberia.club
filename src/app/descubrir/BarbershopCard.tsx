@@ -12,11 +12,18 @@ type Shop = {
   rewards: Reward[];
 };
 
-export default function BarbershopCard({ shop }: { shop: Shop }) {
+export default function BarbershopCard({
+  shop,
+  backgroundUrl,
+}: {
+  shop: Shop;
+  backgroundUrl?: string | null;
+}) {
   const accent = shop.brandColor && shop.brandColor !== "#000000" ? shop.brandColor : "var(--accent-primary)";
   const rewards = shop.rewards;
   // Posición horizontal del centro del primer/último hito (cells de ancho igual).
   const edge = rewards.length > 0 ? 50 / rewards.length : 50;
+  const isVideo = !!backgroundUrl && (/\.(mp4|webm)$/i.test(backgroundUrl) || backgroundUrl.startsWith("data:video/"));
 
   return (
     <article
@@ -30,6 +37,38 @@ export default function BarbershopCard({ shop }: { shop: Shop }) {
         overflow: "hidden",
       }}
     >
+      {/* Fondo: el mismo banner que se muestra en la landing de la barbería */}
+      {backgroundUrl && (
+        <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+          {isVideo ? (
+            <video
+              src={backgroundUrl}
+              autoPlay
+              muted
+              loop
+              playsInline
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            <img
+              src={backgroundUrl}
+              alt=""
+              aria-hidden="true"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          )}
+          {/* Overlay oscuro para legibilidad (igual que en la landing) */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(180deg, rgba(5,5,5,0.72) 0%, rgba(5,5,5,0.82) 55%, rgba(5,5,5,0.94) 100%)",
+            }}
+          />
+        </div>
+      )}
+
       {/* Glow sutil con el color de marca */}
       <div
         style={{
@@ -43,11 +82,12 @@ export default function BarbershopCard({ shop }: { shop: Shop }) {
           opacity: 0.12,
           filter: "blur(40px)",
           pointerEvents: "none",
+          zIndex: 1,
         }}
       />
 
       {/* Encabezado: logo + nombre + ubicación + acceso */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "0.85rem", position: "relative" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "0.85rem", position: "relative", zIndex: 2 }}>
         {shop.logo ? (
           <img
             src={shop.logo}
@@ -132,7 +172,7 @@ export default function BarbershopCard({ shop }: { shop: Shop }) {
 
       {/* Mapa de recompensas (hitos) */}
       {rewards.length > 0 ? (
-        <div style={{ position: "relative", marginTop: "1.75rem" }}>
+        <div style={{ position: "relative", marginTop: "1.75rem", zIndex: 2 }}>
           {/* Etiquetas de recompensa sobre cada hito */}
           <div style={{ display: "flex", alignItems: "flex-end" }}>
             {rewards.map((r) => (
@@ -208,7 +248,7 @@ export default function BarbershopCard({ shop }: { shop: Shop }) {
           </div>
         </div>
       ) : (
-        <p style={{ marginTop: "1.25rem", fontSize: "0.82rem", color: "var(--text-secondary)", textAlign: "center" }}>
+        <p style={{ position: "relative", zIndex: 2, marginTop: "1.25rem", fontSize: "0.82rem", color: "var(--text-secondary)", textAlign: "center" }}>
           Programa de recompensas próximamente.
         </p>
       )}
