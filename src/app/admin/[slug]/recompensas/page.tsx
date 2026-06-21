@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { assertBarbershopAccessBySlug, assertRewardAccess } from "@/lib/guards";
 import Image from "next/image";
@@ -103,11 +104,9 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
 
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
+          position: 'relative',
           marginBottom: '1.5rem',
-          padding: '0.6rem 0.9rem',
+          padding: '0.6rem 0.9rem 1.3rem',
           borderRadius: '10px',
           border: '1px solid rgba(212, 175, 55, 0.35)',
           backgroundColor: 'rgba(212, 175, 55, 0.08)',
@@ -117,6 +116,20 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
         }}
       >
         💡 Tus recompensas son visibles para otros clientes. Considera ofrecer beneficios atractivos
+        <Link
+          href="/descubrir"
+          style={{
+            position: 'absolute',
+            right: '0.7rem',
+            bottom: '0.35rem',
+            fontSize: '0.72rem',
+            color: 'var(--accent-primary)',
+            textDecoration: 'underline',
+            textUnderlineOffset: '2px',
+          }}
+        >
+          Ver barberías
+        </Link>
       </div>
 
       <div className={styles.recompensasGrid}>
