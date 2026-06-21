@@ -85,7 +85,6 @@ export default async function DescubrirPage({
       }}
     >
       <DiscoverHeader
-        count={barbershops.length}
         fromSlug={fromShop?.slug ?? null}
         defaultCity={city}
         defaultCountry={country}
