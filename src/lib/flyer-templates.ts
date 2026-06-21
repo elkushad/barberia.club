@@ -11,16 +11,21 @@ export interface FlyerTemplate {
   width: number;
   height: number;
   qr: { x: number; y: number; size: number };
+  // Barra horizontal (dentro del cuadro blanco, debajo del QR) donde se escribe
+  // "O ingresa a la página de esta barbería: <link>". Opcional por plantilla.
+  caption?: { x: number; y: number; width: number; height: number };
   pro: boolean; // true = exclusiva del plan PRO
 }
 
 // Cada diseño tiene su propio recuadro de QR (detectado sobre la imagen real,
-// QR centrado dentro del placeholder blanco). Si cambias un arte, recalibra su `qr`.
-// Plan Free: oscura + clásica. Plan PRO: además la clara.
+// QR centrado dentro del placeholder blanco). Si cambias un arte, recalibra su `qr`
+// (y su `caption`). Plan Free: oscura + clásica. Plan PRO: además la clara.
 export const FLYER_TEMPLATES: FlyerTemplate[] = [
-  { id: "flyer", label: "Diseño oscuro", src: "/flyer.png", width: 1024, height: 1536, qr: { x: 305, y: 587, size: 380 }, pro: false },
+  // Cuadro blanco real: x290 y560 414x436. QR arriba centrado, texto en la barra de abajo.
+  { id: "flyer", label: "Diseño oscuro", src: "/flyer.png", width: 1024, height: 1535, qr: { x: 332, y: 580, size: 330 }, caption: { x: 300, y: 916, width: 394, height: 70 }, pro: false },
   { id: "flyer3", label: "Clásico", src: "/flyer3.png", width: 1054, height: 1492, qr: { x: 559, y: 939, size: 245 }, pro: false },
-  { id: "flyer2", label: "Diseño claro", src: "/flyer2.png", width: 1024, height: 1536, qr: { x: 307, y: 637, size: 395 }, pro: true },
+  // Cuadro blanco real: x289 y613 431x399. QR arriba centrado, texto en la barra de abajo.
+  { id: "flyer2", label: "Diseño claro", src: "/flyer2.png", width: 1024, height: 1535, qr: { x: 359, y: 632, size: 290 }, caption: { x: 300, y: 930, width: 411, height: 72 }, pro: true },
 ];
 
 // Si la barbería nunca eligió una plantilla, se usa la oscura (disponible en Free).

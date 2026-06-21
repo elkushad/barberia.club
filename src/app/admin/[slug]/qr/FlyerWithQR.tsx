@@ -14,15 +14,19 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+const CAPTION_LABEL = "O ingresa a la página de esta barbería:";
+
 export default function FlyerWithQR({
   qrDataUrl,
   slug,
+  landingDisplay,
   initialTemplate,
   onSaveTemplate,
   isPro = true,
 }: {
   qrDataUrl: string;
   slug: string;
+  landingDisplay: string; // link público sin protocolo, ej. "barberia.club/mi-barberia"
   initialTemplate: FlyerTemplateId;
   onSaveTemplate: (templateId: string) => Promise<void>;
   isPro?: boolean;
@@ -50,6 +54,35 @@ export default function FlyerWithQR({
       if (!ctx) throw new Error("no ctx");
       ctx.drawImage(flyer, 0, 0);
       ctx.drawImage(qr, tpl.qr.x, tpl.qr.y, tpl.qr.size, tpl.qr.size);
+
+      // Texto en la barra horizontal debajo del QR (dentro del cuadro blanco).
+      if (tpl.caption) {
+        const c = tpl.caption;
+        const cx = c.x + c.width / 2;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "alphabetic";
+
+        // Línea 1: etiqueta (gris), se encoge si no entra.
+        let labelSize = Math.round(c.height * 0.27);
+        ctx.font = `500 ${labelSize}px Arial, sans-serif`;
+        while (ctx.measureText(CAPTION_LABEL).width > c.width - 16 && labelSize > 8) {
+          labelSize -= 1;
+          ctx.font = `500 ${labelSize}px Arial, sans-serif`;
+        }
+        ctx.fillStyle = "#444444";
+        ctx.fillText(CAPTION_LABEL, cx, c.y + c.height * 0.42);
+
+        // Línea 2: link público (negro, en negrita), se encoge si no entra.
+        let urlSize = Math.round(c.height * 0.34);
+        ctx.font = `bold ${urlSize}px Arial, sans-serif`;
+        while (ctx.measureText(landingDisplay).width > c.width - 12 && urlSize > 8) {
+          urlSize -= 1;
+          ctx.font = `bold ${urlSize}px Arial, sans-serif`;
+        }
+        ctx.fillStyle = "#000000";
+        ctx.fillText(landingDisplay, cx, c.y + c.height * 0.88);
+      }
+
       const link = document.createElement("a");
       link.download = `flyer-${slug}.png`;
       link.href = canvas.toDataURL("image/png");
@@ -90,6 +123,27 @@ export default function FlyerWithQR({
             height: "auto",
           }}
         />
+        {tpl.caption && (
+          <div
+            style={{
+              position: "absolute",
+              left: `${(tpl.caption.x / tpl.width) * 100}%`,
+              top: `${(tpl.caption.y / tpl.height) * 100}%`,
+              width: `${(tpl.caption.width / tpl.width) * 100}%`,
+              height: `${(tpl.caption.height / tpl.height) * 100}%`,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              lineHeight: 1.1,
+              containerType: "inline-size",
+            }}
+          >
+            <span style={{ color: "#444", fontSize: "5.5cqw", fontWeight: 500 }}>{CAPTION_LABEL}</span>
+            <span style={{ color: "#000", fontSize: "7cqw", fontWeight: 700, wordBreak: "break-all" }}>{landingDisplay}</span>
+          </div>
+        )}
       </div>
 
       <button onClick={download} disabled={downloading} className="premium-btn" style={{ marginTop: "1.5rem" }}>

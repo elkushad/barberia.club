@@ -35,7 +35,9 @@ export default async function QRPage({ params }: { params: Promise<{ slug: strin
   // Ideally this would use an environment variable for the domain
   const domain = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const landingUrl = `${domain}/${barbershop.slug}`;
-  
+  // Versión corta (sin protocolo) que se imprime en la barra del flyer debajo del QR.
+  const landingDisplay = landingUrl.replace(/^https?:\/\//, "");
+
   // Generate QR as Data URI
   const qrDataUrl = await QRCode.toDataURL(landingUrl, {
     width: 600,
@@ -61,6 +63,7 @@ export default async function QRPage({ params }: { params: Promise<{ slug: strin
           <FlyerWithQR
             qrDataUrl={qrDataUrl}
             slug={barbershop.slug}
+            landingDisplay={landingDisplay}
             initialTemplate={selectedTemplate.id}
             onSaveTemplate={saveFlyerTemplate}
             isPro={isPro}
