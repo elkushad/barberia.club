@@ -55,32 +55,34 @@ export default function FlyerWithQR({
       ctx.drawImage(flyer, 0, 0);
       ctx.drawImage(qr, tpl.qr.x, tpl.qr.y, tpl.qr.size, tpl.qr.size);
 
-      // Texto en la barra horizontal debajo del QR (dentro del cuadro blanco).
+      // Link en la barra blanca horizontal debajo del QR: una sola línea
+      // "<etiqueta> <link>" centrada y ajustada al ancho de la barra.
       if (tpl.caption) {
         const c = tpl.caption;
-        const cx = c.x + c.width / 2;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "alphabetic";
+        const cy = c.y + c.height / 2;
+        const label = CAPTION_LABEL + " ";
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "left";
 
-        // Línea 1: etiqueta (gris), se encoge si no entra.
-        let labelSize = Math.round(c.height * 0.27);
-        ctx.font = `500 ${labelSize}px Arial, sans-serif`;
-        while (ctx.measureText(CAPTION_LABEL).width > c.width - 16 && labelSize > 8) {
-          labelSize -= 1;
-          ctx.font = `500 ${labelSize}px Arial, sans-serif`;
-        }
+        const totalWidth = (size: number) => {
+          ctx.font = `500 ${size}px Arial, sans-serif`;
+          const wl = ctx.measureText(label).width;
+          ctx.font = `bold ${size}px Arial, sans-serif`;
+          return wl + ctx.measureText(landingDisplay).width;
+        };
+
+        // Tamaño máximo que entra en la barra (por ancho y alto).
+        let fontSize = Math.round(c.height * 0.62);
+        while (totalWidth(fontSize) > c.width - 16 && fontSize > 6) fontSize -= 1;
+
+        let x = c.x + (c.width - totalWidth(fontSize)) / 2;
         ctx.fillStyle = "#444444";
-        ctx.fillText(CAPTION_LABEL, cx, c.y + c.height * 0.42);
-
-        // Línea 2: link público (negro, en negrita), se encoge si no entra.
-        let urlSize = Math.round(c.height * 0.34);
-        ctx.font = `bold ${urlSize}px Arial, sans-serif`;
-        while (ctx.measureText(landingDisplay).width > c.width - 12 && urlSize > 8) {
-          urlSize -= 1;
-          ctx.font = `bold ${urlSize}px Arial, sans-serif`;
-        }
+        ctx.font = `500 ${fontSize}px Arial, sans-serif`;
+        ctx.fillText(label, x, cy);
+        x += ctx.measureText(label).width;
         ctx.fillStyle = "#000000";
-        ctx.fillText(landingDisplay, cx, c.y + c.height * 0.88);
+        ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+        ctx.fillText(landingDisplay, x, cy);
       }
 
       const link = document.createElement("a");
@@ -132,16 +134,17 @@ export default function FlyerWithQR({
               width: `${(tpl.caption.width / tpl.width) * 100}%`,
               height: `${(tpl.caption.height / tpl.height) * 100}%`,
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              textAlign: "center",
-              lineHeight: 1.1,
+              gap: "0.3em",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              lineHeight: 1,
               containerType: "inline-size",
             }}
           >
-            <span style={{ color: "#444", fontSize: "5.5cqw", fontWeight: 500 }}>{CAPTION_LABEL}</span>
-            <span style={{ color: "#000", fontSize: "7cqw", fontWeight: 700, wordBreak: "break-all" }}>{landingDisplay}</span>
+            <span style={{ color: "#444", fontSize: "2.7cqw", fontWeight: 500 }}>{CAPTION_LABEL}</span>
+            <span style={{ color: "#000", fontSize: "3cqw", fontWeight: 700 }}>{landingDisplay}</span>
           </div>
         )}
       </div>

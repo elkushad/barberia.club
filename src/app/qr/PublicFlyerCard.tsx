@@ -124,7 +124,7 @@ export default function PublicFlyerCard({ template }: { template: FlyerTemplate 
           )}
         </div>
 
-        {/* Barra con el link público (ejemplo) debajo del QR, dentro del cuadro blanco */}
+        {/* Barra con el link público (ejemplo) debajo del QR */}
         {cap && (
           <div
             style={{
@@ -134,18 +134,19 @@ export default function PublicFlyerCard({ template }: { template: FlyerTemplate 
               width: `${(cap.width / template.width) * 100}%`,
               height: `${(cap.height / template.height) * 100}%`,
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              textAlign: "center",
-              lineHeight: 1.1,
+              gap: "0.3em",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              lineHeight: 1,
               containerType: "inline-size",
             }}
           >
-            <span style={{ color: "#444", fontSize: "5.5cqw", fontWeight: 500 }}>
+            <span style={{ color: "#444", fontSize: "2.7cqw", fontWeight: 500 }}>
               O ingresa a la página de esta barbería:
             </span>
-            <span style={{ color: "#000", fontSize: "7cqw", fontWeight: 700 }}>
+            <span style={{ color: "#000", fontSize: "3cqw", fontWeight: 700 }}>
               barberia.club/tu-barbería
             </span>
           </div>

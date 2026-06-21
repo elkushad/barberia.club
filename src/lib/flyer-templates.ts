@@ -21,11 +21,11 @@ export interface FlyerTemplate {
 // QR centrado dentro del placeholder blanco). Si cambias un arte, recalibra su `qr`
 // (y su `caption`). Plan Free: oscura + clásica. Plan PRO: además la clara.
 export const FLYER_TEMPLATES: FlyerTemplate[] = [
-  // Cuadro blanco real: x290 y560 414x436. QR arriba centrado, texto en la barra de abajo.
-  { id: "flyer", label: "Diseño oscuro", src: "/flyer.png", width: 1024, height: 1535, qr: { x: 332, y: 580, size: 330 }, caption: { x: 300, y: 916, width: 394, height: 70 }, pro: false },
+  // QR llena el recuadro blanco (x290 y560 414x436). El link va en la barra blanca de abajo (x282 y1038 432x35).
+  { id: "flyer", label: "Diseño oscuro", src: "/flyer.png", width: 1024, height: 1535, qr: { x: 317, y: 598, size: 360 }, caption: { x: 292, y: 1038, width: 412, height: 35 }, pro: false },
   { id: "flyer3", label: "Clásico", src: "/flyer3.png", width: 1054, height: 1492, qr: { x: 559, y: 939, size: 245 }, pro: false },
-  // Cuadro blanco real: x289 y613 431x399. QR arriba centrado, texto en la barra de abajo.
-  { id: "flyer2", label: "Diseño claro", src: "/flyer2.png", width: 1024, height: 1535, qr: { x: 359, y: 632, size: 290 }, caption: { x: 300, y: 930, width: 411, height: 72 }, pro: true },
+  // QR llena el recuadro blanco (x289 y613 431x399). El link va en la barra blanca de abajo (x283 y1036 440x37).
+  { id: "flyer2", label: "Diseño claro", src: "/flyer2.png", width: 1024, height: 1535, qr: { x: 329, y: 637, size: 350 }, caption: { x: 293, y: 1036, width: 420, height: 37 }, pro: true },
 ];
 
 // Si la barbería nunca eligió una plantilla, se usa la oscura (disponible en Free).
