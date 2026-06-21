@@ -173,10 +173,7 @@ export default async function CustomerDashboardPage({ params }: { params: Promis
         {/* Tarjeta de referidos del cliente */}
         {referralProgress && customer.uniqueCode && (
           <div style={{ marginTop: '2rem' }}>
-            <ReferralProgressCard
-              progress={referralProgress}
-              referralUrl={referralUrl}
-            />
+            <ReferralProgressCard referralUrl={referralUrl} />
           </div>
         )}
 
