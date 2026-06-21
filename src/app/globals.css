@@ -210,6 +210,17 @@ button {
 .upload-zone__title { color: var(--text-primary); font-weight: 600; }
 .upload-zone__hint { font-size: 0.72rem; color: var(--text-secondary); }
 
+/* Móvil: dropzone más delgado (una sola línea: ícono + título) */
+@media (max-width: 640px) {
+  .upload-zone {
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 0.6rem 0.9rem;
+  }
+  .upload-zone__icon { font-size: 1.1rem; }
+  .upload-zone__hint { display: none; }
+}
+
 .premium-btn {
   display: inline-flex;
   align-items: center;
