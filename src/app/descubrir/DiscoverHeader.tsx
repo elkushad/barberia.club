@@ -19,6 +19,8 @@ export default function DiscoverHeader({
   const [city, setCity] = useState<string>(countryByName(initialCountry)?.capital ?? "Ciudad");
   const inputRef = useRef<HTMLInputElement>(null);
   const selectedItemRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
 
   const backHref = fromSlug ? `/${fromSlug}` : "/";
 
@@ -26,9 +28,38 @@ export default function DiscoverHeader({
     if (searchOpen) inputRef.current?.focus();
   }, [searchOpen]);
 
-  // Al abrir un menú, llevar el ítem seleccionado a la vista (sin abrir teclado).
+  // Al abrir un menú: centrar el ítem seleccionado dentro del panel (sin tocar
+  // el scroll de la página ni abrir el teclado).
   useEffect(() => {
-    if (openMenu) selectedItemRef.current?.scrollIntoView({ block: "center" });
+    if (!openMenu) return;
+    const panel = panelRef.current;
+    const item = selectedItemRef.current;
+    if (panel && item) {
+      panel.scrollTop = item.offsetTop - panel.clientHeight / 2 + item.offsetHeight / 2;
+    }
+  }, [openMenu]);
+
+  // Con el menú abierto: cerrarlo al hacer scroll en la página (no en la lista)
+  // o al tocar/click fuera de los controles.
+  useEffect(() => {
+    if (!openMenu) return;
+    const onScroll = (e: Event) => {
+      if (panelRef.current && e.target instanceof Node && panelRef.current.contains(e.target)) return;
+      setOpenMenu(null);
+    };
+    const onPointerDown = (e: Event) => {
+      if (controlsRef.current && e.target instanceof Node && controlsRef.current.contains(e.target)) return;
+      setOpenMenu(null);
+    };
+    // capture: true para detectar el scroll del contenedor fijo de la página.
+    window.addEventListener("scroll", onScroll, true);
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("touchstart", onPointerDown);
+    return () => {
+      window.removeEventListener("scroll", onScroll, true);
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("touchstart", onPointerDown);
+    };
   }, [openMenu]);
 
   const toggleSearch = () => {
@@ -135,6 +166,7 @@ export default function DiscoverHeader({
 
       {/* ── Barra de controles (fuera del navbar): lupa + filtros ──────────── */}
       <div
+        ref={controlsRef}
         style={{
           position: "relative",
           zIndex: 20,
@@ -231,28 +263,22 @@ export default function DiscoverHeader({
 
         {/* Panel desplegable (lista según el filtro seleccionado) */}
         {openMenu && (
-          <>
-            {/* Backdrop para cerrar al hacer clic fuera */}
-            <div
-              onClick={() => setOpenMenu(null)}
-              style={{ position: "fixed", inset: 0, zIndex: 25 }}
-              aria-hidden="true"
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: "calc(100% + 6px)",
-                right: "1rem",
-                zIndex: 26,
-                width: "min(280px, calc(100vw - 2rem))",
-                maxHeight: "340px",
-                overflowY: "auto",
-                backgroundColor: "var(--bg-secondary)",
-                border: "1px solid var(--border-color)",
-                borderRadius: "14px",
-                boxShadow: "0 16px 40px rgba(0,0,0,0.6)",
-              }}
-            >
+          <div
+            ref={panelRef}
+            style={{
+              position: "absolute",
+              top: "calc(100% + 6px)",
+              right: "1rem",
+              zIndex: 26,
+              width: "min(280px, calc(100vw - 2rem))",
+              maxHeight: "340px",
+              overflowY: "auto",
+              backgroundColor: "var(--bg-secondary)",
+              border: "1px solid var(--border-color)",
+              borderRadius: "14px",
+              boxShadow: "0 16px 40px rgba(0,0,0,0.6)",
+            }}
+          >
               {openMenu === "ciudad"
                 ? cityList.map((c) => {
                     const selected = city === c;
@@ -293,8 +319,7 @@ export default function DiscoverHeader({
                       </button>
                     );
                   })}
-            </div>
-          </>
+          </div>
         )}
       </div>
     </>
