@@ -57,7 +57,7 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
 
   const referralRewards = await prisma.clientReferralReward.findMany({
     where: { barbershopId: barbershop.id },
-    orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
+    orderBy: { createdAt: "asc" },
   });
 
   // ── Server actions para referral rewards ──────────────────────────────────
@@ -65,21 +65,11 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
     "use server";
     const shop = await assertBarbershopAccessBySlug(slug);
     const name = (formData.get("name") as string)?.trim();
-    const rewardType = (formData.get("rewardType") as string) || "TEXT";
-    const description = (formData.get("description") as string)?.trim() || null;
     const referralsRequired = parseInt(formData.get("referralsRequired") as string) || 2;
-    const isPrimary = formData.get("isPrimary") === "true";
     if (!name) return;
 
-    // Si va a ser principal, quitar el flag a los demás
-    if (isPrimary) {
-      await prisma.clientReferralReward.updateMany({
-        where: { barbershopId: shop.id },
-        data: { isPrimary: false },
-      });
-    }
     await prisma.clientReferralReward.create({
-      data: { barbershopId: shop.id, name, rewardType, description, referralsRequired, isPrimary, updatedAt: new Date() },
+      data: { barbershopId: shop.id, name, referralsRequired, updatedAt: new Date() },
     });
     revalidatePath(`/admin/${slug}/recompensas`);
   }
@@ -89,15 +79,6 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
     await assertBarbershopAccessBySlug(slug);
     const id = formData.get("id") as string;
     await prisma.clientReferralReward.delete({ where: { id } });
-    revalidatePath(`/admin/${slug}/recompensas`);
-  }
-
-  async function setReferralRewardPrimary(formData: FormData) {
-    "use server";
-    const shop = await assertBarbershopAccessBySlug(slug);
-    const id = formData.get("id") as string;
-    await prisma.clientReferralReward.updateMany({ where: { barbershopId: shop.id }, data: { isPrimary: false } });
-    await prisma.clientReferralReward.update({ where: { id }, data: { isPrimary: true } });
     revalidatePath(`/admin/${slug}/recompensas`);
   }
 
@@ -213,7 +194,6 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
           rewards={referralRewards}
           onCreate={createReferralReward}
           onDelete={deleteReferralReward}
-          onSetPrimary={setReferralRewardPrimary}
           onToggleActive={toggleReferralRewardActive}
         />
       </div>

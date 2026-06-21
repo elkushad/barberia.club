@@ -14,18 +14,12 @@ export async function getReferralProgress(
   customerId: string,
   barbershopId: string
 ): Promise<ReferralProgress | null> {
-  const reward = await prisma.clientReferralReward.findFirst({
-    where: { barbershopId, isActive: true, isPrimary: true },
+  // Recompensa de referidos activa de la barbería (la más antigua si hubiera varias).
+  const activeReward = await prisma.clientReferralReward.findFirst({
+    where: { barbershopId, isActive: true },
+    orderBy: { createdAt: "asc" },
     select: { id: true, name: true, rewardType: true, description: true, referralsRequired: true },
   });
-
-  // Si no hay recompensa activa principal, busca cualquier activa
-  const activeReward =
-    reward ??
-    (await prisma.clientReferralReward.findFirst({
-      where: { barbershopId, isActive: true },
-      select: { id: true, name: true, rewardType: true, description: true, referralsRequired: true },
-    }));
 
   if (!activeReward) return null;
 

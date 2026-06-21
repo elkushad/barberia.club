@@ -5,31 +5,19 @@ import { useState, useTransition } from "react";
 type ReferralReward = {
   id: string;
   name: string;
-  rewardType: string;
-  description: string | null;
   referralsRequired: number;
   isActive: boolean;
-  isPrimary: boolean;
 };
-
-const REWARD_TYPES = [
-  { value: "CORTE_GRATIS", label: "Corte gratis" },
-  { value: "DESCUENTO", label: "Descuento" },
-  { value: "PRODUCTO", label: "Producto" },
-  { value: "TEXT", label: "Texto libre" },
-];
 
 export default function ClientReferralSection({
   rewards,
   onCreate,
   onDelete,
-  onSetPrimary,
   onToggleActive,
 }: {
   rewards: ReferralReward[];
   onCreate: (formData: FormData) => Promise<void>;
   onDelete: (formData: FormData) => Promise<void>;
-  onSetPrimary: (formData: FormData) => Promise<void>;
   onToggleActive: (formData: FormData) => Promise<void>;
 }) {
   const [showForm, setShowForm] = useState(rewards.length === 0);
@@ -87,48 +75,20 @@ export default function ClientReferralSection({
                 required
               />
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-              <div>
-                <label style={{ display: "block", marginBottom: "0.35rem", fontSize: "0.875rem" }}>
-                  Tipo de recompensa
-                </label>
-                <select name="rewardType" className="premium-input" defaultValue="CORTE_GRATIS">
-                  {REWARD_TYPES.map((t) => (
-                    <option key={t.value} value={t.value}>
-                      {t.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label style={{ display: "block", marginBottom: "0.35rem", fontSize: "0.875rem" }}>
-                  Referidos requeridos
-                </label>
-                <input
-                  name="referralsRequired"
-                  type="number"
-                  min="1"
-                  max="50"
-                  defaultValue="2"
-                  className="premium-input"
-                  required
-                />
-              </div>
-            </div>
             <div>
               <label style={{ display: "block", marginBottom: "0.35rem", fontSize: "0.875rem" }}>
-                Descripción (opcional)
+                Referidos requeridos
               </label>
               <input
-                name="description"
+                name="referralsRequired"
+                type="number"
+                min="1"
+                max="50"
+                defaultValue="2"
                 className="premium-input"
-                placeholder="Ej: Un corte gratis en cualquier servicio"
+                required
               />
             </div>
-            <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", cursor: "pointer" }}>
-              <input type="checkbox" name="isPrimary" value="true" defaultChecked={rewards.length === 0} />
-              Marcar como principal (destacada en la landing del cliente)
-            </label>
             <button type="submit" className="premium-btn" disabled={pending}>
               {pending ? "Guardando…" : "Crear recompensa"}
             </button>
@@ -166,26 +126,11 @@ export default function ClientReferralSection({
               gap: "1rem",
               flexWrap: "wrap",
               padding: "1.25rem",
-              border: r.isPrimary ? "1px solid var(--accent-primary)" : undefined,
             }}
           >
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.3rem" }}>
                 <h4 style={{ fontSize: "1rem" }}>{r.name}</h4>
-                {r.isPrimary && (
-                  <span
-                    style={{
-                      fontSize: "0.68rem",
-                      fontWeight: 700,
-                      backgroundColor: "rgba(124,58,237,0.15)",
-                      color: "var(--accent-primary)",
-                      padding: "2px 8px",
-                      borderRadius: "999px",
-                    }}
-                  >
-                    PRINCIPAL
-                  </span>
-                )}
                 {!r.isActive && (
                   <span
                     style={{
@@ -202,30 +147,11 @@ export default function ClientReferralSection({
                 )}
               </div>
               <p style={{ color: "var(--accent-primary)", fontWeight: 600, fontSize: "0.875rem" }}>
-                {r.referralsRequired} referido{r.referralsRequired !== 1 ? "s" : ""} requeridos ·{" "}
-                {REWARD_TYPES.find((t) => t.value === r.rewardType)?.label ?? r.rewardType}
+                {r.referralsRequired} referido{r.referralsRequired !== 1 ? "s" : ""} requeridos
               </p>
-              {r.description && (
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", marginTop: "0.2rem" }}>
-                  {r.description}
-                </p>
-              )}
             </div>
 
             <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-              {!r.isPrimary && (
-                <form action={submit(onSetPrimary)}>
-                  <input type="hidden" name="id" value={r.id} />
-                  <button
-                    type="submit"
-                    className="premium-btn-secondary"
-                    disabled={pending}
-                    style={{ fontSize: "0.78rem", padding: "5px 10px" }}
-                  >
-                    Hacer principal
-                  </button>
-                </form>
-              )}
               <form action={submit(onToggleActive)}>
                 <input type="hidden" name="id" value={r.id} />
                 <input type="hidden" name="isActive" value={r.isActive ? "false" : "true"} />
