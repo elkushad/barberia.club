@@ -24,18 +24,6 @@ function parseMedia(banner: string | null): string[] {
   return banner ? [banner] : [];
 }
 
-// Deriva ciudad/país a partir de la dirección (texto libre) de la barbería de
-// origen. El país por defecto es Perú (mercado actual de la plataforma).
-function deriveLocation(address: string | null): { city: string | null; country: string } {
-  if (!address) return { city: null, country: "Perú" };
-  const parts = address
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  const city = parts.length ? parts[parts.length - 1] : address.trim();
-  return { city: city || null, country: "Perú" };
-}
-
 export default async function DescubrirPage({
   searchParams,
 }: {
@@ -71,7 +59,9 @@ export default async function DescubrirPage({
       })
     : null;
 
-  const { city, country } = deriveLocation(fromShop?.address ?? null);
+  // País por defecto: hoy la plataforma opera en Perú. Cuando el modelo guarde
+  // el país de cada barbería, se derivará desde la de origen (fromShop).
+  const country = "Perú";
 
   return (
     <div
@@ -84,11 +74,7 @@ export default async function DescubrirPage({
           "radial-gradient(circle at 50% 0%, rgba(20,20,20,1) 0%, rgba(5,5,5,1) 100%)",
       }}
     >
-      <DiscoverHeader
-        fromSlug={fromShop?.slug ?? null}
-        defaultCity={city}
-        defaultCountry={country}
-      />
+      <DiscoverHeader fromSlug={fromShop?.slug ?? null} defaultCountry={country} />
 
       {/* Listado de cards */}
       <main

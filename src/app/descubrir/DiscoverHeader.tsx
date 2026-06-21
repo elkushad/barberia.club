@@ -1,30 +1,35 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { COUNTRIES } from "./countries";
+import { COUNTRIES, countryByName, flagEmoji } from "./countries";
 
 export default function DiscoverHeader({
   fromSlug,
-  defaultCity,
   defaultCountry,
 }: {
   fromSlug: string | null;
-  defaultCity: string | null;
   defaultCountry: string;
 }) {
+  const initialCountry = countryByName(defaultCountry) ? defaultCountry : "Perú";
   const [searchOpen, setSearchOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<"ciudad" | "pais" | null>(null);
-  const [city, setCity] = useState<string>(defaultCity || "Ciudad");
-  const [country, setCountry] = useState<string>(defaultCountry);
-  const [query, setQuery] = useState("");
+  const [country, setCountry] = useState<string>(initialCountry);
+  // Ciudad por defecto: la capital del país seleccionado.
+  const [city, setCity] = useState<string>(countryByName(initialCountry)?.capital ?? "Ciudad");
   const inputRef = useRef<HTMLInputElement>(null);
+  const selectedItemRef = useRef<HTMLButtonElement>(null);
 
   const backHref = fromSlug ? `/${fromSlug}` : "/";
 
   useEffect(() => {
     if (searchOpen) inputRef.current?.focus();
   }, [searchOpen]);
+
+  // Al abrir un menú, llevar el ítem seleccionado a la vista (sin abrir teclado).
+  useEffect(() => {
+    if (openMenu) selectedItemRef.current?.scrollIntoView({ block: "center" });
+  }, [openMenu]);
 
   const toggleSearch = () => {
     setOpenMenu(null);
@@ -33,13 +38,11 @@ export default function DiscoverHeader({
 
   const toggleMenu = (menu: "ciudad" | "pais") => {
     setSearchOpen(false);
-    setQuery("");
     setOpenMenu((m) => (m === menu ? null : menu));
   };
 
-  const normalize = (s: string) =>
-    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  const filtered = COUNTRIES.filter((c) => normalize(c).includes(normalize(query)));
+  const selectedCountry = countryByName(country);
+  const cityList = selectedCountry?.cities ?? (selectedCountry ? [selectedCountry.capital] : []);
 
   const pillStyle = (active: boolean): React.CSSProperties => ({
     display: "flex",
@@ -51,11 +54,25 @@ export default function DiscoverHeader({
     borderRadius: "9999px",
     cursor: "pointer",
     whiteSpace: "nowrap",
-    maxWidth: "130px",
+    maxWidth: "135px",
     transition: "all 0.2s ease",
     border: active ? "1px solid var(--accent-primary)" : "1px solid var(--border-color)",
     backgroundColor: active ? "rgba(212,175,55,0.14)" : "rgba(255,255,255,0.04)",
     color: active ? "var(--accent-primary)" : "var(--text-secondary)",
+  });
+
+  const itemStyle = (selected: boolean): React.CSSProperties => ({
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    width: "100%",
+    textAlign: "left",
+    padding: "0.65rem 0.85rem",
+    border: "none",
+    background: selected ? "rgba(212,175,55,0.12)" : "transparent",
+    color: selected ? "var(--accent-primary)" : "var(--text-primary)",
+    fontSize: "0.85rem",
+    cursor: "pointer",
   });
 
   return (
@@ -113,7 +130,6 @@ export default function DiscoverHeader({
           🌐 Descubrir barberías
         </h1>
 
-        {/* Espaciador para centrar el título */}
         <div style={{ minWidth: "82px", flexShrink: 0 }} aria-hidden="true" />
       </header>
 
@@ -193,7 +209,7 @@ export default function DiscoverHeader({
               display: "flex",
               gap: "0.4rem",
               flexShrink: 0,
-              maxWidth: searchOpen ? "0px" : "280px",
+              maxWidth: searchOpen ? "0px" : "300px",
               opacity: searchOpen ? 0 : 1,
               overflow: "hidden",
               pointerEvents: searchOpen ? "none" : "auto",
@@ -205,13 +221,15 @@ export default function DiscoverHeader({
               <span style={{ fontSize: "0.6rem" }}>▾</span>
             </button>
             <button type="button" onClick={() => toggleMenu("pais")} style={pillStyle(openMenu === "pais")}>
-              <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>🌎 {country}</span>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+                {selectedCountry ? flagEmoji(selectedCountry.code) : "🌎"} {country}
+              </span>
               <span style={{ fontSize: "0.6rem" }}>▾</span>
             </button>
           </div>
         </div>
 
-        {/* Panel desplegable con la lista de países del mundo */}
+        {/* Panel desplegable (lista según el filtro seleccionado) */}
         {openMenu && (
           <>
             {/* Backdrop para cerrar al hacer clic fuera */}
@@ -227,72 +245,54 @@ export default function DiscoverHeader({
                 right: "1rem",
                 zIndex: 26,
                 width: "min(280px, calc(100vw - 2rem))",
-                maxHeight: "320px",
-                display: "flex",
-                flexDirection: "column",
+                maxHeight: "340px",
+                overflowY: "auto",
                 backgroundColor: "var(--bg-secondary)",
                 border: "1px solid var(--border-color)",
                 borderRadius: "14px",
                 boxShadow: "0 16px 40px rgba(0,0,0,0.6)",
-                overflow: "hidden",
               }}
             >
-              <div style={{ padding: "0.6rem", borderBottom: "1px solid var(--border-color)" }}>
-                <input
-                  autoFocus
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={openMenu === "ciudad" ? "Buscar ciudad / país…" : "Buscar país…"}
-                  style={{
-                    width: "100%",
-                    padding: "0.5rem 0.75rem",
-                    borderRadius: "9999px",
-                    border: "1px solid var(--border-color)",
-                    background: "var(--bg-primary)",
-                    color: "var(--text-primary)",
-                    fontSize: "0.85rem",
-                    outline: "none",
-                  }}
-                />
-              </div>
-              <div style={{ overflowY: "auto" }}>
-                {filtered.length === 0 ? (
-                  <p style={{ padding: "1rem", textAlign: "center", color: "var(--text-secondary)", fontSize: "0.82rem" }}>
-                    Sin resultados
-                  </p>
-                ) : (
-                  filtered.map((c) => {
-                    const selected = openMenu === "ciudad" ? city === c : country === c;
+              {openMenu === "ciudad"
+                ? cityList.map((c) => {
+                    const selected = city === c;
                     return (
                       <button
                         key={c}
+                        ref={selected ? selectedItemRef : undefined}
                         type="button"
                         onClick={() => {
-                          if (openMenu === "ciudad") setCity(c);
-                          else setCountry(c);
+                          setCity(c);
                           setOpenMenu(null);
                         }}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          width: "100%",
-                          textAlign: "left",
-                          padding: "0.6rem 0.85rem",
-                          border: "none",
-                          background: selected ? "rgba(212,175,55,0.12)" : "transparent",
-                          color: selected ? "var(--accent-primary)" : "var(--text-primary)",
-                          fontSize: "0.85rem",
-                          cursor: "pointer",
-                        }}
+                        style={itemStyle(selected)}
                       >
-                        {c}
+                        <span style={{ flex: 1 }}>📍 {c}</span>
                         {selected && <span>✓</span>}
                       </button>
                     );
                   })
-                )}
-              </div>
+                : COUNTRIES.map((c) => {
+                    const selected = country === c.name;
+                    return (
+                      <button
+                        key={c.code}
+                        ref={selected ? selectedItemRef : undefined}
+                        type="button"
+                        onClick={() => {
+                          setCountry(c.name);
+                          // Al cambiar de país, la ciudad vuelve a su capital.
+                          setCity(c.capital);
+                          setOpenMenu(null);
+                        }}
+                        style={itemStyle(selected)}
+                      >
+                        <span style={{ fontSize: "1.05rem" }}>{flagEmoji(c.code)}</span>
+                        <span style={{ flex: 1 }}>{c.name}</span>
+                        {selected && <span>✓</span>}
+                      </button>
+                    );
+                  })}
             </div>
           </>
         )}
