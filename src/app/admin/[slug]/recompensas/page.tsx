@@ -99,8 +99,26 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
 
   return (
     <div>
-      <h2 style={{ marginBottom: '1.5rem' }}>Sistema de Recompensas</h2>
-      
+      <h2 style={{ marginBottom: '1rem' }}>Sistema de Recompensas</h2>
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          marginBottom: '1.5rem',
+          padding: '0.6rem 0.9rem',
+          borderRadius: '10px',
+          border: '1px solid rgba(212, 175, 55, 0.35)',
+          backgroundColor: 'rgba(212, 175, 55, 0.08)',
+          color: 'var(--accent-primary)',
+          fontSize: '0.8rem',
+          lineHeight: 1.35,
+        }}
+      >
+        💡 Tus recompensas son visibles para otros clientes. Considera ofrecer beneficios atractivos
+      </div>
+
       <div className={styles.recompensasGrid}>
         
         {/* Nueva Recompensa — en Free queda bloqueada tras la 1ra recompensa */}
