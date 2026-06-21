@@ -242,15 +242,19 @@ export default function BannerUpload({ name, existingImages, existingVideos, max
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <input
-        type="file"
-        accept="image/*,video/*"
-        multiple
-        className="premium-input"
-        style={{ padding: "8px" }}
-        onChange={handleFileChange}
-        disabled={uploading || full}
-      />
+      <label className={`upload-zone${uploading || full ? " is-disabled" : ""}`}>
+        <input
+          type="file"
+          accept="image/*,video/*"
+          multiple
+          style={{ display: "none" }}
+          onChange={handleFileChange}
+          disabled={uploading || full}
+        />
+        <span className="upload-zone__icon">{uploading ? "⏳" : "📤"}</span>
+        <span className="upload-zone__title">{uploading ? "Subiendo…" : "Seleccionar archivos"}</span>
+        <span className="upload-zone__hint">Fotos o videos desde tu dispositivo</span>
+      </label>
 
       <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)", margin: 0 }}>
         Hasta {MAX_TOTAL} fondos en total (máx. {MAX_VIDEOS} videos de {MAX_VIDEO_SECONDS}s). Llevas {total}/{MAX_TOTAL}

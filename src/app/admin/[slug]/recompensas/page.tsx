@@ -117,7 +117,7 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Imagen del Producto</label>
-                <ImageUploadPreview name="image" accept="image/*" className="premium-input" style={{ padding: '8px' }} />
+                <ImageUploadPreview name="image" accept="image/*" label="Seleccionar imagen" />
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Visitas Requeridas</label>

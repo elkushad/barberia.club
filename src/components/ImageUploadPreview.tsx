@@ -6,8 +6,8 @@ interface ImageUploadPreviewProps {
   name: string;
   accept?: string;
   multiple?: boolean;
-  className?: string;
-  style?: React.CSSProperties;
+  // Texto del botón de subida.
+  label?: string;
   // "logo": pequeño y nítido, conserva transparencia. "photo": fondos/galería.
   variant?: "logo" | "photo";
   // Máximo de imágenes permitidas en total (existentes + nuevas). Sin límite si no se pasa.
@@ -57,7 +57,7 @@ async function compressImage(file: File, maxDim: number): Promise<File> {
   return new File([blob], `${baseName}.${ext}`, { type: outType });
 }
 
-export default function ImageUploadPreview({ name, accept = "image/*", multiple = false, className, style, variant = "photo", maxItems, existingCount = 0 }: ImageUploadPreviewProps) {
+export default function ImageUploadPreview({ name, accept = "image/*", multiple = false, label = "Seleccionar archivo", variant = "photo", maxItems, existingCount = 0 }: ImageUploadPreviewProps) {
   const [items, setItems] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -113,15 +113,19 @@ export default function ImageUploadPreview({ name, accept = "image/*", multiple 
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <input
-        type="file"
-        accept={accept}
-        multiple={multiple}
-        className={className}
-        style={style}
-        onChange={handleFileChange}
-        disabled={uploading || limitReached}
-      />
+      <label className={`upload-zone${uploading || limitReached ? " is-disabled" : ""}`}>
+        <input
+          type="file"
+          accept={accept}
+          multiple={multiple}
+          style={{ display: "none" }}
+          onChange={handleFileChange}
+          disabled={uploading || limitReached}
+        />
+        <span className="upload-zone__icon">{uploading ? "⏳" : "📤"}</span>
+        <span className="upload-zone__title">{uploading ? "Subiendo…" : label}</span>
+        <span className="upload-zone__hint">Toca para elegir desde tu dispositivo</span>
+      </label>
 
       {uploading && <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Subiendo…</p>}
       {limitReached && !uploading && (

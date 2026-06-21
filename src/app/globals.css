@@ -173,6 +173,43 @@ button {
   box-shadow: 0 0 12px rgba(212, 175, 55, 0.4), inset 0 0 4px rgba(212, 175, 55, 0.2);
 }
 
+/* ── Subida de archivos moderna ─────────────────────────────────────────── */
+.upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 1.4rem 1rem;
+  border: 1.5px dashed var(--border-color);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+}
+.upload-zone:hover {
+  border-color: var(--accent-primary);
+  background: rgba(212, 175, 55, 0.06);
+  color: var(--text-primary);
+}
+.upload-zone:active { transform: scale(0.99); }
+.upload-zone.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.upload-zone__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.upload-zone__title { color: var(--text-primary); font-weight: 600; }
+.upload-zone__hint { font-size: 0.72rem; color: var(--text-secondary); }
+
 .premium-btn {
   display: inline-flex;
   align-items: center;
