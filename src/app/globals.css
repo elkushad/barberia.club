@@ -210,6 +210,13 @@ button {
 .upload-zone__title { color: var(--text-primary); font-weight: 600; }
 .upload-zone__hint { font-size: 0.72rem; color: var(--text-secondary); }
 
+/* Resalte temporal al saltar a la card de un cliente (referidos) */
+.cliente-highlight { animation: clienteFlash 2.2s ease; border-radius: 16px; }
+@keyframes clienteFlash {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+  20%, 60% { box-shadow: 0 0 0 2px var(--accent-success), 0 0 18px rgba(46, 204, 113, 0.5); }
+}
+
 /* Móvil: dropzone más delgado (una sola línea: ícono + título) */
 @media (max-width: 640px) {
   .upload-zone {

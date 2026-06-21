@@ -8,6 +8,7 @@ import PendingApproveButton from "./PendingApproveButton";
 import styles from "../../admin.module.css";
 import FilterDropdown from "./FilterDropdown";
 import SearchInput from "./SearchInput";
+import ReferrerLink from "./ReferrerLink";
 
 const FREE_CUSTOMER_LIMIT = 3;
 
@@ -36,6 +37,10 @@ export default async function ClientesPage({
   const pendingCustomers = await prisma.customer.findMany({
     where: { barbershopId: barbershop.id, status: "PENDING" },
     orderBy: { createdAt: "desc" },
+    include: {
+      // Si fue invitado por un enlace de referido, traemos a quien lo invitó.
+      referralReceived: { include: { referrer: { select: { id: true, name: true } } } },
+    },
   });
 
   let activeCustomers = await prisma.customer.findMany({
@@ -133,7 +138,7 @@ export default async function ClientesPage({
     }
 
     return (
-      <div key={customer.id} className={styles.customerCard}>
+      <div key={customer.id} id={`cliente-${customer.id}`} className={styles.customerCard}>
         {/* Info */}
         <div className={styles.customerInfo}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -198,12 +203,40 @@ export default async function ClientesPage({
             Solicitudes Pendientes ({pendingCustomers.length})
           </h3>
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            {pendingCustomers.map((customer) => (
+            {pendingCustomers.map((customer) => {
+              const referrer = customer.referralReceived?.referrer ?? null;
+              return (
               <div
                 key={customer.id}
+                id={`cliente-${customer.id}`}
                 className="premium-card"
-                style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  position: "relative",
+                  ...(referrer
+                    ? { border: "1.5px solid var(--accent-success)", marginTop: "0.6rem" }
+                    : {}),
+                }}
               >
+                {/* Etiqueta sobre el borde verde: "Invitado por <nombre>" */}
+                {referrer && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "-0.7rem",
+                      right: "1rem",
+                      padding: "0 0.5rem",
+                      backgroundColor: "var(--bg-primary)",
+                      color: "var(--accent-success)",
+                      fontSize: "0.8rem",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Invitado por <ReferrerLink targetId={referrer.id} name={referrer.name} />
+                  </span>
+                )}
                 <div>
                   <p style={{ fontWeight: "bold" }}>{customer.name}</p>
                   <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>{customer.phone}</p>
@@ -228,7 +261,8 @@ export default async function ClientesPage({
                   </form>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
