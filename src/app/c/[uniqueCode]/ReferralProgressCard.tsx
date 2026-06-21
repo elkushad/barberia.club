@@ -75,9 +75,6 @@ export default function ReferralProgressCard({
       >
         {copied ? "✓ ¡Enlace copiado!" : "Copiar enlace de invitación"}
       </button>
-      <p style={{ color: "var(--text-secondary)", fontSize: "0.72rem", textAlign: "center", marginTop: "0.5rem" }}>
-        Comparte este enlace con tus amigos para que se registren
-      </p>
     </div>
   );
 }
