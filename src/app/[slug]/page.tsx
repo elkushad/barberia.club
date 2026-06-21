@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import LandingForm from "./LandingForm";
 import CarouselBackground from "./CarouselBackground";
 
@@ -85,6 +86,32 @@ export default async function PublicLandingPage({
         </div>
       </div>
       
+      {/* Acceso discreto: Descubrir barberías (esquina inferior derecha) */}
+      <Link
+        href="/descubrir"
+        style={{
+          position: 'absolute',
+          bottom: '0.6rem',
+          right: '0.7rem',
+          zIndex: 20,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+          fontSize: '0.72rem',
+          color: 'var(--text-secondary)',
+          textDecoration: 'none',
+          padding: '0.35rem 0.6rem',
+          borderRadius: '9999px',
+          border: '1px solid rgba(255,255,255,0.12)',
+          backgroundColor: 'rgba(5,5,5,0.55)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        🌐 Descubrir barberías
+      </Link>
+
       {/* Footer */}
       <footer style={{ padding: '0.25rem 0.5rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.7rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
         <span>Powered by</span>
