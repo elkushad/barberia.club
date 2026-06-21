@@ -143,10 +143,10 @@ export default function PublicFlyerCard({ template }: { template: FlyerTemplate 
               containerType: "inline-size",
             }}
           >
-            <span style={{ color: "#444", fontSize: "2.7cqw", fontWeight: 500 }}>
-              O ingresa a la página de esta barbería:
+            <span style={{ color: "#444", fontSize: "3.4cqw", fontWeight: 500 }}>
+              O ingresa a:
             </span>
-            <span style={{ color: "#000", fontSize: "3cqw", fontWeight: 700 }}>
+            <span style={{ color: "#000", fontSize: "4cqw", fontWeight: 700 }}>
               barberia.club/tu-barbería
             </span>
           </div>

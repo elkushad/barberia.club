@@ -14,7 +14,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-const CAPTION_LABEL = "O ingresa a la página de esta barbería:";
+const CAPTION_LABEL = "O ingresa a:";
 
 export default function FlyerWithQR({
   qrDataUrl,
@@ -143,8 +143,8 @@ export default function FlyerWithQR({
               containerType: "inline-size",
             }}
           >
-            <span style={{ color: "#444", fontSize: "2.7cqw", fontWeight: 500 }}>{CAPTION_LABEL}</span>
-            <span style={{ color: "#000", fontSize: "3cqw", fontWeight: 700 }}>{landingDisplay}</span>
+            <span style={{ color: "#444", fontSize: "3.4cqw", fontWeight: 500 }}>{CAPTION_LABEL}</span>
+            <span style={{ color: "#000", fontSize: "4cqw", fontWeight: 700 }}>{landingDisplay}</span>
           </div>
         )}
       </div>
