@@ -20,6 +20,7 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
   // Valoración de la visita recién registrada (estrellas).
   const [ratingVisitId, setRatingVisitId] = useState<string | null>(null);
   const [hoverStar, setHoverStar] = useState(0);
+  const [selectedStar, setSelectedStar] = useState(0);
   const [rated, setRated] = useState(false);
   const router = useRouter();
 
@@ -137,8 +138,10 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
   };
 
   const submitRating = async (value: number) => {
-    if (!ratingVisitId || rated) return;
-    setRated(true); // optimista: ocultamos las estrellas de inmediato
+    if (!ratingVisitId || rated || selectedStar) return;
+    // Mostramos las estrellas marcadas 1s antes de ocultarlas.
+    setSelectedStar(value);
+    setTimeout(() => setRated(true), 1000);
     try {
       await fetch(`/api/customer/visit/rating`, {
         method: 'POST',
@@ -299,28 +302,32 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
             <div style={{ marginTop: '1.25rem' }}>
               <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>¿Cómo fue tu experiencia?</p>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '0.35rem' }}>
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => submitRating(star)}
-                    onMouseEnter={() => setHoverStar(star)}
-                    onMouseLeave={() => setHoverStar(0)}
-                    aria-label={`${star} estrella${star > 1 ? 's' : ''}`}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      padding: '2px',
-                      cursor: 'pointer',
-                      fontSize: '2rem',
-                      lineHeight: 1,
-                      color: star <= hoverStar ? '#f5c518' : 'rgba(255,255,255,0.25)',
-                      transition: 'color 0.15s ease, transform 0.1s ease',
-                    }}
-                  >
-                    {star <= hoverStar ? '★' : '☆'}
-                  </button>
-                ))}
+                {[1, 2, 3, 4, 5].map((star) => {
+                  const active = selectedStar || hoverStar;
+                  const filled = star <= active;
+                  return (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => submitRating(star)}
+                      onMouseEnter={() => !selectedStar && setHoverStar(star)}
+                      onMouseLeave={() => !selectedStar && setHoverStar(0)}
+                      aria-label={`${star} estrella${star > 1 ? 's' : ''}`}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        padding: '2px',
+                        cursor: selectedStar ? 'default' : 'pointer',
+                        fontSize: '2rem',
+                        lineHeight: 1,
+                        color: filled ? '#f5c518' : 'rgba(255,255,255,0.25)',
+                        transition: 'color 0.15s ease, transform 0.1s ease',
+                      }}
+                    >
+                      {filled ? '★' : '☆'}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
