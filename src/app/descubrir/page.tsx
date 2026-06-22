@@ -27,9 +27,9 @@ function parseMedia(banner: string | null): string[] {
 export default async function DescubrirPage({
   searchParams,
 }: {
-  searchParams: Promise<{ from?: string }>;
+  searchParams: Promise<{ from?: string; back?: string }>;
 }) {
-  const { from } = await searchParams;
+  const { from, back } = await searchParams;
 
   // Estructura pensada para crecer (búsqueda, orden por distancia/recompensas).
   // Por ahora: todas las barberías activas con sus recompensas (hitos).
@@ -63,6 +63,10 @@ export default async function DescubrirPage({
   // el país de cada barbería, se derivará desde la de origen (fromShop).
   const country = "Perú";
 
+  // Destino de "Regresar": ruta interna explícita (?back=) > landing de origen > home.
+  const isInternalPath = !!back && back.startsWith("/") && !back.startsWith("//");
+  const backHref = isInternalPath ? back! : fromShop ? `/${fromShop.slug}` : "/";
+
   return (
     <div
       style={{
@@ -74,7 +78,7 @@ export default async function DescubrirPage({
           "radial-gradient(circle at 50% 0%, rgba(20,20,20,1) 0%, rgba(5,5,5,1) 100%)",
       }}
     >
-      <DiscoverHeader fromSlug={fromShop?.slug ?? null} defaultCountry={country} />
+      <DiscoverHeader backHref={backHref} defaultCountry={country} />
 
       {/* Listado de cards */}
       <main

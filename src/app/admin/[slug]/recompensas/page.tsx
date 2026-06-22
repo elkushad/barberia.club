@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { assertBarbershopAccessBySlug, assertRewardAccess } from "@/lib/guards";
 import Image from "next/image";
@@ -8,6 +7,7 @@ import styles from "../../admin.module.css";
 import { hasProAccess } from "@/lib/plans";
 import ProLock from "@/components/ProLock";
 import ClientReferralSection from "./ClientReferralSection";
+import RewardsVisibilityTip from "./RewardsVisibilityTip";
 
 export default async function RecompensasPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -102,38 +102,7 @@ export default async function RecompensasPage({ params }: { params: Promise<{ sl
     <div>
       <h2 style={{ marginBottom: '1rem' }}>Sistema de Recompensas</h2>
 
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-end',
-          gap: '0.75rem',
-          marginBottom: '1.5rem',
-          padding: '0.6rem 0.9rem',
-          borderRadius: '10px',
-          border: '1px solid rgba(212, 175, 55, 0.35)',
-          backgroundColor: 'rgba(212, 175, 55, 0.08)',
-          color: 'var(--accent-primary)',
-          fontSize: '0.8rem',
-          lineHeight: 1.35,
-        }}
-      >
-        <span style={{ flex: 1 }}>
-          💡 Tus recompensas son visibles para otros clientes. Considera ofrecer beneficios atractivos
-        </span>
-        <Link
-          href="/descubrir"
-          style={{
-            flexShrink: 0,
-            fontSize: '0.62rem',
-            color: 'var(--accent-primary)',
-            textDecoration: 'underline',
-            textUnderlineOffset: '2px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Ver barberías
-        </Link>
-      </div>
+      <RewardsVisibilityTip discoverHref={`/descubrir?back=${encodeURIComponent(`/admin/${slug}/recompensas`)}`} />
 
       <div className={styles.recompensasGrid}>
         

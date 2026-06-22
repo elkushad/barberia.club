@@ -5,10 +5,10 @@ import Link from "next/link";
 import { COUNTRIES, countryByName, flagEmoji } from "./countries";
 
 export default function DiscoverHeader({
-  fromSlug,
+  backHref,
   defaultCountry,
 }: {
-  fromSlug: string | null;
+  backHref: string;
   defaultCountry: string;
 }) {
   const initialCountry = countryByName(defaultCountry) ? defaultCountry : "Perú";
@@ -21,8 +21,6 @@ export default function DiscoverHeader({
   const selectedItemRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
-
-  const backHref = fromSlug ? `/${fromSlug}` : "/";
 
   useEffect(() => {
     if (searchOpen) inputRef.current?.focus();
