@@ -14,7 +14,15 @@ type Shop = {
   rewards: Reward[];
 };
 
-export default function BarbershopCard({ shop, media }: { shop: Shop; media: string[] }) {
+export default function BarbershopCard({
+  shop,
+  media,
+  rating,
+}: {
+  shop: Shop;
+  media: string[];
+  rating?: { avg: number; count: number } | null;
+}) {
   const accent = shop.brandColor && shop.brandColor !== "#000000" ? shop.brandColor : "var(--accent-primary)";
   const rewards = shop.rewards;
   // Posición horizontal del centro del primer/último hito (cells de ancho igual).
@@ -120,6 +128,29 @@ export default function BarbershopCard({ shop, media }: { shop: Shop; media: str
           </h2>
           {shop.address && <AddressMapLink address={shop.address} />}
         </div>
+
+        {/* Valoración promedio (esquina superior) */}
+        {rating && rating.count > 0 && (
+          <span
+            title={`${rating.count} valoracion${rating.count !== 1 ? "es" : ""}`}
+            style={{
+              flexShrink: 0,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "2px",
+              fontSize: "0.8rem",
+              fontWeight: 700,
+              color: "#f5c518",
+              backgroundColor: "rgba(0,0,0,0.35)",
+              border: "1px solid rgba(245,197,24,0.4)",
+              borderRadius: "9999px",
+              padding: "2px 8px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            ⭐ {rating.avg.toFixed(1)}
+          </span>
+        )}
       </div>
 
       {/* Mapa de recompensas (hitos) */}

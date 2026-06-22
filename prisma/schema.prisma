@@ -140,6 +140,7 @@ model Visit {
   serviceId    String?
   service      Service?   @relation(fields: [serviceId], references: [id])
   servicePrice Float?     // precio del servicio al momento de la visita (snapshot)
+  rating       Int?       // valoración del cliente (1-5); se publica al confirmar la visita
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }

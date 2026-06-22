@@ -17,6 +17,10 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
   const [apptError, setApptError] = useState("");
   const [apptLoading, setApptLoading] = useState(false);
   const [today] = useState(() => new Date().toISOString().split("T")[0]);
+  // Valoración de la visita recién registrada (estrellas).
+  const [ratingVisitId, setRatingVisitId] = useState<string | null>(null);
+  const [hoverStar, setHoverStar] = useState(0);
+  const [rated, setRated] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -114,17 +118,36 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
   const registerVisit = async () => {
     setLoading(true);
     try {
-      await fetch(`/api/customer/visit`, {
+      const res = await fetch(`/api/customer/visit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ customerId: customerData.id })
       });
-      setMessage("¡Visita registrada! Esperando confirmación del dueño.");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Error al registrar la visita");
+      setMessage("¡Visita registrada! Esperando confirmación de la barbería.");
+      setRatingVisitId(data.visitId ?? null);
+      setRated(false);
+      setHoverStar(0);
       setStep(4);
     } catch (err) {
-      setError("Error al registrar la visita");
+      setError(err instanceof Error ? err.message : "Error al registrar la visita");
     }
     setLoading(false);
+  };
+
+  const submitRating = async (value: number) => {
+    if (!ratingVisitId || rated) return;
+    setRated(true); // optimista: ocultamos las estrellas de inmediato
+    try {
+      await fetch(`/api/customer/visit/rating`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visitId: ratingVisitId, rating: value })
+      });
+    } catch {
+      // si falla, igual mostramos el agradecimiento (no bloqueamos al cliente)
+    }
   };
 
   const formatDate = (d: string) => {
@@ -270,7 +293,44 @@ export default function LandingForm({ barbershopId, brandColor, barbershopName, 
           <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>✅</div>
           <h3 style={{ marginBottom: '0.5rem', fontSize: '1.2rem' }}>¡Listo!</h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{message}</p>
-          
+
+          {/* Valoración de la visita (solo tras registrar una visita) */}
+          {ratingVisitId && !rated && (
+            <div style={{ marginTop: '1.25rem' }}>
+              <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>¿Cómo fue tu experiencia?</p>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '0.35rem' }}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => submitRating(star)}
+                    onMouseEnter={() => setHoverStar(star)}
+                    onMouseLeave={() => setHoverStar(0)}
+                    aria-label={`${star} estrella${star > 1 ? 's' : ''}`}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: '2px',
+                      cursor: 'pointer',
+                      fontSize: '2rem',
+                      lineHeight: 1,
+                      color: star <= hoverStar ? '#f5c518' : 'rgba(255,255,255,0.25)',
+                      transition: 'color 0.15s ease, transform 0.1s ease',
+                    }}
+                  >
+                    {star <= hoverStar ? '★' : '☆'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {ratingVisitId && rated && (
+            <p style={{ marginTop: '1.25rem', fontSize: '0.85rem', color: 'var(--accent-success)' }}>
+              ¡Gracias! Tu valoración se publicará una vez que la barbería confirme tu visita.
+            </p>
+          )}
+
           {customerData && customerData.status === 'ACTIVE' && (
             <>
               <button 

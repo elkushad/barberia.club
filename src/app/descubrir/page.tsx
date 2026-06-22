@@ -51,6 +51,23 @@ export default async function DescubrirPage({
     },
   });
 
+  // Valoración promedio por barbería: solo visitas confirmadas y valoradas.
+  const ratingRows = await prisma.$queryRaw<
+    Array<{ barbershopId: string; avg: number; count: number | bigint }>
+  >`
+    SELECT c."barbershopId" AS "barbershopId",
+           AVG(v.rating)::float AS "avg",
+           COUNT(v.rating)      AS "count"
+    FROM "Visit" v
+    JOIN "Customer" c ON c.id = v."customerId"
+    WHERE v.status = 'CONFIRMED' AND v.rating IS NOT NULL
+    GROUP BY c."barbershopId"
+  `;
+  const ratingByShop = new Map<string, { avg: number; count: number }>();
+  for (const r of ratingRows) {
+    ratingByShop.set(r.barbershopId, { avg: Number(r.avg), count: Number(r.count) });
+  }
+
   // Barbería desde la que entró el usuario (para "Regresar" y la ubicación por defecto).
   const fromShop = from
     ? await prisma.barbershop.findUnique({
@@ -97,7 +114,12 @@ export default async function DescubrirPage({
           </p>
         ) : (
           barbershops.map((shop) => (
-            <BarbershopCard key={shop.id} shop={shop} media={parseMedia(shop.banner)} />
+            <BarbershopCard
+              key={shop.id}
+              shop={shop}
+              media={parseMedia(shop.banner)}
+              rating={ratingByShop.get(shop.id) ?? null}
+            />
           ))
         )}
       </main>

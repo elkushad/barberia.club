@@ -49,7 +49,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Ya tienes una visita pendiente de confirmar hoy" }, { status: 400 });
     }
 
-    await prisma.visit.create({
+    const visit = await prisma.visit.create({
       data: {
         customerId,
         status: "PENDING",
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
       }
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, visitId: visit.id });
   } catch {
     return NextResponse.json({ error: "Error en el servidor" }, { status: 500 });
   }
