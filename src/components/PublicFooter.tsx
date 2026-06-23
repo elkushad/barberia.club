@@ -35,8 +35,9 @@ export default function PublicFooter() {
           <div>
             <h4 style={{ color: 'white', marginBottom: '1rem', fontWeight: 500 }}>Legal</h4>
             <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <li><Link href="#" style={{ fontSize: '0.9rem' }}>Términos de servicio</Link></li>
-              <li><Link href="#" style={{ fontSize: '0.9rem' }}>Política de privacidad</Link></li>
+              <li><Link href="/terminos" style={{ fontSize: '0.9rem' }}>Términos de servicio</Link></li>
+              <li><Link href="/privacidad" style={{ fontSize: '0.9rem' }}>Política de privacidad</Link></li>
+              <li><Link href="/eliminar-cuenta" style={{ fontSize: '0.9rem' }}>Eliminar cuenta</Link></li>
             </ul>
           </div>
           
