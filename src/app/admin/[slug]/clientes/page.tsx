@@ -1,11 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { assertCustomerAccess, generateUniqueCode } from "@/lib/guards";
+import { assertCustomerAccess, assertBarbershopAccessBySlug, generateUniqueCode } from "@/lib/guards";
 import { hasProAccess } from "@/lib/plans";
-import { processCustomerApprovalReferral } from "@/lib/client-referrals";
+import { processCustomerApprovalReferral, processFirstVisitReferral } from "@/lib/client-referrals";
+import { welcomeMessage, visitMessage, waLink } from "@/lib/loyalty";
 import ProLock from "@/components/ProLock";
 import ReferralProgressBar from "@/components/ReferralProgressBar";
 import PendingApproveButton from "./PendingApproveButton";
+import ClientActions from "./ClientActions";
 import styles from "../../admin.module.css";
 import FilterDropdown from "./FilterDropdown";
 import SearchInput from "./SearchInput";
@@ -128,6 +130,94 @@ export default async function ClientesPage({
     revalidatePath(`/admin/${slug}/clientes`);
   }
 
+  // Alta directa por el barbero (sin pasar por el QR ni aprobación): nace ACTIVE
+  // con su código y su primera visita CONFIRMED (igual que el flujo de aprobación).
+  async function addCustomerAction(name: string, phone: string) {
+    "use server";
+    const shopGuard = await assertBarbershopAccessBySlug(slug);
+    const cleanName = name.trim();
+    const cleanPhone = phone.trim();
+    if (!cleanName || !cleanPhone) return { ok: false as const, error: "Completa nombre y teléfono." };
+
+    // Límite del plan Free (defensa en servidor, no solo en la UI).
+    if (!hasProAccess(shopGuard)) {
+      const activeCount = await prisma.customer.count({
+        where: { barbershopId: shopGuard.id, status: "ACTIVE" },
+      });
+      if (activeCount >= FREE_CUSTOMER_LIMIT) {
+        return { ok: false as const, error: `Límite del plan Free (${FREE_CUSTOMER_LIMIT} clientes). Actualiza a PRO.` };
+      }
+    }
+
+    const existing = await prisma.customer.findFirst({
+      where: { phone: cleanPhone, barbershopId: shopGuard.id },
+    });
+    if (existing) return { ok: false as const, error: "Ya existe un cliente con ese teléfono." };
+
+    let uniqueCode = generateUniqueCode();
+    while (await prisma.customer.findUnique({ where: { uniqueCode } })) {
+      uniqueCode = generateUniqueCode();
+    }
+
+    const customer = await prisma.customer.create({
+      data: { name: cleanName, phone: cleanPhone, barbershopId: shopGuard.id, status: "ACTIVE", uniqueCode },
+    });
+    // Primera visita CONFIRMED + posible referral aprobado (mismo flujo que la aprobación).
+    await prisma.visit.create({ data: { customerId: customer.id, status: "CONFIRMED" } });
+    await processCustomerApprovalReferral(customer.id);
+
+    revalidatePath(`/admin/${slug}/clientes`);
+
+    const welcome = welcomeMessage(cleanName, shopGuard.name, uniqueCode);
+    return {
+      ok: true as const,
+      name: cleanName,
+      link: `${process.env.NEXT_PUBLIC_APP_URL || "https://barberia.club"}/c/${uniqueCode}`,
+      welcomeWaLink: waLink(cleanPhone, welcome),
+    };
+  }
+
+  // Registro de visita directo por el barbero: crea una visita CONFIRMED (con
+  // snapshot del servicio principal, igual que /api/customer/visit) y prepara el
+  // mensaje de WhatsApp según los cortes que falten.
+  async function registerVisitAction(customerId: string) {
+    "use server";
+    const customer = await assertCustomerAccess(customerId);
+
+    const primary = await prisma.service.findFirst({
+      where: { barbershopId: customer.barbershopId, isPrimary: true },
+      select: { id: true, price: true },
+    });
+
+    await prisma.visit.create({
+      data: {
+        customerId,
+        status: "CONFIRMED",
+        serviceId: primary?.id ?? null,
+        servicePrice: primary?.price ?? null,
+      },
+    });
+    await processFirstVisitReferral(customerId);
+
+    const totalVisits = await prisma.visit.count({ where: { customerId, status: "CONFIRMED" } });
+
+    revalidatePath(`/admin/${slug}/clientes`);
+
+    const message = visitMessage({
+      name: customer.name,
+      uniqueCode: customer.uniqueCode,
+      totalVisits,
+      rewards: shop.rewards,
+    });
+    return {
+      ok: true as const,
+      name: customer.name,
+      totalVisits,
+      message,
+      waLink: waLink(customer.phone, message),
+    };
+  }
+
   const maxVisits = shop.rewards.length > 0
     ? shop.rewards[shop.rewards.length - 1].visitsRequired
     : 10;
@@ -227,6 +317,21 @@ export default async function ClientesPage({
   return (
     <div>
       <h2 style={{ marginBottom: "1.5rem" }}>Gestión de Clientes</h2>
+
+      {/* ── Acciones principales: registrar visita / agregar cliente ── */}
+      <ClientActions
+        isPro={isPro}
+        freeLimit={FREE_CUSTOMER_LIMIT}
+        customers={visibleCustomers.map((c) => ({
+          id: c.id,
+          name: c.name,
+          phone: c.phone,
+          uniqueCode: c.uniqueCode,
+          totalVisits: c._count.visits,
+        }))}
+        addCustomerAction={addCustomerAction}
+        registerVisitAction={registerVisitAction}
+      />
 
       {/* ── Solicitudes pendientes ── */}
       {pendingCustomers.length > 0 && (
