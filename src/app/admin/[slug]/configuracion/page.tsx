@@ -262,6 +262,15 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
         </button>
       </form>
 
+      {/* Eliminación de cuenta (requisito de Google Play). Enlace discreto que
+          lleva a la página pública con el proceso. */}
+      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+        ¿Quieres irte?{' '}
+        <a href="/eliminar-cuenta" style={{ color: 'var(--text-secondary)', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+          Eliminar mi cuenta y mis datos
+        </a>
+      </p>
+
     </div>
   );
 }

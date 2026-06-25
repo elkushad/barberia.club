@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import CookiePrefsLink from './CookiePrefsLink';
 
 export default function PublicFooter() {
   const currentYear = new Date().getFullYear();
@@ -38,6 +39,7 @@ export default function PublicFooter() {
               <li><Link href="/terminos" style={{ fontSize: '0.9rem' }}>Términos de servicio</Link></li>
               <li><Link href="/privacidad" style={{ fontSize: '0.9rem' }}>Política de privacidad</Link></li>
               <li><Link href="/eliminar-cuenta" style={{ fontSize: '0.9rem' }}>Eliminar cuenta</Link></li>
+              <li><CookiePrefsLink style={{ fontSize: '0.9rem' }} /></li>
             </ul>
           </div>
           

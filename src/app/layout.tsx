@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
-import { GoogleAnalytics } from "@next/third-parties/google";
-import MetaPixel from "@/components/MetaPixel";
-import TikTokPixel from "@/components/TikTokPixel";
+import CookieConsent from "@/components/CookieConsent";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -60,9 +58,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
-        {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
-        {metaPixelId ? <MetaPixel pixelId={metaPixelId} /> : null}
-        {tiktokPixelId ? <TikTokPixel pixelId={tiktokPixelId} /> : null}
+        <CookieConsent gaId={gaId} metaPixelId={metaPixelId} tiktokPixelId={tiktokPixelId} />
       </body>
     </html>
   );
