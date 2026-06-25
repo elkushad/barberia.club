@@ -10,7 +10,9 @@
 ## PARTE 1 — Eliminación de cuenta
 
 ### 1.1 Requisito de Google Play
-Toda app con creación de cuenta debe ofrecer: (a) eliminar la cuenta **desde dentro de la app**, y (b) una **URL pública** para solicitarlo sin instalar la app. Hoy **no existe** ninguna de las dos (solo el super-admin puede borrar barberías desde godmode).
+Toda app con creación de cuenta debe ofrecer: (a) eliminar la cuenta **desde dentro de la app**, y (b) una **URL pública** para solicitarlo sin instalar la app.
+
+> **Estado:** ambas vías ya existen — la URL pública `/eliminar-cuenta` y el enlace dentro de Configuración. La solicitud se tramita por correo/WhatsApp/login. Lo que falta (opcional) es el borrado *self-service automático* descrito en 1.5; el borrado completo en cascada sigue disponible solo desde godmode.
 
 ### 1.2 Lo que ya existe (reutilizable)
 La cascada de borrado ya implementada en `src/app/godmode/barberias/page.tsx:105-123` elimina, en orden: `referral` → `visit` → `redemption` → `appointment` → `customer` → `service` → `reward` → `creditMovement` → `payment` → `barbershop`. **Falta** borrar también `clientReferral` / `clientReferralReward` y el registro `User` del dueño.
@@ -100,25 +102,32 @@ Banner de cookies (abajo, no bloqueante)
 3. **Enlace "Cookies"** en `PublicFooter.tsx` para reabrir la elección.
 
 ### 2.5 Notas de implementación (coherentes con el sistema)
-- No se requiere backend: el consentimiento vive en el dispositivo (igual que el resto del estado de cliente).
-- Los IDs de los pixeles hoy están **hardcodeados** como fallback en `layout.tsx`. Aprovechar este cambio para moverlos a variables de entorno y no embeberlos.
-- Mantener el idioma y estilo existentes (es-PE, mismo sistema de variables CSS).
+- ✅ **Implementado** en `CookieConsent.tsx` (gatea GA/Meta/TikTok) + `layout.tsx` + enlace "Cookies" en el footer (`CookiePrefsLink.tsx`). El consentimiento vive en `localStorage` (`barberia_cookie_consent`), sin backend.
+- ⬜ **Pendiente menor:** los IDs de los pixeles siguen **hardcodeados** como fallback en `layout.tsx`; conviene moverlos solo a variables de entorno y no embeberlos.
+- ⚠️ Si el usuario acepta y luego rechaza, los scripts ya inyectados (`fbq`/`ttq`/GA) dejan de re-montarse pero se retiran del todo recién al recargar la página.
+- Mantiene el idioma y estilo existentes (es-PE, mismo sistema de variables CSS).
 
 ---
 
 ## PARTE 3 — Checklist de cierre para publicar en Play
 
+Estado a la fecha (✅ hecho · 🟡 parcial · ⬜ pendiente):
+
 | # | Acción | Archivo / ruta | Estado |
 |---|--------|----------------|--------|
-| 1 | Página pública `/privacidad` con la Política de Privacidad | nueva ruta | ⬜ |
-| 2 | Página pública `/terminos` con los Términos | nueva ruta | ⬜ |
-| 3 | Página pública `/eliminar-cuenta` | nueva ruta | ⬜ |
-| 4 | Botón "Eliminar mi cuenta" in-app + server action | `admin/[slug]/configuracion` | ⬜ |
+| 1 | Página pública `/privacidad` con la Política de Privacidad | `src/app/privacidad/page.tsx` | ✅ |
+| 2 | Página pública `/terminos` con los Términos | `src/app/terminos/page.tsx` | ✅ |
+| 3 | Página pública `/eliminar-cuenta` | `src/app/eliminar-cuenta/page.tsx` | ✅ |
+| 4 | Acceso a eliminar cuenta in-app | `admin/[slug]/configuracion` | 🟡 enlace discreto a `/eliminar-cuenta` (no botón con borrado automático) |
 | 5 | Extender cascada de borrado (clientReferral, clientReferralReward, User) en transacción | nueva action / reutiliza godmode | ⬜ |
-| 6 | Banner de consentimiento que gatea GA/Meta/TikTok | `CookieConsent.tsx` + `layout.tsx` | ⬜ |
-| 7 | Footer: enlaces legales reales (no `#`) + "Cookies" | `PublicFooter.tsx` | ⬜ |
-| 8 | Completar ficha Data Safety con el documento correspondiente | Play Console | ⬜ |
+| 6 | Banner de consentimiento que gatea GA/Meta/TikTok | `CookieConsent.tsx` + `layout.tsx` | ✅ |
+| 7 | Footer: enlaces legales reales (no `#`) + "Cookies" | `PublicFooter.tsx` + `CookiePrefsLink.tsx` | ✅ |
+| 8 | Completar ficha Data Safety con el documento correspondiente | Play Console | ⬜ (documento listo en `GOOGLE-PLAY-DATA-SAFETY.md`) |
 | 9 | Resolver pago de suscripción vs. Google Play Billing | decisión de producto | ⬜ |
 | 10 | Empaquetado Android (TWA/Bubblewrap) + assetlinks.json | nuevo | ⬜ |
 
+> Datos del responsable (Luis Gonzalo Oyola Tapia · RUC 10609761780 · Prolongación Lucanas 367, La Victoria, Lima) y correo de contacto (barberia.club777@gmail.com) ya incrustados en las páginas legales.
+>
+> **Pendiente para borrado real (#4/#5):** hoy la eliminación se tramita por correo/WhatsApp/login desde `/eliminar-cuenta`; satisface el requisito de Google de tener acceso in-app + URL pública. Falta, si se quiere borrado self-service automático, una server action que ejecute la cascada en transacción incluyendo `ClientReferral`, `ClientReferralReward` y el `User` dueño.
+>
 > Los puntos 9 y 10 exceden los flujos de este documento pero son condición para publicar (ver informe técnico §5 y §13).
