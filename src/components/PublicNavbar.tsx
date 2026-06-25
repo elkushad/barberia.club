@@ -26,7 +26,7 @@ export default function PublicNavbar() {
           <Link href="/planes" className="text-secondary" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
             Precios
           </Link>
-          <a href="mailto:contacto@barberia.club" className="text-secondary" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
+          <a href="mailto:barberia.club777@gmail.com" className="text-secondary" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
             Soporte
           </a>
         </div>

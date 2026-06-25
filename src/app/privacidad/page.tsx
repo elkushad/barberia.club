@@ -9,15 +9,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-// Marca un dato que el titular debe completar antes de publicar (razón social, etc.).
-function Todo({ children }: { children: React.ReactNode }) {
-  return (
-    <span style={{ background: "rgba(212,175,55,0.18)", color: "#f1c40f", padding: "0 4px", borderRadius: "3px" }}>
-      [{children}]
-    </span>
-  );
-}
-
 export default function PrivacidadPage() {
   return (
     <LegalLayout title="Política de Privacidad" lastUpdated="22 de junio de 2026">
@@ -27,9 +18,9 @@ export default function PrivacidadPage() {
         clientes, visitas, citas, recompensas y un programa de referidos.
       </p>
       <ul>
-        <li><strong>Responsable del tratamiento:</strong> <Todo>COMPLETAR: razón social</Todo>, con RUC <Todo>COMPLETAR</Todo> y domicilio en <Todo>COMPLETAR</Todo>, Perú.</li>
+        <li><strong>Responsable del tratamiento:</strong> Luis Gonzalo Oyola Tapia, con RUC 10609761780 y domicilio en Prolongación Lucanas 367, La Victoria, Lima, Perú.</li>
         <li><strong>Sitio web:</strong> https://barberia.club</li>
-        <li><strong>Correo de contacto:</strong> <a href="mailto:contacto@barberia.club">contacto@barberia.club</a></li>
+        <li><strong>Correo de contacto:</strong> <a href="mailto:barberia.club777@gmail.com">barberia.club777@gmail.com</a></li>
         <li><strong>WhatsApp de soporte:</strong> +51 997 237 775</li>
       </ul>
       <p>
@@ -54,7 +45,7 @@ export default function PrivacidadPage() {
       </ol>
       <p>
         Si eres cliente final y quieres ejercer tus derechos, puedes dirigirte a la barbería donde te
-        registraste o escribirnos a <a href="mailto:contacto@barberia.club">contacto@barberia.club</a> y lo canalizaremos.
+        registraste o escribirnos a <a href="mailto:barberia.club777@gmail.com">barberia.club777@gmail.com</a> y lo canalizaremos.
       </p>
 
       <h2>3. Qué datos recopilamos</h2>
@@ -167,7 +158,7 @@ export default function PrivacidadPage() {
       <p>
         Como titular de datos, tienes derecho a <strong>acceder, rectificar, actualizar, oponerte, cancelar (suprimir)</strong>
         tus datos y, cuando corresponda, a la <strong>portabilidad</strong>, conforme a la Ley N.º 29733. Para ejercerlos, escribe
-        a <a href="mailto:contacto@barberia.club">contacto@barberia.club</a>. También puedes presentar reclamaciones ante la
+        a <a href="mailto:barberia.club777@gmail.com">barberia.club777@gmail.com</a>. También puedes presentar reclamaciones ante la
         Autoridad Nacional de Protección de Datos Personales del Perú.
       </p>
 
@@ -175,7 +166,7 @@ export default function PrivacidadPage() {
       <p>
         Puedes eliminar tu cuenta y los datos asociados desde la página{" "}
         <a href="/eliminar-cuenta">barberia.club/eliminar-cuenta</a> o escribiendo a{" "}
-        <a href="mailto:contacto@barberia.club">contacto@barberia.club</a>. El detalle de qué se elimina, los plazos
+        <a href="mailto:barberia.club777@gmail.com">barberia.club777@gmail.com</a>. El detalle de qué se elimina, los plazos
         y las excepciones está en la Política de Eliminación de Cuenta.
       </p>
 
@@ -193,9 +184,9 @@ export default function PrivacidadPage() {
 
       <h2>14. Contacto</h2>
       <ul>
-        <li><strong>Correo:</strong> <a href="mailto:contacto@barberia.club">contacto@barberia.club</a></li>
+        <li><strong>Correo:</strong> <a href="mailto:barberia.club777@gmail.com">barberia.club777@gmail.com</a></li>
         <li><strong>WhatsApp:</strong> +51 997 237 775</li>
-        <li><strong>Responsable:</strong> <Todo>COMPLETAR: razón social, RUC, domicilio</Todo></li>
+        <li><strong>Responsable:</strong> Luis Gonzalo Oyola Tapia · RUC 10609761780 · Prolongación Lucanas 367, La Victoria, Lima, Perú.</li>
       </ul>
     </LegalLayout>
   );

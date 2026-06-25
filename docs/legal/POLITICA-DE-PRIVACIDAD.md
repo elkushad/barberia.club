@@ -3,17 +3,15 @@
 **Última actualización:** 22 de junio de 2026
 **Vigencia:** desde la fecha de publicación.
 
-> ⚠️ **Campos que debes completar antes de publicar** (no figuran en el código): razón social del titular, RUC, domicilio fiscal y, si aplica, nombre del encargado de protección de datos. Aparecen marcados como `[COMPLETAR: ...]`.
-
 ---
 
 ## 1. Quiénes somos
 
 barberia.club es una plataforma de fidelización para barberías que permite gestionar clientes, visitas, citas, recompensas y un programa de referidos.
 
-- **Responsable del tratamiento:** `[COMPLETAR: razón social]`, con RUC `[COMPLETAR]` y domicilio en `[COMPLETAR]`, Perú.
+- **Responsable del tratamiento:** Luis Gonzalo Oyola Tapia, con RUC 10609761780 y domicilio en Prolongación Lucanas 367, La Victoria, Lima, Perú.
 - **Sitio web:** https://barberia.club
-- **Correo de contacto:** contacto@barberia.club
+- **Correo de contacto:** barberia.club777@gmail.com
 - **WhatsApp de soporte:** +51 997 237 775
 
 Esta política se rige por la **Ley N.º 29733, Ley de Protección de Datos Personales del Perú**, y su Reglamento (D.S. 003-2013-JUS).
@@ -28,7 +26,7 @@ barberia.club trata datos de dos grupos distintos, con roles distintos:
 
 2. **Clientes finales de cada barbería.** Son las personas que se registran en la página de una barbería (dejando su nombre y número de teléfono) para acumular visitas y recompensas. Estos datos los recopila e introduce **la barbería**, que es la responsable de obtener el consentimiento de sus clientes. Respecto a estos datos, **barberia.club actúa como encargado del tratamiento por cuenta de la barbería**, almacenándolos y procesándolos según las instrucciones de esta.
 
-Si eres cliente final y quieres ejercer tus derechos, puedes dirigirte a la barbería donde te registraste o escribirnos a contacto@barberia.club y lo canalizaremos.
+Si eres cliente final y quieres ejercer tus derechos, puedes dirigirte a la barbería donde te registraste o escribirnos a barberia.club777@gmail.com y lo canalizaremos.
 
 ---
 
@@ -134,7 +132,7 @@ Las suscripciones PRO se cobran a través de **PayPal** o **Mercado Pago**. Los 
 
 Como titular de datos, tienes derecho a **acceder, rectificar, actualizar, oponerte, cancelar (suprimir)** tus datos y, cuando corresponda, a la **portabilidad**, conforme a la Ley N.º 29733.
 
-Para ejercerlos, escribe a **contacto@barberia.club**. Responderemos en los plazos legales. También puedes presentar reclamaciones ante la **Autoridad Nacional de Protección de Datos Personales** del Perú.
+Para ejercerlos, escribe a **barberia.club777@gmail.com**. Responderemos en los plazos legales. También puedes presentar reclamaciones ante la **Autoridad Nacional de Protección de Datos Personales** del Perú.
 
 Para eliminar tu cuenta y tus datos, consulta la **Política de Eliminación de Cuenta** (sección 11).
 
@@ -145,7 +143,7 @@ Para eliminar tu cuenta y tus datos, consulta la **Política de Eliminación de 
 Puedes eliminar tu cuenta y los datos asociados:
 - **Desde la aplicación:** opción "Eliminar mi cuenta" en la configuración de tu barbería.
 - **Desde la web, sin instalar la app:** https://barberia.club/eliminar-cuenta
-- **Por contacto:** escribiendo a contacto@barberia.club o al WhatsApp +51 997 237 775.
+- **Por contacto:** escribiendo a barberia.club777@gmail.com o al WhatsApp +51 997 237 775.
 
 El detalle de qué se elimina, los plazos y las excepciones está en la **Política de Eliminación de Cuenta**.
 
@@ -165,6 +163,6 @@ Podemos actualizar esta política. Publicaremos la versión vigente en esta pág
 
 ## 14. Contacto
 
-- **Correo:** contacto@barberia.club
+- **Correo:** barberia.club777@gmail.com
 - **WhatsApp:** +51 997 237 775
-- **Responsable:** `[COMPLETAR: razón social, RUC, domicilio]`
+- **Responsable:** Luis Gonzalo Oyola Tapia · RUC 10609761780 · Prolongación Lucanas 367, La Victoria, Lima, Perú.

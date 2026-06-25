@@ -18,7 +18,7 @@ const WHATSAPP_LINK = `https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURICompone
 const MAIL_SUBJECT = "Solicitud de eliminación de cuenta";
 const MAIL_BODY =
   "Hola, solicito la eliminación de mi cuenta de barberia.club y los datos asociados.%0A%0ACorreo de registro: %0ANombre de la barbería: ";
-const MAIL_LINK = `mailto:contacto@barberia.club?subject=${encodeURIComponent(MAIL_SUBJECT)}&body=${MAIL_BODY}`;
+const MAIL_LINK = `mailto:barberia.club777@gmail.com?subject=${encodeURIComponent(MAIL_SUBJECT)}&body=${MAIL_BODY}`;
 
 export default function EliminarCuentaPage() {
   return (
@@ -73,7 +73,7 @@ export default function EliminarCuentaPage() {
         </li>
         <li>
           <strong>Por correo:</strong> envía tu solicitud a{" "}
-          <a href="mailto:contacto@barberia.club">contacto@barberia.club</a> desde el correo de tu cuenta,
+          <a href="mailto:barberia.club777@gmail.com">barberia.club777@gmail.com</a> desde el correo de tu cuenta,
           indicando el nombre de tu barbería.
         </li>
         <li>
@@ -129,7 +129,7 @@ export default function EliminarCuentaPage() {
 
       <h2>Contacto</h2>
       <ul>
-        <li><strong>Correo:</strong> <a href="mailto:contacto@barberia.club">contacto@barberia.club</a></li>
+        <li><strong>Correo:</strong> <a href="mailto:barberia.club777@gmail.com">barberia.club777@gmail.com</a></li>
         <li><strong>WhatsApp:</strong> +51 997 237 775</li>
       </ul>
     </LegalLayout>

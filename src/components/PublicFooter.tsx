@@ -27,8 +27,8 @@ export default function PublicFooter() {
           <div>
             <h4 style={{ color: 'white', marginBottom: '1rem', fontWeight: 500 }}>Soporte</h4>
             <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <li><a href="mailto:contacto@barberia.club" style={{ fontSize: '0.9rem' }}>Centro de ayuda</a></li>
-              <li><a href="mailto:contacto@barberia.club" style={{ fontSize: '0.9rem' }}>Contacto</a></li>
+              <li><a href="mailto:barberia.club777@gmail.com" style={{ fontSize: '0.9rem' }}>Centro de ayuda</a></li>
+              <li><a href="mailto:barberia.club777@gmail.com" style={{ fontSize: '0.9rem' }}>Contacto</a></li>
             </ul>
           </div>
           

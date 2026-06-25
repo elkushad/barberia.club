@@ -9,21 +9,14 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-function Todo({ children }: { children: React.ReactNode }) {
-  return (
-    <span style={{ background: "rgba(212,175,55,0.18)", color: "#f1c40f", padding: "0 4px", borderRadius: "3px" }}>
-      [{children}]
-    </span>
-  );
-}
-
 export default function TerminosPage() {
   return (
     <LegalLayout title="Términos y Condiciones" lastUpdated="22 de junio de 2026">
       <h2>1. Aceptación</h2>
       <p>
         Estos Términos y Condiciones (&quot;Términos&quot;) regulan el uso de la plataforma barberia.club
-        (&quot;la Plataforma&quot;), operada por <Todo>COMPLETAR: razón social, RUC, domicilio</Todo>, Perú. Al
+        (&quot;la Plataforma&quot;), operada por Luis Gonzalo Oyola Tapia, con RUC 10609761780 y domicilio en
+        Prolongación Lucanas 367, La Victoria, Lima, Perú. Al
         registrarte o usar la Plataforma aceptas estos Términos y la <a href="/privacidad">Política de Privacidad</a>.
         Si no estás de acuerdo, no uses la Plataforma.
       </p>
@@ -138,7 +131,7 @@ export default function TerminosPage() {
 
       <h2>17. Contacto</h2>
       <ul>
-        <li><strong>Correo:</strong> <a href="mailto:contacto@barberia.club">contacto@barberia.club</a></li>
+        <li><strong>Correo:</strong> <a href="mailto:barberia.club777@gmail.com">barberia.club777@gmail.com</a></li>
         <li><strong>WhatsApp:</strong> +51 997 237 775</li>
       </ul>
     </LegalLayout>

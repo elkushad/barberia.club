@@ -19,7 +19,7 @@ Dispones de tres vías:
 
 1. **Desde la aplicación:** entra a tu panel → Configuración de la barbería → **"Eliminar mi cuenta"**, y confirma.
 2. **Desde la web, sin instalar la app:** visita **https://barberia.club/eliminar-cuenta** y sigue las instrucciones.
-3. **Por contacto directo:** escribe a **contacto@barberia.club** o al WhatsApp **+51 997 237 775** indicando el correo de tu cuenta.
+3. **Por contacto directo:** escribe a **barberia.club777@gmail.com** o al WhatsApp **+51 997 237 775** indicando el correo de tu cuenta.
 
 ---
 
@@ -66,6 +66,6 @@ La eliminación es **permanente e irreversible** una vez completada. Perderás e
 
 ## 7. Contacto
 
-- **Correo:** contacto@barberia.club
+- **Correo:** barberia.club777@gmail.com
 - **WhatsApp:** +51 997 237 775
 - **Página de solicitud:** https://barberia.club/eliminar-cuenta

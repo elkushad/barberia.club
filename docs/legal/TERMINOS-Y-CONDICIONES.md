@@ -2,13 +2,11 @@
 
 **Última actualización:** 22 de junio de 2026
 
-> ⚠️ **Completar antes de publicar:** razón social, RUC y domicilio del titular (`[COMPLETAR]`).
-
 ---
 
 ## 1. Aceptación
 
-Estos Términos y Condiciones ("Términos") regulan el uso de la plataforma barberia.club ("la Plataforma"), operada por `[COMPLETAR: razón social, RUC, domicilio]`, Perú. Al registrarte o usar la Plataforma aceptas estos Términos y la **Política de Privacidad**. Si no estás de acuerdo, no uses la Plataforma.
+Estos Términos y Condiciones ("Términos") regulan el uso de la plataforma barberia.club ("la Plataforma"), operada por Luis Gonzalo Oyola Tapia, con RUC 10609761780 y domicilio en Prolongación Lucanas 367, La Victoria, Lima, Perú. Al registrarte o usar la Plataforma aceptas estos Términos y la **Política de Privacidad**. Si no estás de acuerdo, no uses la Plataforma.
 
 ---
 
@@ -118,5 +116,5 @@ Podemos modificar estos Términos. Publicaremos la versión vigente con su fecha
 
 ## 17. Contacto
 
-- **Correo:** contacto@barberia.club
+- **Correo:** barberia.club777@gmail.com
 - **WhatsApp:** +51 997 237 775
