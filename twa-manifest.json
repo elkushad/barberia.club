@@ -1,0 +1,42 @@
+{
+  "packageId": "club.barberia.app",
+  "host": "barberia.club",
+  "name": "Barbería Club",
+  "launcherName": "Barbería",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#0b0f14",
+  "themeColorDark": "#0b0f14",
+  "navigationColor": "#050505",
+  "navigationColorDark": "#050505",
+  "navigationDividerColor": "#050505",
+  "navigationDividerColorDark": "#050505",
+  "backgroundColor": "#050505",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://barberia.club/icon.png",
+  "maskableIconUrl": "https://barberia.club/icon.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://barberia.club/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://barberia.club/",
+  "minSdkVersion": 21,
+  "playBilling": {
+    "enabled": true
+  }
+}

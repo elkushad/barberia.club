@@ -47,3 +47,9 @@ next-env.d.ts
 *.db
 *.db-journal
 /public/uploads/
+
+# Android / TWA (Bubblewrap): nunca subir keystore ni binarios firmados
+*.keystore
+*.jks
+*.aab
+*.apk
