@@ -81,6 +81,54 @@ https://developers.google.com/digital-asset-links/tools/generator
 
 ---
 
+## Runbook interactivo (respuestas exactas a cada prompt)
+
+Bubblewrap ya está instalado (`@bubblewrap/cli@1.24.1`). Corre esto **en tu propia terminal (PowerShell)**, en una carpeta **fuera del repo** para no mezclar el keystore con el código:
+
+```powershell
+cd C:\Users\Windows\Desktop
+mkdir barberia-twa
+cd barberia-twa
+bubblewrap init --manifest=https://barberia.club/manifest.webmanifest
+```
+
+La **primera vez** te preguntará si descarga el **JDK 17** y el **Android SDK** → responde **Sí** a ambos y acepta las licencias. Luego, respuestas a los prompts:
+
+| Prompt | Respuesta |
+|--------|-----------|
+| Domain | `barberia.club` (ya viene del manifest) |
+| URL path | `/` |
+| Application name | `Barbería Club` |
+| Short name | `Barbería` |
+| Application ID (package) | **`club.barberia.app`** (escríbelo exacto) |
+| Starting version code | `1` |
+| Display mode | `standalone` |
+| Orientation | `portrait` |
+| Status bar / splash colors | Enter (acepta los del tema) |
+| Icon / Maskable icon URL | Enter (usa tu `icon.png` 1024) |
+| Monochrome icon | dejar vacío |
+| **Include support for Play Billing** | **Yes** ✅ |
+| Request geolocation permission | No |
+| Include app shortcuts | No |
+| Key store location | `./android.keystore` (default) |
+| Key alias | `android` (default) |
+| **Contraseña del keystore / de la clave** | **Elige una y GUÁRDALA muy bien** |
+
+Luego genera la app:
+```powershell
+bubblewrap build
+```
+Te pedirá las contraseñas que pusiste. Resultado:
+- **`app-release-bundle.aab`** → esto subes a Play.
+- `app-release-signed.apk` → para probar en un teléfono.
+
+> ⚠️ **Guarda con tu vida:** `android.keystore` + las contraseñas. Sin ellos no podrás publicar actualizaciones. No los subas a ningún repo (ya están en `.gitignore`).
+
+### Sobre la huella SHA-256 (assetlinks)
+- La huella **definitiva** la da **Play Console → App signing** *después* de subir el `.aab` (requiere tu cuenta ya verificada). Esa es la que va en `public/.well-known/assetlinks.json`.
+- La huella de tu keystore local (de `bubblewrap build`) sirve solo si quieres probar el APK firmado localmente. `assetlinks.json` acepta **varias** huellas en el array, así que se pueden tener ambas.
+- Cuando tengas la huella de Play, pásamela y actualizo `assetlinks.json` + despliego.
+
 ## Después de #10 viene #9 (Play Billing)
 Con la TWA publicada y verificada, seguimos con `PLAN-GOOGLE-PLAY-BILLING.md`:
 1. Crear el producto de suscripción en Play Console.
