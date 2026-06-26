@@ -25,7 +25,7 @@ Una TWA es tu sitio web mostrado a pantalla completa, sin barra del navegador, v
 - **Node.js** (ya lo tienes).
 - **JDK 17** y **Android SDK**: Bubblewrap los descarga solo la primera vez (`bubblewrap doctor` te guía). No necesitas Android Studio.
 - Una **cuenta de Google Play Console** (pago único de USD 25).
-- Un **icono PNG cuadrado de al menos 512×512** en `public/icon.png`. ⚠️ **El actual es 489×979 (no cuadrado): Bubblewrap lo rechazará.** Reemplázalo por uno cuadrado ≥512×512 antes del build y, en `src/app/manifest.ts`, vuelve a declarar `sizes: "512x512"`.
+- Un **icono PNG cuadrado de al menos 512×512** en `public/icon.png`. ✅ Resuelto: ahora es PNG 1024×1024 (convertido desde el JPEG que se había subido por error con extensión .png).
 
 ---
 

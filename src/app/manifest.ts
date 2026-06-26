@@ -16,9 +16,9 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#0b0f14",
     lang: "es",
     orientation: "portrait",
-    // NOTA: public/icon.png hoy es 489x979 (no cuadrado). Para la TWA hace falta
-    // un PNG cuadrado de >=512x512; reemplázalo y declara aquí "512x512".
-    // Mientras tanto usamos "any" para no declarar un tamaño falso.
-    icons: [{ src: "/icon.png", sizes: "any", type: "image/png" }],
+    icons: [
+      { src: "/icon.png", sizes: "1024x1024", type: "image/png", purpose: "any" },
+      { src: "/icon.png", sizes: "1024x1024", type: "image/png", purpose: "maskable" },
+    ],
   };
 }
