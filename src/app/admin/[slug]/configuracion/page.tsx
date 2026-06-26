@@ -1,10 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { assertBarbershopAccessBySlug } from "@/lib/guards";
+import { getSession } from "@/lib/auth";
 import Image from "next/image";
 import ImageUploadPreview from "@/components/ImageUploadPreview";
 import BannerUpload from "@/components/BannerUpload";
 import WhatsappInput from "@/components/WhatsappInput";
+import DeleteAccountSection from "./DeleteAccountSection";
 import { hasProAccess } from "@/lib/plans";
 
 function isVideoUrl(u: string) {
@@ -20,6 +22,12 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
   if (!barbershop) return null;
 
   const isPro = hasProAccess(barbershop);
+
+  // La zona de eliminación solo se muestra al dueño real (no a un ADMIN que
+  // esté viendo la barbería de otro), y la action borra solo su propia cuenta.
+  const session = await getSession();
+  const sessionUserId = (session?.user as { id?: string })?.id;
+  const isOwner = !!sessionUserId && sessionUserId === barbershop.ownerId;
 
   // Parse existing banners as array
   let existingBanners: string[] = [];
@@ -117,9 +125,60 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
       where: { id: currentBarbershop.id },
       data: { banner: JSON.stringify(filteredBanners) }
     });
-    
+
     revalidatePath(`/admin/${slug}/configuracion`);
     revalidatePath(`/${slug}`);
+  }
+
+  // Eliminación self-service de la cuenta: borra en una transacción TODOS los
+  // datos de las barberías del dueño y, al final, el propio usuario. Solo afecta
+  // a la cuenta de la sesión actual (el id sale de la sesión, nunca del cliente).
+  async function deleteAccount() {
+    "use server";
+    const me = await getSession();
+    const userId = (me?.user as { id?: string })?.id;
+    if (!userId) return { ok: false as const, error: "No autorizado." };
+
+    try {
+      await prisma.$transaction(async (tx) => {
+        const shops = await tx.barbershop.findMany({ where: { ownerId: userId }, select: { id: true } });
+        const shopIds = shops.map((s) => s.id);
+
+        if (shopIds.length) {
+          const customers = await tx.customer.findMany({
+            where: { barbershopId: { in: shopIds } },
+            select: { id: true },
+          });
+          const customerIds = customers.map((c) => c.id);
+
+          // Hijos primero (sin onDelete cascade en el esquema → orden manual).
+          await tx.clientReferral.deleteMany({ where: { barbershopId: { in: shopIds } } });
+          await tx.clientReferralReward.deleteMany({ where: { barbershopId: { in: shopIds } } });
+          if (customerIds.length) {
+            await tx.redemption.deleteMany({ where: { customerId: { in: customerIds } } });
+            await tx.visit.deleteMany({ where: { customerId: { in: customerIds } } });
+          }
+          await tx.appointment.deleteMany({ where: { barbershopId: { in: shopIds } } });
+          await tx.referral.deleteMany({
+            where: { OR: [{ referrerId: { in: shopIds } }, { referredId: { in: shopIds } }] },
+          });
+          await tx.creditMovement.deleteMany({ where: { barbershopId: { in: shopIds } } });
+          await tx.payment.deleteMany({ where: { barbershopId: { in: shopIds } } });
+          await tx.auditEvent.deleteMany({ where: { barbershopId: { in: shopIds } } });
+          await tx.customer.deleteMany({ where: { barbershopId: { in: shopIds } } });
+          await tx.service.deleteMany({ where: { barbershopId: { in: shopIds } } });
+          await tx.reward.deleteMany({ where: { barbershopId: { in: shopIds } } });
+          // Barberías externas referidas por las nuestras: liberar la relación.
+          await tx.barbershop.updateMany({ where: { referredById: { in: shopIds } }, data: { referredById: null } });
+          await tx.barbershop.deleteMany({ where: { id: { in: shopIds } } });
+        }
+
+        await tx.user.delete({ where: { id: userId } });
+      });
+      return { ok: true as const };
+    } catch {
+      return { ok: false as const, error: "No se pudo eliminar la cuenta. Intenta de nuevo." };
+    }
   }
 
   return (
@@ -262,14 +321,9 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
         </button>
       </form>
 
-      {/* Eliminación de cuenta (requisito de Google Play). Enlace discreto que
-          lleva a la página pública con el proceso. */}
-      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
-        ¿Quieres irte?{' '}
-        <a href="/eliminar-cuenta" style={{ color: 'var(--text-secondary)', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
-          Eliminar mi cuenta y mis datos
-        </a>
-      </p>
+      {/* Eliminación de cuenta self-service (requisito de Google Play). Solo el
+          dueño real la ve; la action borra únicamente su propia cuenta. */}
+      {isOwner && <DeleteAccountSection deleteAccount={deleteAccount} />}
 
     </div>
   );
