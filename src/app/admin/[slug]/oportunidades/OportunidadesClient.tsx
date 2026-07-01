@@ -70,15 +70,17 @@ export default function OportunidadesClient({
           <span style={{ fontWeight: 600 }}>Seguimiento automático por WhatsApp</span>
         </div>
 
-        <div style={{ marginTop: "0.75rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-          <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.5 }}>
-            barberia.club enviará automáticamente mensajes de seguimiento cuando detecte una
-            oportunidad para que un cliente regrese.
-          </p>
-          <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.5 }}>
-            Si prefieres enviar los mensajes personalmente desde tu WhatsApp, desactiva esta opción.
-          </p>
-        </div>
+        {autoFollow && (
+          <div style={{ marginTop: "0.75rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.5 }}>
+              barberia.club enviará automáticamente mensajes de seguimiento cuando detecte una
+              oportunidad para que un cliente regrese.
+            </p>
+            <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.5 }}>
+              Si prefieres enviar los mensajes personalmente desde tu WhatsApp, desactiva esta opción.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* ── Tabla de oportunidades ── */}
